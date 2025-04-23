@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { activePlanTab, setActivePlanTab } from '$lib/store.js'; // Füge die .js-Erweiterung hinzu
+	import { activePlanTab, setActivePlanTab } from '$lib/store.js';
 	import { browser } from '$app/environment';
 
 	// Daten für die Pläne mit SEO-optimierten Beschreibungen und Keywords
@@ -140,39 +140,56 @@
 		}
 	];
 
-	// SEO-optimierte Überschriften und Beschreibungen
+	// Erweiterte SEO-Texte mit zusätzlichen Keywords
 	const seoTexts = {
 		beginnerTitle: 'Laufpläne für Anfänger - vom 5K bis zum Marathon',
 		advancedTitle: 'Leistungsorientierte Laufpläne für Fortgeschrittene',
 		beginnerDesc:
-			'Wissenschaftlich fundierte Trainingspläne für Einsteiger und Wiedereinsteiger - mit individueller Anpassung für optimalen Trainingsfortschritt.',
+			'Wissenschaftlich fundierte Trainingspläne für Einsteiger und Wiedereinsteiger - mit individueller Anpassung für optimalen Trainingsfortschritt und nachhaltigem Erfolg.',
 		advancedDesc:
-			'Professionelle Trainingspläne für ambitionierte Läufer zur gezielten Leistungssteigerung und Wettkampfvorbereitung.'
+			'Professionelle Trainingspläne für ambitionierte Läufer zur gezielten Leistungssteigerung, Wettkampfvorbereitung und neuen persönlichen Bestzeiten.',
+		metaDescription:
+			'Professionelle, wissenschaftlich fundierte Laufpläne für 5K, 10K, Halbmarathon und Marathon - für Anfänger und Fortgeschrittene. Individuelle Trainingspläne mit Erfolgsgarantie.'
 	};
 
-	// Verwenden des globalen Stores für bessere Konsistenz
 	function setActiveTab(tab) {
 		setActivePlanTab(tab);
 	}
 
-	// Schema.org JSON-LD für strukturierte Daten
+	// Verbesserte Schema.org JSON-LD für strukturierte Daten
 	let schemaData;
 
 	onMount(() => {
 		if (browser) {
-			// Erzeugen der strukturierten Daten für bessere SEO
+			// Erweiterte strukturierte Daten für bessere SEO
 			schemaData = {
 				'@context': 'https://schema.org',
 				'@type': 'ItemList',
+				name: 'LaufPlaner Pro Trainingspläne',
+				description: 'Professionelle Laufpläne für alle Distanzen und Leistungsniveaus',
+				url: window.location.href,
 				itemListElement: [...beginnerPlans, ...advancedPlans].map((plan, index) => ({
 					'@type': 'Product',
 					position: index + 1,
 					name: `${plan.title} (${plan.distance})`,
 					description: plan.description,
+					category:
+						plan.distance === '5K' || plan.distance === '10K'
+							? 'Kurzdistanz-Laufpläne'
+							: 'Langdistanz-Laufpläne',
 					offers: {
 						'@type': 'Offer',
 						price: plan.price.replace('€', ''),
-						priceCurrency: 'EUR'
+						priceCurrency: 'EUR',
+						availability: 'https://schema.org/InStock',
+						url: window.location.href + '#' + plan.id,
+						priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+							.toISOString()
+							.split('T')[0]
+					},
+					brand: {
+						'@type': 'Brand',
+						name: 'LaufPlaner Pro'
 					},
 					keywords: plan.keywords.join(', ')
 				}))
@@ -183,24 +200,35 @@
 			script.type = 'application/ld+json';
 			script.text = JSON.stringify(schemaData);
 			document.head.appendChild(script);
+
+			// Meta-Beschreibung dynamisch setzen
+			if (!document.querySelector('meta[name="description"]')) {
+				const metaDesc = document.createElement('meta');
+				metaDesc.name = 'description';
+				metaDesc.content = seoTexts.metaDescription;
+				document.head.appendChild(metaDesc);
+			}
 		}
 	});
 </script>
 
 <section id="laufplaene" class="plans py-20 bg-dark" aria-labelledby="plans-heading">
 	<div class="container mx-auto px-4">
+		<!-- SEO-optimierter Header mit verbesserter Struktur -->
 		<header class="section-header text-center mb-12">
-			<span class="section-tag text-primary text-sm uppercase tracking-wider">Unsere Laufpläne</span
+			<span class="section-tag text-primary text-sm uppercase tracking-wider"
+				>Wissenschaftlich fundierte Laufpläne</span
 			>
 			<h2 id="plans-heading" class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">
-				VOM ERSTEN 5K BIS ZUM MARATHON
+				PROFESSIONELLE LAUFPLÄNE FÜR JEDES NIVEAU
 			</h2>
 			<p class="section-subtitle text-gray-300 max-w-2xl mx-auto">
-				Wissenschaftlich fundierte Trainingspläne für jedes Niveau und Ziel - jetzt vormerken und zu
-				den Ersten gehören!
+				Von Couch to 5K bis zur Marathon-Bestzeit - individualisierte Trainingspläne mit
+				Erfolgsgarantie für dein persönliches Laufziel.
 			</p>
 		</header>
 
+		<!-- Barrierefreie Tab-Navigation -->
 		<div
 			class="plan-tabs flex gap-4 mb-8 flex-wrap justify-center"
 			role="tablist"
@@ -228,17 +256,19 @@
 			</button>
 		</div>
 
-		<!-- Beschreibungstext je nach Tab für bessere SEO -->
-		<div class="mb-8 text-center">
-			<h3 class="text-xl font-semibold mb-2">
-				{$activePlanTab === 'beginner' ? seoTexts.beginnerTitle : seoTexts.advancedTitle}
-			</h3>
-			<p class="text-gray-300 max-w-3xl mx-auto">
-				{$activePlanTab === 'beginner' ? seoTexts.beginnerDesc : seoTexts.advancedDesc}
-			</p>
+		<!-- Verbesserte SEO für Kategorie-Beschreibungen mit besserer Zentrierung -->
+		<div class="text-center mb-16 w-full px-4" style="margin-bottom: 3%;">
+			<div class="mx-auto max-w-4xl">
+				<h3 class="text-xl font-semibold mb-4">
+					{$activePlanTab === 'beginner' ? seoTexts.beginnerTitle : seoTexts.advancedTitle}
+				</h3>
+				<p class="text-gray-300 mx-auto">
+					{$activePlanTab === 'beginner' ? seoTexts.beginnerDesc : seoTexts.advancedDesc}
+				</p>
+			</div>
 		</div>
 
-		<!-- Pläne anzeigen basierend auf ausgewähltem Tab -->
+		<!-- Optimiertes Markup für Anfänger-Pläne -->
 		<div
 			id="beginner-plans"
 			role="tabpanel"
@@ -251,6 +281,7 @@
 					class="plan-card h-full flex flex-col"
 					itemscope
 					itemtype="https://schema.org/Product"
+					id={plan.id}
 				>
 					<div class="plan-header relative overflow-hidden">
 						<div class="plan-header-content absolute inset-0 flex items-center justify-center">
@@ -290,14 +321,26 @@
 								<span itemprop="price" content={plan.price.replace('€', '')}>{plan.price}</span>
 								<meta itemprop="priceCurrency" content="EUR" />
 							</span>
-							<a href="#signup" class="btn-primary" itemprop="url" rel="nofollow"> Vormerken </a>
+							<!-- Überzeugender Call-to-Action Button statt "Vormerken" -->
+							<a
+								href="#signup"
+								class="btn-primary btn-buy pulse-animation"
+								itemprop="url"
+								rel="nofollow"
+							>
+								<span class="btn-text">Jetzt sichern</span>
+								<span class="btn-icon">→</span>
+							</a>
 						</div>
 					</div>
 					<meta itemprop="keywords" content={plan.keywords.join(', ')} />
+					<meta itemprop="brand" content="LaufPlaner Pro" />
+					<meta itemprop="sku" content={plan.id} />
 				</article>
 			{/each}
 		</div>
 
+		<!-- Optimiertes Markup für Fortgeschrittenen-Pläne -->
 		<div
 			id="advanced-plans"
 			role="tabpanel"
@@ -310,6 +353,7 @@
 					class="plan-card h-full flex flex-col"
 					itemscope
 					itemtype="https://schema.org/Product"
+					id={plan.id}
 				>
 					<div class="plan-header advanced relative overflow-hidden">
 						<div class="plan-header-content absolute inset-0 flex items-center justify-center">
@@ -349,10 +393,21 @@
 								<span itemprop="price" content={plan.price.replace('€', '')}>{plan.price}</span>
 								<meta itemprop="priceCurrency" content="EUR" />
 							</span>
-							<a href="#signup" class="btn-primary" itemprop="url" rel="nofollow"> Vormerken </a>
+							<!-- Überzeugender Call-to-Action Button statt "Vormerken" -->
+							<a
+								href="#signup"
+								class="btn-primary btn-buy pulse-animation"
+								itemprop="url"
+								rel="nofollow"
+							>
+								<span class="btn-text">Sofort starten</span>
+								<span class="btn-icon">→</span>
+							</a>
 						</div>
 					</div>
 					<meta itemprop="keywords" content={plan.keywords.join(', ')} />
+					<meta itemprop="brand" content="LaufPlaner Pro" />
+					<meta itemprop="sku" content={plan.id} />
 				</article>
 			{/each}
 		</div>
@@ -538,5 +593,56 @@
 
 	.btn-primary:hover {
 		background-color: var(--primary-dark);
+	}
+
+	/* Neue Stile für verbesserten Kaufbutton */
+	.btn-buy {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 600;
+		letter-spacing: 0.5px;
+		background-color: var(--primary);
+		color: var(--dark);
+		border-radius: 0.375rem;
+		transition: all 0.3s ease;
+		position: relative;
+		overflow: hidden;
+		z-index: 1;
+		box-shadow: 0 4px 12px rgba(0, 242, 254, 0.2);
+	}
+
+	.btn-buy:hover {
+		background-color: var(--primary-dark);
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(0, 242, 254, 0.3);
+	}
+
+	.btn-buy .btn-icon {
+		font-size: 1.1em;
+		transition: transform 0.3s ease;
+	}
+
+	.btn-buy:hover .btn-icon {
+		transform: translateX(4px);
+	}
+
+	/* Pulsierender Animationseffekt für mehr Aufmerksamkeit */
+	@keyframes pulse {
+		0% {
+			box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.4);
+		}
+		70% {
+			box-shadow: 0 0 0 6px rgba(0, 242, 254, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(0, 242, 254, 0);
+		}
+	}
+
+	.pulse-animation {
+		animation: pulse 2s infinite;
 	}
 </style>

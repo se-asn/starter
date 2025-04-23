@@ -14,7 +14,7 @@
 					Schritt ins Ziel.
 				</p>
 				<div class="hero-buttons">
-					<a href="#plans" class="btn-primary">PLÄNE ENTDECKEN</a>
+					<a href="#laufplaene" class="btn-primary">PLÄNE ENTDECKEN</a>
 					<a href="#features" class="btn-outline">MEHR ERFAHREN</a>
 				</div>
 

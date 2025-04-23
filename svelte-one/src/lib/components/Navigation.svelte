@@ -15,7 +15,7 @@
 					<span class="logo">LAUF<span class="text-primary">PLANER</span> PRO</span>
 				</div>
 				<div class="nav-links-desktop">
-					<a href="#plans" class="nav-link">LAUFPLÄNE</a>
+					<a href="#laufplaene" class="nav-link">LAUFPLÄNE</a>
 					<a href="#features" class="nav-link">FEATURES</a>
 					<a href="#about" class="nav-link">ÜBER UNS</a>
 					<a href="#faq" class="nav-link">FAQ</a>
@@ -34,7 +34,7 @@
 		<!-- Mobile menu -->
 		{#if mobileMenuVisible}
 			<div class="mobile-menu">
-				<a href="#plans" class="mobile-link">LAUFPLÄNE</a>
+				<a href="#laufplaene" class="mobile-link">LAUFPLÄNE</a>
 				<a href="#features" class="mobile-link">FEATURES</a>
 				<a href="#about" class="mobile-link">ÜBER UNS</a>
 				<a href="#faq" class="mobile-link">FAQ</a>
