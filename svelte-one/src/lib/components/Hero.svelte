@@ -41,8 +41,8 @@
 			<div class="hero-right">
 				<div class="hero-image-container">
 					<img
-						src="https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-						alt="Läufer bei Sonnenaufgang"
+						src="/images/laufplaner_pro.webp"
+						alt="LaufPlaner Pro Trainingsbeispiel"
 						class="hero-image"
 					/>
 					<div class="blur-circle blur-circle-bottom"></div>
@@ -177,6 +177,8 @@
 
 	.hero-image-container {
 		position: relative;
+		display: flex;
+		justify-content: center;
 	}
 
 	.hero-image {

@@ -5,6 +5,7 @@
 	import ForWho from '$lib/components/ForWho.svelte';
 	import Plans from '$lib/components/Plans.svelte';
 	import Features from '$lib/components/Features.svelte';
+	import AboutUs from '$lib/components/AboutUs.svelte'; // Neue Komponente importieren
 	import WhyPlan from '$lib/components/WhyPlan.svelte';
 	import ExampleWeek from '$lib/components/ExampleWeek.svelte';
 	import FAQ from '$lib/components/FAQ.svelte';
@@ -29,6 +30,8 @@
 <ForWho />
 <Plans />
 <Features />
+<AboutUs />
+<!-- Fügen Sie die Komponente hier ein -->
 <WhyPlan />
 <ExampleWeek />
 <FAQ />
