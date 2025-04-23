@@ -20,7 +20,7 @@
 
 				<div class="hero-stats">
 					<div class="stat">
-						<p class="stat-number gradient-text">5000+</p>
+						<p class="stat-number gradient-text">300+</p>
 						<p class="stat-label">Zufriedene Läufer</p>
 					</div>
 					<div class="stat">
@@ -28,7 +28,7 @@
 						<p class="stat-label">Spezialisierte Pläne</p>
 					</div>
 					<div class="stat">
-						<p class="stat-number gradient-text">94%</p>
+						<p class="stat-number gradient-text">97%</p>
 						<p class="stat-label">Zielzeit erreicht</p>
 					</div>
 					<div class="stat">
@@ -56,9 +56,11 @@
 <style>
 	.hero {
 		position: relative;
-		min-height: 100vh;
+		min-height: 75vh; /* Geändert von 100vh auf 75vh - reduziert den vertikalen Raum um 25% */
 		display: flex;
 		align-items: center;
+		padding-top: 3rem; /* Fügt oben etwas Abstand hinzu */
+		padding-bottom: 3rem; /* Fügt unten etwas Abstand hinzu */
 	}
 
 	.animated-bg {
