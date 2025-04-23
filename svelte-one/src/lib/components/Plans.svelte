@@ -1,54 +1,74 @@
-<!-- src/lib/components/Plans.svelte -->
 <script>
-	// Daten für die Pläne
+	import { onMount } from 'svelte';
+	import { activePlanTab, setActivePlanTab } from '$lib/store.js'; // Füge die .js-Erweiterung hinzu
+	import { browser } from '$app/environment';
+
+	// Daten für die Pläne mit SEO-optimierten Beschreibungen und Keywords
 	const beginnerPlans = [
 		{
 			id: 'b5k',
 			distance: '5K',
 			subtitle: 'in 6-8 Wochen',
-			title: 'Komm vom Sofa zur Ziellinie',
-			description: 'Ideal für Laufanfänger und Wiedereinsteiger – ohne Überforderung.',
+			title: 'Vom Sofa zur 5K-Ziellinie',
+			description:
+				'Idealer Laufplan für Anfänger und Wiedereinsteiger – schrittweise Steigerung ohne Überforderung mit bewährtem Konzept.',
 			features: [
-				'Sanfter Einstieg mit Geh-Lauf-Intervallen',
-				'3 Trainingseinheiten pro Woche',
-				'Fokus auf Regelmäßigkeit'
+				'Wissenschaftlich fundierte Geh-Lauf-Intervalle für optimalen Trainingseffekt',
+				'3 effektive Trainingseinheiten pro Woche für maximalen Fortschritt',
+				'Fokus auf nachhaltige Lauftechnik und Regelmäßigkeit'
 			],
-			price: '€29.99'
+			price: '€29.99',
+			keywords: ['5K Laufplan', 'Anfänger Laufen', 'Couch to 5K', 'Laufen lernen']
 		},
 		{
 			id: 'b10k',
 			distance: '10K',
 			subtitle: 'mit System',
-			title: 'Bau auf deinen 5K-Erfolg auf',
-			description: 'Verdopple deine Ausdauer mit einfachen Tempoeinheiten & Regenerationstagen.',
+			title: 'Systematisch zur 10K-Distanz',
+			description:
+				'Verdopple deine Ausdauer mit wissenschaftlich fundierten Tempoeinheiten und strategischen Regenerationstagen für optimale Leistungssteigerung.',
 			features: [
-				'Aufbauend auf 5K-Fitness',
-				'4 Trainingseinheiten pro Woche',
-				'Erste Tempovariationen'
+				'Aufbauend auf 5K-Fitness mit progressiver Belastungssteigerung',
+				'4 strukturierte Trainingseinheiten pro Woche für kontinuierlichen Fortschritt',
+				'Einführung effektiver Tempovariationen für Leistungssteigerung'
 			],
-			price: '€34.99'
+			price: '€34.99',
+			keywords: ['10K Training', 'Laufplan 10 Kilometer', 'Ausdauer verbessern', '10K für Anfänger']
 		},
 		{
 			id: 'b21k',
 			distance: '21K',
 			subtitle: 'für Einsteiger',
-			title: 'Laufend zur nächsten Herausforderung',
-			description: 'Für alle, die sich erstmals an längere Strecken wagen wollen.',
+			title: 'Erster Halbmarathon-Erfolg',
+			description:
+				'Perfekter Trainingsplan für alle, die erstmals die Halbmarathon-Distanz bewältigen wollen – mit professioneller Anleitung zum Erfolg.',
 			features: [
-				'Schonender Aufbau der Langstrecke',
-				'Fokus auf Durchhaltevermögen',
-				'Ernährungs- & Erholungstipps'
+				'Wissenschaftlich fundierter, schonender Aufbau der Langstreckenfähigkeit',
+				'Effektives Training für nachhaltiges Durchhaltevermögen und Motivation',
+				'Umfassende Ernährungs-, Erholungs- und Renntaktik-Tipps für optimale Vorbereitung'
 			],
-			price: '€39.99'
+			price: '€39.99',
+			keywords: [
+				'Halbmarathon Einsteiger',
+				'21K Trainingsplan',
+				'erster Halbmarathon',
+				'Halbmarathon Training'
+			]
 		},
 		{
 			id: 'b42k',
 			distance: '42K',
 			subtitle: 'erster Marathon',
-			title: 'Dein erster Marathon',
-			description: 'Langstrecke? Kein Problem – mit der richtigen Vorbereitung.',
-			features: ['Realistische Zeitziele', 'Klare Wochenstruktur', 'Fokus auf Gesundheit'],
-			price: '€49.99'
+			title: 'Erfolgreicher Marathon-Einsteiger',
+			description:
+				'Professioneller Trainingsplan für deinen ersten Marathon – mit der richtigen Vorbereitung zum erfolgreichen Finish über die volle Distanz.',
+			features: [
+				'Realistische, individuell anpassbare Trainingsziele für Marathonanfänger',
+				'Klar strukturierter Wochenplan mit optimaler Belastungssteigerung',
+				'Besonderer Fokus auf Gesundheit, Regeneration und Verletzungsprävention'
+			],
+			price: '€49.99',
+			keywords: ['Marathon Anfänger', 'Erster Marathon', 'Marathon Training', '42K Laufplan']
 		}
 	];
 
@@ -56,108 +76,284 @@
 		{
 			id: 'a5k',
 			distance: '5K',
-			subtitle: 'schnell & effizient',
-			title: 'Hol dir deine neue Bestzeit',
-			description: 'Perfekt für ambitionierte Läufer:innen mit Wettkampfambitionen.',
+			subtitle: 'Bestzeiten',
+			title: 'Deine neue 5K-Bestzeit',
+			description:
+				'Wissenschaftlich entwickelter Leistungsplan für ambitionierte Läufer mit Wettkampfambitionen – optimiert für maximale Geschwindigkeit.',
 			features: [
-				'Intensive Intervalle',
-				'Techniktraining für Effizienz',
-				'Peak-Performance-Timing'
+				'Hocheffektive Intervall- und Tempotrainings für messbare Leistungssteigerung',
+				'Fortgeschrittenes Techniktraining für optimale Laufökonomie und Effizienz',
+				'Strategisches Peak-Performance-Timing für Wettkampfhöhepunkte'
 			],
-			price: '€34.99'
+			price: '€34.99',
+			keywords: ['5K Bestzeit', 'Schneller laufen', '5K PB', 'Leistungssteigerung 5K']
 		},
 		{
 			id: 'a10k',
 			distance: '10K',
-			subtitle: 'mit Kick',
-			title: 'Leistungsorientiertes Training',
-			description: 'Mit Schwellentraining, Lauf-ABC und Progression zur Bestleistung.',
+			subtitle: 'Leistungsorientiert',
+			title: 'Performance-Optimierung 10K',
+			description:
+				'Mit wissenschaftlichem Schwellentraining, Lauf-ABC und strategischer Progression zur persönlichen Bestleistung über 10 Kilometer.',
 			features: [
-				'Schwellenläufe für Tempohärte',
-				'Periodisiertes Training',
-				'Genauer Tapering-Plan'
+				'Spezialisierte Schwellenläufe für maximale Tempohärte und Laktattoleranz',
+				'Periodisiertes Trainingssystem mit optimalen Belastungs- und Erholungsphasen',
+				'Präziser Tapering-Plan für perfektes Wettkampf-Timing'
 			],
-			price: '€39.99'
+			price: '€39.99',
+			keywords: ['10K Wettkampf', 'Schwellentraining', '10K Bestzeit', 'Tempotraining']
 		},
 		{
 			id: 'a21k',
 			distance: '21K',
-			subtitle: 'mit Plan',
-			title: 'Strategisch zum starken Finish',
-			description: 'Steigere Tempo, Ausdauer und Renntaktik für neue Bestzeiten.',
+			subtitle: 'mit Strategie',
+			title: 'Halbmarathon auf neuem Niveau',
+			description:
+				'Wissenschaftlich fundierter Plan zur Steigerung von Tempo, Ausdauer und Renntaktik für neue persönliche Halbmarathon-Bestzeiten.',
 			features: [
-				'Spezifisches Tempotraining',
-				'Rennstrategien & Pacing',
-				'Optimale Wettkampfvorbereitung'
+				'Hochspezialisiertes Tempotraining für optimale Wettkampfgeschwindigkeit',
+				'Effektive Rennstrategien und präzises Pacing für perfekte Renneinteilung',
+				'Umfassende Wettkampfvorbereitung mit Ernährung, Taper und mentaler Stärke'
 			],
-			price: '€44.99'
+			price: '€44.99',
+			keywords: [
+				'Halbmarathon Bestzeit',
+				'21K Wettkampf',
+				'Schneller Halbmarathon',
+				'Halbmarathon Leistung'
+			]
 		},
 		{
 			id: 'a42k',
 			distance: '42K',
 			subtitle: 'Performance',
-			title: 'Marathon-Performance',
-			description: 'Ob Sub4, Sub3:30 oder ambitionierter – wir helfen dir, dein Ziel zu erreichen.',
-			features: ['Fokus auf Tempoeinheiten', 'Optimierte Long Runs', 'Professionelles Tapering'],
-			price: '€54.99'
+			title: 'Marathon-Leistungsoptimierung',
+			description:
+				'Wissenschaftlich optimierter Leistungsplan für ambitionierte Ziele wie Sub4, Sub3:30 oder schneller – mit professioneller Unterstützung zum Erfolg.',
+			features: [
+				'Hocheffektive Tempoeinheiten für optimale Marathonpace und Schwellentoleranz',
+				'Strategisch optimierte Long Runs mit spezifischen Trainingsschwerpunkten',
+				'Professionelles Tapering-Konzept für maximale Wettkampfleistung'
+			],
+			price: '€54.99',
+			keywords: ['Marathon Bestzeit', 'Marathon Performance', 'Sub4 Marathon', 'Schneller Marathon']
 		}
 	];
 
-	let activeTab = 'beginner'; // 'beginner' oder 'advanced'
+	// SEO-optimierte Überschriften und Beschreibungen
+	const seoTexts = {
+		beginnerTitle: 'Laufpläne für Anfänger - vom 5K bis zum Marathon',
+		advancedTitle: 'Leistungsorientierte Laufpläne für Fortgeschrittene',
+		beginnerDesc:
+			'Wissenschaftlich fundierte Trainingspläne für Einsteiger und Wiedereinsteiger - mit individueller Anpassung für optimalen Trainingsfortschritt.',
+		advancedDesc:
+			'Professionelle Trainingspläne für ambitionierte Läufer zur gezielten Leistungssteigerung und Wettkampfvorbereitung.'
+	};
 
+	// Verwenden des globalen Stores für bessere Konsistenz
 	function setActiveTab(tab) {
-		activeTab = tab;
+		setActivePlanTab(tab);
 	}
+
+	// Schema.org JSON-LD für strukturierte Daten
+	let schemaData;
+
+	onMount(() => {
+		if (browser) {
+			// Erzeugen der strukturierten Daten für bessere SEO
+			schemaData = {
+				'@context': 'https://schema.org',
+				'@type': 'ItemList',
+				itemListElement: [...beginnerPlans, ...advancedPlans].map((plan, index) => ({
+					'@type': 'Product',
+					position: index + 1,
+					name: `${plan.title} (${plan.distance})`,
+					description: plan.description,
+					offers: {
+						'@type': 'Offer',
+						price: plan.price.replace('€', ''),
+						priceCurrency: 'EUR'
+					},
+					keywords: plan.keywords.join(', ')
+				}))
+			};
+
+			// Schema.org Daten in den Head einfügen
+			const script = document.createElement('script');
+			script.type = 'application/ld+json';
+			script.text = JSON.stringify(schemaData);
+			document.head.appendChild(script);
+		}
+	});
 </script>
 
-<section id="plans" class="plans">
-	<div class="container">
-		<div class="section-header">
-			<span class="section-tag">Unsere Laufpläne</span>
-			<h2 class="section-title">VOM ERSTEN 5K BIS ZUM MARATHON</h2>
-			<p class="section-subtitle">Bald verfügbar – trag dich ein & sei unter den Ersten!</p>
+<section id="laufplaene" class="plans py-20 bg-dark" aria-labelledby="plans-heading">
+	<div class="container mx-auto px-4">
+		<header class="section-header text-center mb-12">
+			<span class="section-tag text-primary text-sm uppercase tracking-wider">Unsere Laufpläne</span
+			>
+			<h2 id="plans-heading" class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">
+				VOM ERSTEN 5K BIS ZUM MARATHON
+			</h2>
+			<p class="section-subtitle text-gray-300 max-w-2xl mx-auto">
+				Wissenschaftlich fundierte Trainingspläne für jedes Niveau und Ziel - jetzt vormerken und zu
+				den Ersten gehören!
+			</p>
+		</header>
+
+		<div
+			class="plan-tabs flex gap-4 mb-8 flex-wrap justify-center"
+			role="tablist"
+			aria-label="Laufplan-Kategorien"
+		>
+			<button
+				class="plan-tab {$activePlanTab === 'beginner' ? 'active' : ''}"
+				on:click={() => setActiveTab('beginner')}
+				role="tab"
+				aria-selected={$activePlanTab === 'beginner'}
+				aria-controls="beginner-plans"
+				id="tab-beginner"
+			>
+				<span>Anfänger</span>
+			</button>
+			<button
+				class="plan-tab {$activePlanTab === 'advanced' ? 'active' : ''}"
+				on:click={() => setActiveTab('advanced')}
+				role="tab"
+				aria-selected={$activePlanTab === 'advanced'}
+				aria-controls="advanced-plans"
+				id="tab-advanced"
+			>
+				<span>Fortgeschrittene</span>
+			</button>
 		</div>
 
-		<div class="plan-tabs">
-			<button
-				class="plan-tab {activeTab === 'beginner' ? 'active' : ''}"
-				on:click={() => setActiveTab('beginner')}
-			>
-				Anfänger
-			</button>
-			<button
-				class="plan-tab {activeTab === 'advanced' ? 'active' : ''}"
-				on:click={() => setActiveTab('advanced')}
-			>
-				Fortgeschrittene
-			</button>
+		<!-- Beschreibungstext je nach Tab für bessere SEO -->
+		<div class="mb-8 text-center">
+			<h3 class="text-xl font-semibold mb-2">
+				{$activePlanTab === 'beginner' ? seoTexts.beginnerTitle : seoTexts.advancedTitle}
+			</h3>
+			<p class="text-gray-300 max-w-3xl mx-auto">
+				{$activePlanTab === 'beginner' ? seoTexts.beginnerDesc : seoTexts.advancedDesc}
+			</p>
 		</div>
 
 		<!-- Pläne anzeigen basierend auf ausgewähltem Tab -->
-		<div class="plan-grid">
-			{#each activeTab === 'beginner' ? beginnerPlans : advancedPlans as plan (plan.id)}
-				<div class="plan-card">
-					<div class="plan-header {activeTab === 'advanced' ? 'advanced' : ''}">
-						<div class="plan-header-content">
-							<h3 class="plan-distance">{plan.distance}</h3>
+		<div
+			id="beginner-plans"
+			role="tabpanel"
+			aria-labelledby="tab-beginner"
+			class="plan-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+			style="display: {$activePlanTab === 'beginner' ? 'grid' : 'none'}"
+		>
+			{#each beginnerPlans as plan (plan.id)}
+				<article
+					class="plan-card h-full flex flex-col"
+					itemscope
+					itemtype="https://schema.org/Product"
+				>
+					<div class="plan-header relative overflow-hidden">
+						<div class="plan-header-content absolute inset-0 flex items-center justify-center">
+							<h4 class="plan-distance text-2xl font-bold text-white" itemprop="name">
+								<span itemprop="category">{plan.distance}</span>
+							</h4>
 						</div>
-						<div class="plan-subtitle">{plan.subtitle}</div>
-						<div class="plan-header-bg"></div>
+						<div
+							class="plan-subtitle absolute bottom-4 left-4 z-10 text-sm"
+							itemprop="alternateHeadline"
+						>
+							{plan.subtitle}
+						</div>
+						<div class="plan-header-bg absolute inset-0"></div>
 					</div>
-					<div class="plan-content">
-						<h4 class="plan-title">{plan.title}</h4>
-						<p class="plan-description">{plan.description}</p>
-						<ul class="plan-features">
+					<div class="plan-content flex-grow flex flex-col p-6">
+						<h5 class="plan-title text-xl font-bold mb-2" itemprop="headline">{plan.title}</h5>
+						<p class="plan-description text-gray-300 mb-4" itemprop="description">
+							{plan.description}
+						</p>
+						<ul class="plan-features mb-6 flex-grow">
 							{#each plan.features as feature}
-								<li class="plan-feature">{feature}</li>
+								<li class="plan-feature mb-2 pl-6 relative text-gray-200" itemprop="featureList">
+									{feature}
+								</li>
 							{/each}
 						</ul>
-						<div class="plan-footer">
-							<span class="plan-price">{plan.price}</span>
-							<a href="#signup" class="btn-primary">Vormerken</a>
+						<div
+							class="plan-footer flex justify-between items-center border-t border-gray-700 pt-4"
+						>
+							<span
+								class="plan-price text-xl font-bold"
+								itemprop="offers"
+								itemscope
+								itemtype="https://schema.org/Offer"
+							>
+								<span itemprop="price" content={plan.price.replace('€', '')}>{plan.price}</span>
+								<meta itemprop="priceCurrency" content="EUR" />
+							</span>
+							<a href="#signup" class="btn-primary" itemprop="url" rel="nofollow"> Vormerken </a>
 						</div>
 					</div>
-				</div>
+					<meta itemprop="keywords" content={plan.keywords.join(', ')} />
+				</article>
+			{/each}
+		</div>
+
+		<div
+			id="advanced-plans"
+			role="tabpanel"
+			aria-labelledby="tab-advanced"
+			class="plan-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+			style="display: {$activePlanTab === 'advanced' ? 'grid' : 'none'}"
+		>
+			{#each advancedPlans as plan (plan.id)}
+				<article
+					class="plan-card h-full flex flex-col"
+					itemscope
+					itemtype="https://schema.org/Product"
+				>
+					<div class="plan-header advanced relative overflow-hidden">
+						<div class="plan-header-content absolute inset-0 flex items-center justify-center">
+							<h4 class="plan-distance text-2xl font-bold text-white" itemprop="name">
+								<span itemprop="category">{plan.distance}</span>
+							</h4>
+						</div>
+						<div
+							class="plan-subtitle absolute bottom-4 left-4 z-10 text-sm"
+							itemprop="alternateHeadline"
+						>
+							{plan.subtitle}
+						</div>
+						<div class="plan-header-bg absolute inset-0"></div>
+					</div>
+					<div class="plan-content flex-grow flex flex-col p-6">
+						<h5 class="plan-title text-xl font-bold mb-2" itemprop="headline">{plan.title}</h5>
+						<p class="plan-description text-gray-300 mb-4" itemprop="description">
+							{plan.description}
+						</p>
+						<ul class="plan-features mb-6 flex-grow">
+							{#each plan.features as feature}
+								<li class="plan-feature mb-2 pl-6 relative text-gray-200" itemprop="featureList">
+									{feature}
+								</li>
+							{/each}
+						</ul>
+						<div
+							class="plan-footer flex justify-between items-center border-t border-gray-700 pt-4"
+						>
+							<span
+								class="plan-price text-xl font-bold"
+								itemprop="offers"
+								itemscope
+								itemtype="https://schema.org/Offer"
+							>
+								<span itemprop="price" content={plan.price.replace('€', '')}>{plan.price}</span>
+								<meta itemprop="priceCurrency" content="EUR" />
+							</span>
+							<a href="#signup" class="btn-primary" itemprop="url" rel="nofollow"> Vormerken </a>
+						</div>
+					</div>
+					<meta itemprop="keywords" content={plan.keywords.join(', ')} />
+				</article>
 			{/each}
 		</div>
 	</div>
@@ -331,5 +527,16 @@
 	.btn-primary {
 		padding: 0.5rem 1rem;
 		font-size: 0.875rem;
+		background-color: var(--primary);
+		color: var(--dark);
+		font-weight: 500;
+		border-radius: 0.375rem;
+		transition: background-color 0.2s ease;
+		text-decoration: none;
+		display: inline-block;
+	}
+
+	.btn-primary:hover {
+		background-color: var(--primary-dark);
 	}
 </style>
