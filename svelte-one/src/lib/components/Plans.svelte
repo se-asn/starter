@@ -3,7 +3,7 @@
 	import { activePlanTab, setActivePlanTab } from '$lib/store.js';
 	import { browser } from '$app/environment';
 
-	// Daten für die Pläne mit SEO-optimierten Beschreibungen und Keywords
+	// Daten für die Pläne mit kreativ optimierten Beschreibungen und Keywords
 	const beginnerPlans = [
 		{
 			id: 'b5k',
@@ -11,11 +11,11 @@
 			subtitle: 'in 6-8 Wochen',
 			title: 'Vom Sofa zur 5K-Ziellinie',
 			description:
-				'Idealer Laufplan für Anfänger und Wiedereinsteiger – schrittweise Steigerung ohne Überforderung mit bewährtem Konzept.',
+				'Der perfekte Einstieg für Laufneulinge – unser praxiserprobtes Konzept baut deine Ausdauer behutsam auf, ohne deinen Körper zu überfordern.',
 			features: [
-				'Wissenschaftlich fundierte Geh-Lauf-Intervalle für optimalen Trainingseffekt',
-				'3 effektive Trainingseinheiten pro Woche für maximalen Fortschritt',
-				'Fokus auf nachhaltige Lauftechnik und Regelmäßigkeit'
+				'Clever konzipierte Geh-Lauf-Intervalle für sanften Aufbau deiner Kondition',
+				'3 effektive Trainingseinheiten pro Woche für optimalen Fortschritt',
+				'Fokus auf nachhaltige Lauftechnik und Erfolgsroutinen'
 			],
 			price: '€29.99',
 			keywords: ['5K Laufplan', 'Anfänger Laufen', 'Couch to 5K', 'Laufen lernen']
@@ -26,11 +26,11 @@
 			subtitle: 'mit System',
 			title: 'Systematisch zur 10K-Distanz',
 			description:
-				'Verdopple deine Ausdauer mit wissenschaftlich fundierten Tempoeinheiten und strategischen Regenerationstagen für optimale Leistungssteigerung.',
+				'Verdopple deine Ausdauer mit unserem expertenkonstruierten Trainingsaufbau – die perfekte Balance aus Tempoeinheiten und strategischen Erholungsphasen.',
 			features: [
-				'Aufbauend auf 5K-Fitness mit progressiver Belastungssteigerung',
+				'Aufbauend auf 5K-Fitness mit intelligenter Belastungssteigerung',
 				'4 strukturierte Trainingseinheiten pro Woche für kontinuierlichen Fortschritt',
-				'Einführung effektiver Tempovariationen für Leistungssteigerung'
+				'Einführung effektiver Tempovariationen für spürbaren Leistungsschub'
 			],
 			price: '€34.99',
 			keywords: ['10K Training', 'Laufplan 10 Kilometer', 'Ausdauer verbessern', '10K für Anfänger']
@@ -41,11 +41,11 @@
 			subtitle: 'für Einsteiger',
 			title: 'Erster Halbmarathon-Erfolg',
 			description:
-				'Perfekter Trainingsplan für alle, die erstmals die Halbmarathon-Distanz bewältigen wollen – mit professioneller Anleitung zum Erfolg.',
+				'Von Läufern für Läufer entwickelt – unser praxisnaher Plan führt dich mit durchdachtem Training zur erfolgreichen Bewältigung deiner ersten 21K.',
 			features: [
-				'Wissenschaftlich fundierter, schonender Aufbau der Langstreckenfähigkeit',
-				'Effektives Training für nachhaltiges Durchhaltevermögen und Motivation',
-				'Umfassende Ernährungs-, Erholungs- und Renntaktik-Tipps für optimale Vorbereitung'
+				'Evidenzbasierter, schonender Aufbau deiner Langstreckenfähigkeit',
+				'Motivierende Trainingsstruktur für nachhaltiges Durchhaltevermögen',
+				'Umfassende Ernährungs-, Erholungs- und Renntaktik-Tipps aus der Praxis'
 			],
 			price: '€39.99',
 			keywords: [
@@ -61,11 +61,11 @@
 			subtitle: 'erster Marathon',
 			title: 'Erfolgreicher Marathon-Einsteiger',
 			description:
-				'Professioneller Trainingsplan für deinen ersten Marathon – mit der richtigen Vorbereitung zum erfolgreichen Finish über die volle Distanz.',
+				'Der Traum vom Marathon wird Realität – mit unserem von Experten entwickelten Plan meisterst du die Königsdistanz mit Freude statt Quälerei.',
 			features: [
-				'Realistische, individuell anpassbare Trainingsziele für Marathonanfänger',
-				'Klar strukturierter Wochenplan mit optimaler Belastungssteigerung',
-				'Besonderer Fokus auf Gesundheit, Regeneration und Verletzungsprävention'
+				'Realistische, alltagstaugliche Trainingsziele für Marathonneulinge',
+				'Kristallklarer Wochenaufbau mit intelligenter Steigerungslogik',
+				'Besonderer Fokus auf Verletzungsprävention und nachhaltige Trainingsfreude'
 			],
 			price: '€49.99',
 			keywords: ['Marathon Anfänger', 'Erster Marathon', 'Marathon Training', '42K Laufplan']
@@ -79,11 +79,11 @@
 			subtitle: 'Bestzeiten',
 			title: 'Deine neue 5K-Bestzeit',
 			description:
-				'Wissenschaftlich entwickelter Leistungsplan für ambitionierte Läufer mit Wettkampfambitionen – optimiert für maximale Geschwindigkeit.',
+				'Sprenge deine Tempogrenzen mit unserem von Elite-Trainern konzipierten Leistungsplan – jede Sekunde zählt auf dem Weg zu deiner neuen Bestmarke.',
 			features: [
-				'Hocheffektive Intervall- und Tempotrainings für messbare Leistungssteigerung',
-				'Fortgeschrittenes Techniktraining für optimale Laufökonomie und Effizienz',
-				'Strategisches Peak-Performance-Timing für Wettkampfhöhepunkte'
+				'Hocheffektive Intervall-Architekturen für messbare Geschwindigkeitsexplosion',
+				'Ausgeklügeltes Techniktraining für optimale Laufökonomie und Effizienz',
+				'Strategisches Peak-Performance-Timing für deine Wettkampfhöhepunkte'
 			],
 			price: '€34.99',
 			keywords: ['5K Bestzeit', 'Schneller laufen', '5K PB', 'Leistungssteigerung 5K']
@@ -94,11 +94,11 @@
 			subtitle: 'Leistungsorientiert',
 			title: 'Performance-Optimierung 10K',
 			description:
-				'Mit wissenschaftlichem Schwellentraining, Lauf-ABC und strategischer Progression zur persönlichen Bestleistung über 10 Kilometer.',
+				'Durchbreche deine 10K-Schallmauer mit modernsten Trainingsmethoden – unser Plan kombiniert Schwellentraining, Lauf-ABC und mentale Stärke für deinen Erfolg.',
 			features: [
-				'Spezialisierte Schwellenläufe für maximale Tempohärte und Laktattoleranz',
-				'Periodisiertes Trainingssystem mit optimalen Belastungs- und Erholungsphasen',
-				'Präziser Tapering-Plan für perfektes Wettkampf-Timing'
+				'Hochmoderne Schwelleneinheiten für maximale Tempohärte und Laktattoleranz',
+				'Durchdachtes Periodisierungssystem mit präzisen Belastungs- und Erholungsphasen',
+				'Maßgeschneidertes Tapering-Konzept für punktgenaue Wettkampfform'
 			],
 			price: '€39.99',
 			keywords: ['10K Wettkampf', 'Schwellentraining', '10K Bestzeit', 'Tempotraining']
@@ -109,11 +109,11 @@
 			subtitle: 'mit Strategie',
 			title: 'Halbmarathon auf neuem Niveau',
 			description:
-				'Wissenschaftlich fundierter Plan zur Steigerung von Tempo, Ausdauer und Renntaktik für neue persönliche Halbmarathon-Bestzeiten.',
+				'Revolutioniere deine Halbmarathon-Performance mit unserem von Eliteläufern inspirierten Plan – gezielte Optimierung von Tempo, Ausdauer und mentaler Härte.',
 			features: [
-				'Hochspezialisiertes Tempotraining für optimale Wettkampfgeschwindigkeit',
-				'Effektive Rennstrategien und präzises Pacing für perfekte Renneinteilung',
-				'Umfassende Wettkampfvorbereitung mit Ernährung, Taper und mentaler Stärke'
+				'Präzisionsgesteuertes Tempotraining für optimale Rennpace-Stabilität',
+				'Von Profis erprobte Rennstrategien für perfekte Wettkampfeinteilung',
+				'Ganzheitliche Wettkampfvorbereitung mit Fokus auf mentale Siegesstrategien'
 			],
 			price: '€44.99',
 			keywords: [
@@ -129,27 +129,27 @@
 			subtitle: 'Performance',
 			title: 'Marathon-Leistungsoptimierung',
 			description:
-				'Wissenschaftlich optimierter Leistungsplan für ambitionierte Ziele wie Sub4, Sub3:30 oder schneller – mit professioneller Unterstützung zum Erfolg.',
+				'Erobere die Königsdistanz mit Bestzeit – unser Elite-Plan macht ambitionierte Ziele wie Sub4, Sub3:30 oder schneller zur greifbaren Realität.',
 			features: [
-				'Hocheffektive Tempoeinheiten für optimale Marathonpace und Schwellentoleranz',
-				'Strategisch optimierte Long Runs mit spezifischen Trainingsschwerpunkten',
-				'Professionelles Tapering-Konzept für maximale Wettkampfleistung'
+				'Innovatives System aus Tempoeinheiten für optimale Marathon-Pace-Ökonomie',
+				'Strategisch durchkomponierte Long Runs mit wechselnden Trainingsschwerpunkten',
+				'Von Top-Athleten inspiriertes Tapering-Konzept für maximale Rennpower'
 			],
 			price: '€54.99',
 			keywords: ['Marathon Bestzeit', 'Marathon Performance', 'Sub4 Marathon', 'Schneller Marathon']
 		}
 	];
 
-	// Erweiterte SEO-Texte mit zusätzlichen Keywords
+	// Erweiterte SEO-Texte mit abwechslungsreichen Formulierungen
 	const seoTexts = {
-		beginnerTitle: 'Laufpläne für Anfänger - vom 5K bis zum Marathon',
-		advancedTitle: 'Leistungsorientierte Laufpläne für Fortgeschrittene',
+		beginnerTitle: 'Laufpläne für Anfänger - vom ersten Kilometer bis zum Marathon',
+		advancedTitle: 'Performance-Pläne für ambitionierte Läufer und Wettkämpfer',
 		beginnerDesc:
-			'Wissenschaftlich fundierte Trainingspläne für Einsteiger und Wiedereinsteiger - mit individueller Anpassung für optimalen Trainingsfortschritt und nachhaltigem Erfolg.',
+			'Von Laufexperten entwickelte Trainingspläne für Einsteiger und Wiedereinsteiger - mit alltagstauglicher Struktur für konstanten Fortschritt und langanhaltende Motivation.',
 		advancedDesc:
-			'Professionelle Trainingspläne für ambitionierte Läufer zur gezielten Leistungssteigerung, Wettkampfvorbereitung und neuen persönlichen Bestzeiten.',
+			'Hochentwickelte Trainingssysteme für ambitionierte Läufer mit klarem Fokus auf Bestzeiten, effektive Wettkampfvorbereitung und kontinuierliche Leistungssteigerung.',
 		metaDescription:
-			'Professionelle, wissenschaftlich fundierte Laufpläne für 5K, 10K, Halbmarathon und Marathon - für Anfänger und Fortgeschrittene. Individuelle Trainingspläne mit Erfolgsgarantie.'
+			'Maßgeschneiderte, von Experten entwickelte Laufpläne für 5K, 10K, Halbmarathon und Marathon - für Anfänger und Fortgeschrittene. Trainiere mit System und erreiche deine Ziele!'
 	};
 
 	function setActiveTab(tab) {
