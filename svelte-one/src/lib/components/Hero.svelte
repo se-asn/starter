@@ -1,56 +1,141 @@
-<!-- src/lib/components/Hero.svelte -->
-<section class="hero">
-	<div class="cyber-grid"></div>
-	<div class="animated-bg"></div>
+<script>
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
-	<div class="container">
+	// SEO-optimierte Daten
+	const heroData = {
+		title: 'Professionelle Laufpläne für dein persönliches Trainingsziel',
+		description:
+			'Erreiche deine Laufziele mit wissenschaftlich fundierten Trainingsplänen – individuell angepasst an dein Niveau und deinen Alltag. Von Couch-to-5K bis zur Marathon-Bestzeit: Mit LaufPlaner Pro schrittweise zum Erfolg!',
+		keywords: [
+			'Laufplan',
+			'Laufpläne',
+			'Trainingsplan Laufen',
+			'Lauftraining',
+			'Marathon Trainingsplan',
+			'5K Laufplan',
+			'10K Trainingsplan',
+			'Halbmarathon Plan',
+			'Lauftraining für Anfänger',
+			'Laufplan Fortgeschrittene',
+			'strukturierte Laufpläne',
+			'individueller Laufplan'
+		],
+		stats: [
+			{
+				number: '750+',
+				label: 'Zufriedene Läufer',
+				description: 'Über 750 erfolgreiche Läufer haben mit unseren Plänen ihre Ziele erreicht'
+			},
+			{
+				number: '8',
+				label: 'Spezialisierte Pläne',
+				description:
+					'Acht professionell erstellte Trainingspläne für alle Distanzen und Leistungsniveaus'
+			},
+			{
+				number: '97%',
+				label: 'Zielzeit erreicht',
+				description: '97% unserer Kunden erreichen ihre angestrebte Zielzeit'
+			},
+			{
+				number: '15+',
+				label: 'Jahre Expertise',
+				description: 'Über 15 Jahre Erfahrung in der Entwicklung von Trainingsplänen'
+			}
+		],
+		imageUrl: '/images/laufplaner_pro.webp',
+		imageAlt:
+			'LaufPlaner Pro Trainingsbeispiel - Personalisierter Laufplan mit Trainingseinheiten für eine Woche'
+	};
+
+	// Schema.org structured data
+	onMount(() => {
+		if (browser) {
+			const schema = {
+				'@context': 'https://schema.org',
+				'@type': 'SportsActivityLocation',
+				name: 'LaufPlaner Pro',
+				description: heroData.description,
+				image: new URL(heroData.imageUrl, window.location.origin).toString(),
+				offers: {
+					'@type': 'Offer',
+					description: 'Professionelle Laufpläne für alle Distanzen',
+					availability: 'https://schema.org/InStock'
+				},
+				review: {
+					'@type': 'Review',
+					reviewRating: {
+						'@type': 'Rating',
+						ratingValue: '4.9',
+						bestRating: '5'
+					},
+					author: {
+						'@type': 'Person',
+						name: 'LaufPlaner Pro Kunden'
+					},
+					reviewBody:
+						'Über 300 zufriedene Läufer haben mit unseren Trainingsplänen ihre Ziele erreicht.'
+				}
+			};
+
+			const script = document.createElement('script');
+			script.type = 'application/ld+json';
+			script.text = JSON.stringify(schema);
+			document.head.appendChild(script);
+		}
+	});
+</script>
+
+<section class="hero" aria-labelledby="hero-heading">
+	<div class="cyber-grid" aria-hidden="true"></div>
+	<div class="animated-bg" aria-hidden="true"></div>
+
+	<div class="container mx-auto px-4">
 		<div class="hero-content">
 			<div class="hero-left">
-				<h1 class="hero-title">
+				<h1 id="hero-heading" class="hero-title">
 					STARTE DEINE <span class="gradient-text">LAUFREISE</span>
 				</h1>
 				<p class="hero-description">
-					Mit dem richtigen Plan zum Ziel. Ob 5K oder Marathon – wir bringen dich Schritt für
-					Schritt ins Ziel.
+					{heroData.description}
 				</p>
 				<div class="hero-buttons">
 					<a href="#laufplaene" class="btn-primary">PLÄNE ENTDECKEN</a>
 					<a href="#features" class="btn-outline">MEHR ERFAHREN</a>
 				</div>
 
-				<div class="hero-stats">
-					<div class="stat">
-						<p class="stat-number gradient-text">300+</p>
-						<p class="stat-label">Zufriedene Läufer</p>
-					</div>
-					<div class="stat">
-						<p class="stat-number gradient-text">8</p>
-						<p class="stat-label">Spezialisierte Pläne</p>
-					</div>
-					<div class="stat">
-						<p class="stat-number gradient-text">97%</p>
-						<p class="stat-label">Zielzeit erreicht</p>
-					</div>
-					<div class="stat">
-						<p class="stat-number gradient-text">15+</p>
-						<p class="stat-label">Jahre Expertise</p>
-					</div>
+				<div class="hero-stats" aria-label="Erfolgsstatistiken LaufPlaner Pro">
+					{#each heroData.stats as stat, i}
+						<div class="stat">
+							<p class="stat-number gradient-text">{stat.number}</p>
+							<p class="stat-label">{stat.label}</p>
+							<meta itemprop="description" content={stat.description} />
+						</div>
+					{/each}
 				</div>
 			</div>
 
 			<div class="hero-right">
 				<div class="hero-image-container">
 					<img
-						src="/images/laufplaner_pro.webp"
-						alt="LaufPlaner Pro Trainingsbeispiel"
+						src={heroData.imageUrl}
+						alt={heroData.imageAlt}
 						class="hero-image"
+						width="600"
+						height="400"
+						loading="eager"
+						fetchpriority="high"
 					/>
-					<div class="blur-circle blur-circle-bottom"></div>
-					<div class="blur-circle blur-circle-top"></div>
+					<div class="blur-circle blur-circle-bottom" aria-hidden="true"></div>
+					<div class="blur-circle blur-circle-top" aria-hidden="true"></div>
 				</div>
 			</div>
 		</div>
 	</div>
+
+	<!-- Hidden SEO-optimized metadata -->
+	<meta itemprop="keywords" content={heroData.keywords.join(', ')} />
 </section>
 
 <style>
