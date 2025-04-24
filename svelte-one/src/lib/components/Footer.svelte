@@ -9,14 +9,46 @@
 
 			<div class="footer-links">
 				<a href="#plans" class="footer-link">Laufpläne</a>
-				<a href="#features" class="footer-link">Features</a>
 				<a href="#faq" class="footer-link">FAQ</a>
 				<a href="#signup" class="footer-link">Anmelden</a>
+				<a href="mailto:support@laufplanerpro.de" class="footer-link contact-link">
+					<i class="fas fa-envelope"></i> Kontakt
+				</a>
+			</div>
+		</div>
+
+		<!-- Neue Trust Signals Sektion -->
+		<div class="trust-signals">
+			<div class="trust-item">
+				<i class="fas fa-lock"></i>
+				<span>Sichere Zahlungsmethoden</span>
+			</div>
+			<div class="trust-item">
+				<i class="fas fa-medal"></i>
+				<span>Von Laufexperten erstellt</span>
+			</div>
+			<div class="trust-item">
+				<i class="fas fa-shield-alt"></i>
+				<span>Sichere Datenübertragung</span>
+			</div>
+			<div class="trust-item">
+				<i class="fas fa-thumbs-up"></i>
+				<span>100% Zufriedenheitsgarantie</span>
 			</div>
 		</div>
 
 		<div class="footer-bottom">
-			<p class="copyright">&copy; 2023 LaufPlaner Pro. Alle Rechte vorbehalten.</p>
+			<div class="payment-options">
+				<i class="fab fa-cc-visa" title="Visa"></i>
+				<i class="fab fa-cc-mastercard" title="MasterCard"></i>
+				<i class="fab fa-cc-paypal" title="PayPal"></i>
+				<i class="fab fa-cc-apple-pay" title="Apple Pay"></i>
+				<i class="fab fa-google-pay" title="Google Pay"></i>
+			</div>
+
+			<p class="copyright">
+				&copy; {new Date().getFullYear()} LaufPlanerPro. Alle Rechte vorbehalten.
+			</p>
 		</div>
 	</div>
 </footer>
@@ -85,14 +117,67 @@
 		color: var(--primary);
 	}
 
+	.contact-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	/* Neue Styles für Trust Signals */
+	.trust-signals {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1.5rem;
+		margin: 2rem 0;
+		padding: 1.5rem 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.trust-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: #d0d0d0;
+	}
+
+	.trust-item i {
+		font-size: 1.25rem;
+		color: var(--primary);
+	}
+
+	/* Styles für Zahlungsoptionen */
+	.payment-options {
+		display: flex;
+		justify-content: center;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.payment-options i {
+		font-size: 1.75rem;
+		color: #d0d0d0;
+		opacity: 0.7;
+		transition:
+			opacity 0.3s ease,
+			transform 0.3s ease;
+	}
+
+	.payment-options i:hover {
+		opacity: 1;
+		transform: translateY(-2px);
+	}
+
 	.footer-bottom {
-		padding-top: 2rem;
-		border-top: 1px solid var(--light-gray);
+		padding-top: 1.5rem;
+		border-top: none;
 		text-align: center;
 	}
 
 	.copyright {
 		font-size: 0.875rem;
 		color: var(--text-gray);
+		margin-top: 0.5rem;
 	}
 </style>
