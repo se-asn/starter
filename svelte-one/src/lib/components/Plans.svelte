@@ -259,9 +259,10 @@
 		<!-- Verbesserte SEO für Kategorie-Beschreibungen mit besserer Zentrierung -->
 		<div class="text-center mb-16 w-full px-4" style="margin-bottom: 3%;">
 			<div class="mx-auto max-w-4xl">
-				<h3 class="text-xl font-semibold mb-4">
+				<h3 class="text-xl font-semibold mb-8">
 					{$activePlanTab === 'beginner' ? seoTexts.beginnerTitle : seoTexts.advancedTitle}
 				</h3>
+				<div class="spacer py-2"></div>
 				<p class="text-gray-300 mx-auto">
 					{$activePlanTab === 'beginner' ? seoTexts.beginnerDesc : seoTexts.advancedDesc}
 				</p>
@@ -644,5 +645,10 @@
 
 	.pulse-animation {
 		animation: pulse 2s infinite;
+	}
+
+	/* Neuer Stil für den zusätzlichen Abstand */
+	.spacer {
+		height: 0.75rem;
 	}
 </style>
