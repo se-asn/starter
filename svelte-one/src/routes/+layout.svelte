@@ -28,8 +28,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link rel="preconnect" href="https://cdnjs.cloudflare.com" />
 	<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
-	<!-- Wenn eigene Fonts verwendet werden: -->
-	<link rel="preload" href="/fonts/main-font.woff2" as="font" type="font/woff2" crossorigin />
+	<link rel="preload" href="/images/laufplaner_pro.webp" as="image" type="image/webp" />
 
 	<!-- SEO: Standard-Meta-Tags -->
 	<meta name="robots" content="index, follow" />
@@ -51,16 +50,6 @@
 	<meta property="og:url" content={$page.url.href} />
 	<meta property="og:type" content="website" />
 	<meta name="twitter:card" content="summary_large_image" />
-
-	<!-- Performance: Font Display Strategie -->
-	<style>
-		@font-face {
-			font-family: 'DeinFont';
-			src: url('/fonts/dein-font.woff2') format('woff2');
-			font-display: swap;
-			font-weight: normal;
-		}
-	</style>
 
 	<!-- Font Awesome mit defer für bessere Performance -->
 	<script
