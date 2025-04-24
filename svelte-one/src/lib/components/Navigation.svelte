@@ -1,58 +1,234 @@
 <!-- src/lib/components/Navigation.svelte -->
 <script>
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+
 	let mobileMenuVisible = false;
+	let activeSection = 'home';
+	let scrollY = 0;
+	let isScrolled = false;
+	let lastScrollY = 0;
+	let ticking = false;
 
 	function toggleMobileMenu() {
 		mobileMenuVisible = !mobileMenuVisible;
 	}
+
+	// Track active section based on scroll position with improved performance
+	function updateActiveSection() {
+		if (!ticking) {
+			window.requestAnimationFrame(() => {
+				const sections = document.querySelectorAll('section[id]');
+
+				// Find the section that's most in view
+				let currentSection = null;
+				let maxVisibleArea = 0;
+
+				sections.forEach((section) => {
+					const rect = section.getBoundingClientRect();
+					const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+
+					if (visibleHeight > maxVisibleArea) {
+						maxVisibleArea = visibleHeight;
+						currentSection = section;
+					}
+				});
+
+				if (currentSection && currentSection.id) {
+					activeSection = currentSection.id;
+					// Update URL hash without scrolling
+					history.replaceState(null, null, `#${activeSection}`);
+				}
+
+				// Check if page is scrolled for styling
+				isScrolled = scrollY > 50;
+				lastScrollY = scrollY;
+				ticking = false;
+			});
+
+			ticking = true;
+		}
+	}
+
+	// Close mobile menu when a link is clicked
+	function handleLinkClick(e) {
+		mobileMenuVisible = false;
+
+		// Implement smooth scrolling
+		const href = e.currentTarget.getAttribute('href');
+		if (href && href.startsWith('#')) {
+			e.preventDefault();
+			const targetId = href.substring(1);
+			const targetElement = document.getElementById(targetId);
+
+			if (targetElement) {
+				targetElement.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start'
+				});
+
+				// Update active section after scroll
+				setTimeout(() => {
+					activeSection = targetId;
+				}, 500);
+			}
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('scroll', () => {
+			scrollY = window.scrollY;
+			updateActiveSection();
+		});
+	});
 </script>
 
-<nav class="nav">
-	<div class="container">
-		<div class="nav-content">
-			<div class="nav-left">
-				<div class="nav-logo">
-					<a href="/" class="logo-link">
-						<span class="logo">LAUF<span class="text-primary">PLANER</span> PRO</span>
-					</a>
-				</div>
-				<div class="nav-links-desktop">
-					<a href="#laufplaene" class="nav-link">LAUFPLÄNE</a>
-					<a href="#features" class="nav-link">FEATURES</a>
-					<a href="#about" class="nav-link">ÜBER UNS</a>
-					<a href="#faq" class="nav-link">FAQ</a>
-				</div>
-			</div>
-			<div class="nav-right">
-				<a href="#signup" class="btn-primary">JETZT STARTEN</a>
-			</div>
-			<div class="nav-mobile-button">
-				<button on:click={toggleMobileMenu} aria-label="Menü öffnen">
-					<i class="fas fa-bars"></i>
-				</button>
-			</div>
-		</div>
+<svelte:window bind:scrollY on:scroll={updateActiveSection} />
 
-		<!-- Mobile menu -->
-		{#if mobileMenuVisible}
-			<div class="mobile-menu">
-				<a href="#laufplaene" class="mobile-link">LAUFPLÄNE</a>
-				<a href="#features" class="mobile-link">FEATURES</a>
-				<a href="#about" class="mobile-link">ÜBER UNS</a>
-				<a href="#faq" class="mobile-link">FAQ</a>
-				<a href="#signup" class="mobile-button">JETZT STARTEN</a>
+<!-- Skip to main content for accessibility -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<header
+	class="site-header {isScrolled ? 'scrolled' : ''}"
+	itemscope
+	itemtype="https://schema.org/SiteNavigationElement"
+>
+	<nav class="nav" aria-label="Main Navigation">
+		<div class="container">
+			<div class="nav-content">
+				<div class="nav-left">
+					<div class="nav-logo" itemscope itemtype="https://schema.org/Organization">
+						<a href="/" class="logo-link" itemprop="url" aria-label="LaufPlaner Pro Homepage">
+							<span class="logo" itemprop="name"
+								>LAUF<span class="text-primary">PLANER</span> PRO</span
+							>
+						</a>
+						<meta itemprop="logo" content="/images/logo.png" />
+					</div>
+					<div class="nav-links-desktop" role="menubar">
+						<a
+							href="#laufplaene"
+							class="nav-link {activeSection === 'laufplaene' ? 'active' : ''}"
+							role="menuitem"
+							on:click={handleLinkClick}>LAUFPLÄNE</a
+						>
+						<a
+							href="#features"
+							class="nav-link {activeSection === 'features' ? 'active' : ''}"
+							role="menuitem"
+							on:click={handleLinkClick}>FEATURES</a
+						>
+						<a
+							href="#testimonials"
+							class="nav-link {activeSection === 'testimonials' ? 'active' : ''}"
+							role="menuitem"
+							on:click={handleLinkClick}>ERFOLGE</a
+						>
+						<a
+							href="#about"
+							class="nav-link {activeSection === 'about' ? 'active' : ''}"
+							role="menuitem"
+							on:click={handleLinkClick}>ÜBER UNS</a
+						>
+						<a
+							href="#faq"
+							class="nav-link {activeSection === 'faq' ? 'active' : ''}"
+							role="menuitem"
+							on:click={handleLinkClick}>FAQ</a
+						>
+					</div>
+				</div>
+				<div class="nav-right">
+					<div class="search-container">
+						<button class="search-button" aria-label="Suchen">
+							<i class="fas fa-search"></i>
+						</button>
+					</div>
+					<a href="#signup" class="btn-primary pulse-animation" on:click={handleLinkClick}
+						>JETZT STARTEN</a
+					>
+				</div>
+				<div class="nav-mobile-button">
+					<button
+						on:click={toggleMobileMenu}
+						aria-label={mobileMenuVisible ? 'Menü schließen' : 'Menü öffnen'}
+						aria-expanded={mobileMenuVisible}
+					>
+						<i class={mobileMenuVisible ? 'fas fa-times' : 'fas fa-bars'}></i>
+					</button>
+				</div>
 			</div>
-		{/if}
-	</div>
-</nav>
+
+			<!-- Mobile menu with improved accessibility -->
+			{#if mobileMenuVisible}
+				<div class="mobile-menu" role="menu">
+					<a
+						href="#laufplaene"
+						class="mobile-link {activeSection === 'laufplaene' ? 'active' : ''}"
+						role="menuitem"
+						on:click={handleLinkClick}>LAUFPLÄNE</a
+					>
+					<a
+						href="#features"
+						class="mobile-link {activeSection === 'features' ? 'active' : ''}"
+						role="menuitem"
+						on:click={handleLinkClick}>FEATURES</a
+					>
+					<a
+						href="#testimonials"
+						class="mobile-link {activeSection === 'testimonials' ? 'active' : ''}"
+						role="menuitem"
+						on:click={handleLinkClick}>ERFOLGE</a
+					>
+					<a
+						href="#about"
+						class="mobile-link {activeSection === 'about' ? 'active' : ''}"
+						role="menuitem"
+						on:click={handleLinkClick}>ÜBER UNS</a
+					>
+					<a
+						href="#faq"
+						class="mobile-link {activeSection === 'faq' ? 'active' : ''}"
+						role="menuitem"
+						on:click={handleLinkClick}>FAQ</a
+					>
+					<a href="#signup" class="mobile-button" on:click={handleLinkClick}>JETZT STARTEN</a>
+				</div>
+			{/if}
+		</div>
+	</nav>
+
+	<!-- Optional breadcrumbs for deep pages -->
+	{#if $page?.url?.pathname !== '/'}
+		<div class="breadcrumbs container">
+			<a href="/">Startseite</a> &rsaquo;
+			<span>{$page?.data?.title || 'Aktuelle Seite'}</span>
+		</div>
+	{/if}
+</header>
 
 <style>
 	.nav {
 		background-color: var(--dark-gray);
-		position: sticky;
+		position: fixed;
+		width: 100%;
 		top: 0;
+		left: 0;
 		z-index: 50;
 		border-bottom: 1px solid #2d2d2d;
+		transition:
+			background-color 0.3s ease,
+			box-shadow 0.3s ease;
+	}
+
+	.site-header.scrolled .nav {
+		background-color: rgba(18, 18, 18, 0.95);
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+	}
+
+	/* Add padding to body to prevent content from hiding under fixed navbar */
+	:global(body) {
+		padding-top: 4rem;
 	}
 
 	.nav-content {
@@ -120,6 +296,13 @@
 		border-bottom-color: var(--primary);
 	}
 
+	.nav-link.active,
+	.mobile-link.active {
+		color: white;
+		border-bottom-color: var(--primary);
+		font-weight: 600;
+	}
+
 	.nav-right {
 		display: none;
 	}
@@ -134,6 +317,22 @@
 	.btn-primary {
 		font-size: 0.875rem;
 		padding: 0.5rem 1rem;
+	}
+
+	.pulse-animation {
+		animation: pulse 2s infinite;
+	}
+
+	@keyframes pulse {
+		0% {
+			box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.4);
+		}
+		70% {
+			box-shadow: 0 0 0 6px rgba(0, 242, 254, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(0, 242, 254, 0);
+		}
 	}
 
 	.nav-mobile-button {
@@ -171,6 +370,10 @@
 		padding: 0.5rem 0.75rem;
 		font-size: 1rem;
 		font-weight: 500;
+		transition:
+			color 0.3s ease,
+			border-color 0.3s ease,
+			font-weight 0.3s ease;
 	}
 
 	.mobile-button {
@@ -182,5 +385,59 @@
 		text-align: center;
 		text-decoration: none;
 		font-weight: 500;
+	}
+
+	.skip-link {
+		position: absolute;
+		top: -40px;
+		left: 0;
+		background: var(--primary);
+		color: var(--dark);
+		padding: 8px;
+		z-index: 100;
+		transition: top 0.3s;
+	}
+
+	.skip-link:focus {
+		top: 0;
+	}
+
+	.search-container {
+		margin-right: 15px;
+		display: none;
+	}
+
+	@media (min-width: 768px) {
+		.search-container {
+			display: block;
+		}
+	}
+
+	.search-button {
+		background: transparent;
+		border: none;
+		color: #a0a0a0;
+		cursor: pointer;
+		padding: 5px 10px;
+		transition: color 0.3s;
+	}
+
+	.search-button:hover {
+		color: white;
+	}
+
+	.breadcrumbs {
+		padding: 10px 0;
+		font-size: 0.8rem;
+		color: #a0a0a0;
+	}
+
+	.breadcrumbs a {
+		color: #a0a0a0;
+		text-decoration: none;
+	}
+
+	.breadcrumbs a:hover {
+		color: var(--primary);
 	}
 </style>
