@@ -11,7 +11,7 @@
 			subtitle: 'in 6-8 Wochen',
 			title: 'Vom Sofa zur 5K-Ziellinie',
 			description:
-				'Der perfekte Einstieg für Laufneulinge – unser praxiserprobtes Konzept baut deine Ausdauer behutsam auf, ohne deinen Körper zu überfordern.',
+				'Der perfekte Einstieg für Laufneulinge – unser Konzept baut deine Ausdauer behutsam auf.',
 			features: [
 				'Clever konzipierte Geh-Lauf-Intervalle für sanften Aufbau deiner Kondition',
 				'3 effektive Trainingseinheiten pro Woche für optimalen Fortschritt',
@@ -26,7 +26,7 @@
 			subtitle: 'mit System',
 			title: 'Systematisch zur 10K-Distanz',
 			description:
-				'Verdopple deine Ausdauer mit unserem expertenkonstruierten Trainingsaufbau – die perfekte Balance aus Tempoeinheiten und strategischen Erholungsphasen.',
+				'Verdopple deine Ausdauer mit unserem Trainingsaufbau – die perfekte Balance aus Tempo und Erholung.',
 			features: [
 				'Aufbauend auf 5K-Fitness mit intelligenter Belastungssteigerung',
 				'4 strukturierte Trainingseinheiten pro Woche für kontinuierlichen Fortschritt',
@@ -41,7 +41,7 @@
 			subtitle: 'für Einsteiger',
 			title: 'Erster Halbmarathon-Erfolg',
 			description:
-				'Von Läufern für Läufer entwickelt – unser praxisnaher Plan führt dich mit durchdachtem Training zur erfolgreichen Bewältigung deiner ersten 21K.',
+				'Von Läufern für Läufer entwickelt – unser Plan führt dich zur erfolgreichen Bewältigung deiner ersten 21K.',
 			features: [
 				'Evidenzbasierter, schonender Aufbau deiner Langstreckenfähigkeit',
 				'Motivierende Trainingsstruktur für nachhaltiges Durchhaltevermögen',
@@ -61,7 +61,7 @@
 			subtitle: 'erster Marathon',
 			title: 'Erfolgreicher Marathon-Einsteiger',
 			description:
-				'Der Traum vom Marathon wird Realität – mit unserem von Experten entwickelten Plan meisterst du die Königsdistanz mit Freude statt Quälerei.',
+				'Der Traum vom Marathon wird Realität – mit unserem Plan meisterst du die Königsdistanz mit Freude.',
 			features: [
 				'Realistische, alltagstaugliche Trainingsziele für Marathonneulinge',
 				'Kristallklarer Wochenaufbau mit intelligenter Steigerungslogik',
@@ -78,8 +78,7 @@
 			distance: '5K',
 			subtitle: 'Bestzeiten',
 			title: 'Deine neue 5K-Bestzeit',
-			description:
-				'Sprenge deine Tempogrenzen mit unserem von Elite-Trainern konzipierten Leistungsplan – jede Sekunde zählt auf dem Weg zu deiner neuen Bestmarke.',
+			description: 'Sprenge deine Tempogrenzen mit unserem Leistungsplan – jede Sekunde zählt.',
 			features: [
 				'Hocheffektive Intervall-Architekturen für messbare Geschwindigkeitsexplosion',
 				'Ausgeklügeltes Techniktraining für optimale Laufökonomie und Effizienz',
@@ -94,7 +93,7 @@
 			subtitle: 'Leistungsorientiert',
 			title: 'Performance-Optimierung 10K',
 			description:
-				'Durchbreche deine 10K-Schallmauer mit modernsten Trainingsmethoden – unser Plan kombiniert Schwellentraining, Lauf-ABC und mentale Stärke für deinen Erfolg.',
+				'Durchbreche deine 10K-Schallmauer mit modernsten Trainingsmethoden – unser Plan kombiniert Tempo und mentale Stärke.',
 			features: [
 				'Hochmoderne Schwelleneinheiten für maximale Tempohärte und Laktattoleranz',
 				'Durchdachtes Periodisierungssystem mit präzisen Belastungs- und Erholungsphasen',
@@ -109,7 +108,7 @@
 			subtitle: 'mit Strategie',
 			title: 'Halbmarathon auf neuem Niveau',
 			description:
-				'Revolutioniere deine Halbmarathon-Performance mit unserem von Eliteläufern inspirierten Plan – gezielte Optimierung von Tempo, Ausdauer und mentaler Härte.',
+				'Revolutioniere deine Halbmarathon-Performance mit unserem Plan – gezielte Optimierung von Tempo und Ausdauer.',
 			features: [
 				'Präzisionsgesteuertes Tempotraining für optimale Rennpace-Stabilität',
 				'Von Profis erprobte Rennstrategien für perfekte Wettkampfeinteilung',
@@ -129,7 +128,7 @@
 			subtitle: 'Performance',
 			title: 'Marathon-Leistungsoptimierung',
 			description:
-				'Erobere die Königsdistanz mit Bestzeit – unser Elite-Plan macht ambitionierte Ziele wie Sub4, Sub3:30 oder schneller zur greifbaren Realität.',
+				'Erobere die Königsdistanz mit Bestzeit – unser Plan macht ambitionierte Ziele wie Sub4 zur Realität.',
 			features: [
 				'Innovatives System aus Tempoeinheiten für optimale Marathon-Pace-Ökonomie',
 				'Strategisch durchkomponierte Long Runs mit wechselnden Trainingsschwerpunkten',
@@ -145,11 +144,21 @@
 		beginnerTitle: 'Laufpläne für Anfänger - vom ersten Kilometer bis zum Marathon',
 		advancedTitle: 'Performance-Pläne für ambitionierte Läufer und Wettkämpfer',
 		beginnerDesc:
-			'Von Laufexperten entwickelte Trainingspläne für Einsteiger und Wiedereinsteiger - mit alltagstauglicher Struktur für konstanten Fortschritt und langanhaltende Motivation.',
+			'Von Experten konzipierte Laufpläne für Einsteiger - strukturiert, motivierend und erfolgsorientiert.',
 		advancedDesc:
-			'Hochentwickelte Trainingssysteme für ambitionierte Läufer mit klarem Fokus auf Bestzeiten, effektive Wettkampfvorbereitung und kontinuierliche Leistungssteigerung.',
+			'Hochentwickelte Trainingssysteme für ambitionierte Läufer - fokussiert auf Bestzeiten und effektive Wettkampfvorbereitung.',
 		metaDescription:
 			'Maßgeschneiderte, von Experten entwickelte Laufpläne für 5K, 10K, Halbmarathon und Marathon - für Anfänger und Fortgeschrittene. Trainiere mit System und erreiche deine Ziele!'
+	};
+
+	// Add additional SEO metadata
+	const pageSEO = {
+		title: 'Professionelle Laufpläne für alle Niveaus | LaufPlaner Pro',
+		canonical: 'https://laufplanerpro.de/laufplaene',
+		ogDescription:
+			'Entdecke wissenschaftlich fundierte Laufpläne für jedes Niveau - vom 5K bis zum Marathon. Erreiche deine persönlichen Laufziele mit LaufPlaner Pro.',
+		additionalKeywords:
+			'Läufer Training, Laufprogramm, personalisierte Laufpläne, Lauftraining für 5K, 10K, Halbmarathon, Marathon'
 	};
 
 	function setActiveTab(tab) {
@@ -208,11 +217,54 @@
 				metaDesc.content = seoTexts.metaDescription;
 				document.head.appendChild(metaDesc);
 			}
+
+			// Add additional metadata for better SEO
+			if (!document.querySelector('meta[name="keywords"]')) {
+				const metaKeywords = document.createElement('meta');
+				metaKeywords.name = 'keywords';
+				metaKeywords.content = pageSEO.additionalKeywords;
+				document.head.appendChild(metaKeywords);
+			}
+
+			// Add canonical link
+			if (!document.querySelector('link[rel="canonical"]')) {
+				const canonicalLink = document.createElement('link');
+				canonicalLink.rel = 'canonical';
+				canonicalLink.href = pageSEO.canonical;
+				document.head.appendChild(canonicalLink);
+			}
+
+			// Add Open Graph meta tags
+			const ogTags = [
+				{ property: 'og:title', content: pageSEO.title },
+				{ property: 'og:description', content: pageSEO.ogDescription },
+				{ property: 'og:url', content: window.location.href },
+				{ property: 'og:type', content: 'website' },
+				{ property: 'og:site_name', content: 'LaufPlaner Pro' }
+			];
+
+			ogTags.forEach((tag) => {
+				if (!document.querySelector(`meta[property="${tag.property}"]`)) {
+					const metaTag = document.createElement('meta');
+					metaTag.setAttribute('property', tag.property);
+					metaTag.content = tag.content;
+					document.head.appendChild(metaTag);
+				}
+			});
 		}
 	});
 </script>
 
-<section id="laufplaene" class="plans py-20 bg-dark" aria-labelledby="plans-heading">
+<section
+	id="laufplaene"
+	class="plans py-20 bg-dark"
+	aria-labelledby="plans-heading"
+	itemscope
+	itemtype="https://schema.org/CollectionPage"
+>
+	<meta itemprop="name" content={pageSEO.title} />
+	<meta itemprop="description" content={pageSEO.ogDescription} />
+
 	<div class="container mx-auto px-4">
 		<!-- SEO-optimierter Header mit verbesserter Struktur -->
 		<header class="section-header text-center mb-12">
@@ -310,28 +362,32 @@
 								</li>
 							{/each}
 						</ul>
-						<div
-							class="plan-footer flex justify-between items-center border-t border-gray-700 pt-4"
-						>
-							<span
-								class="plan-price text-xl font-bold"
-								itemprop="offers"
-								itemscope
-								itemtype="https://schema.org/Offer"
-							>
-								<span itemprop="price" content={plan.price.replace('€', '')}>{plan.price}</span>
-								<meta itemprop="priceCurrency" content="EUR" />
-							</span>
-							<!-- Überzeugender Call-to-Action Button statt "Vormerken" -->
-							<a
-								href="#signup"
-								class="btn-primary btn-buy pulse-animation"
-								itemprop="url"
-								rel="nofollow"
-							>
-								<span class="btn-text">Jetzt sichern</span>
-								<span class="btn-icon">→</span>
-							</a>
+
+						<!-- Redesigned footer with flexbox for perfect alignment -->
+						<div class="plan-footer fixed-height">
+							<div class="price-container">
+								<span
+									class="plan-price text-xl font-bold"
+									itemprop="offers"
+									itemscope
+									itemtype="https://schema.org/Offer"
+								>
+									<span itemprop="price" content={plan.price.replace('€', '')}>{plan.price}</span>
+									<meta itemprop="priceCurrency" content="EUR" />
+								</span>
+							</div>
+							<div class="button-container">
+								<a
+									href="#signup"
+									class="btn-primary btn-buy pulse-animation"
+									itemprop="url"
+									rel="nofollow"
+									aria-label="Plan {plan.title} jetzt sichern"
+								>
+									<span class="btn-text">Jetzt sichern</span>
+									<span class="btn-icon">→</span>
+								</a>
+							</div>
 						</div>
 					</div>
 					<meta itemprop="keywords" content={plan.keywords.join(', ')} />
@@ -341,7 +397,7 @@
 			{/each}
 		</div>
 
-		<!-- Optimiertes Markup für Fortgeschrittenen-Pläne -->
+		<!-- Optimiertes Markup für Fortgeschrittenen-Pläne mit identischer Struktur -->
 		<div
 			id="advanced-plans"
 			role="tabpanel"
@@ -382,28 +438,32 @@
 								</li>
 							{/each}
 						</ul>
-						<div
-							class="plan-footer flex justify-between items-center border-t border-gray-700 pt-4"
-						>
-							<span
-								class="plan-price text-xl font-bold"
-								itemprop="offers"
-								itemscope
-								itemtype="https://schema.org/Offer"
-							>
-								<span itemprop="price" content={plan.price.replace('€', '')}>{plan.price}</span>
-								<meta itemprop="priceCurrency" content="EUR" />
-							</span>
-							<!-- Überzeugender Call-to-Action Button statt "Vormerken" -->
-							<a
-								href="#signup"
-								class="btn-primary btn-buy pulse-animation"
-								itemprop="url"
-								rel="nofollow"
-							>
-								<span class="btn-text">Sofort starten</span>
-								<span class="btn-icon">→</span>
-							</a>
+
+						<!-- Identical footer structure for perfect alignment across tabs -->
+						<div class="plan-footer fixed-height">
+							<div class="price-container">
+								<span
+									class="plan-price text-xl font-bold"
+									itemprop="offers"
+									itemscope
+									itemtype="https://schema.org/Offer"
+								>
+									<span itemprop="price" content={plan.price.replace('€', '')}>{plan.price}</span>
+									<meta itemprop="priceCurrency" content="EUR" />
+								</span>
+							</div>
+							<div class="button-container">
+								<a
+									href="#signup"
+									class="btn-primary btn-buy pulse-animation"
+									itemprop="url"
+									rel="nofollow"
+									aria-label="Plan {plan.title} sofort starten"
+								>
+									<span class="btn-text">Sofort starten</span>
+									<span class="btn-icon">→</span>
+								</a>
+							</div>
 						</div>
 					</div>
 					<meta itemprop="keywords" content={plan.keywords.join(', ')} />
@@ -411,6 +471,48 @@
 					<meta itemprop="sku" content={plan.id} />
 				</article>
 			{/each}
+		</div>
+
+		<!-- Footer information with additional rich snippets -->
+		<div
+			class="plan-section-footer mt-24 text-center"
+			itemscope
+			itemtype="https://schema.org/FAQPage"
+		>
+			<div
+				class="max-w-2xl mx-auto py-6"
+				itemprop="mainEntity"
+				itemscope
+				itemtype="https://schema.org/Question"
+			>
+				<!-- Enhanced spacers before the FAQ heading for more vertical space -->
+				<div class="spacer py-6"></div>
+				<div class="spacer py-6"></div>
+
+				<h4 class="text-lg font-semibold mb-6" itemprop="name">
+					Wie finde ich den richtigen Laufplan?
+				</h4>
+
+				<!-- Added spacer div between question and answer -->
+				<div class="spacer py-4"></div>
+
+				<div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
+					<div class="text-gray-300 mb-12 leading-relaxed" itemprop="text">
+						<p class="mb-10">
+							Wähle den passenden Plan basierend auf deinem Fitnesslevel, Lauferfahrungen und
+							persönlichen Zielen.
+						</p>
+
+						<!-- Added spacer div for more vertical space -->
+						<div class="spacer py-4"></div>
+
+						<p class="mt-4">
+							Anfänger sollten mit den Einstiegsplänen beginnen, während erfahrene Läufer von
+							unseren leistungsorientierten Plänen profitieren.
+						</p>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </section>
@@ -564,11 +666,31 @@
 	}
 
 	.plan-footer {
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr 140px; /* Fixed grid with exact button width */
+		grid-gap: 10px;
 		align-items: center;
 		border-top: 1px solid var(--light-gray);
 		padding-top: 1rem;
+		height: 3.75rem;
+	}
+
+	.plan-footer.fixed-height {
+		border-top: 1px solid var(--light-gray);
+		padding-top: 1rem;
+		height: 3.75rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.price-container {
+		flex: 1;
+	}
+
+	.button-container {
+		width: 140px;
+		height: 2.5rem;
 	}
 
 	.plan-price {
@@ -580,28 +702,15 @@
 		background-clip: text;
 	}
 
-	.btn-primary {
-		padding: 0.5rem 1rem;
-		font-size: 0.875rem;
-		background-color: var(--primary);
-		color: var(--dark);
-		font-weight: 500;
-		border-radius: 0.375rem;
-		transition: background-color 0.2s ease;
-		text-decoration: none;
-		display: inline-block;
-	}
-
-	.btn-primary:hover {
-		background-color: var(--primary-dark);
-	}
-
 	/* Neue Stile für verbesserten Kaufbutton */
 	.btn-buy {
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		gap: 0.5rem;
 		padding: 0.5rem 1rem;
+		height: 100%;
+		width: 100%;
 		font-size: 0.875rem;
 		font-weight: 600;
 		letter-spacing: 0.5px;
@@ -609,7 +718,6 @@
 		color: var(--dark);
 		border-radius: 0.375rem;
 		transition: all 0.3s ease;
-		position: relative;
 		overflow: hidden;
 		z-index: 1;
 		box-shadow: 0 4px 12px rgba(0, 242, 254, 0.2);
