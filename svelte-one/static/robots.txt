@@ -1,0 +1,16 @@
+# robots.txt für LaufPlanerPro
+User-agent: *
+Allow: /
+
+# Verhindern von Crawling für Admin-Bereiche (falls vorhanden)
+Disallow: /admin/
+Disallow: /konto/
+Disallow: /login/
+Disallow: /checkout/
+
+# Cache-Steuerung für Google-Bot
+User-agent: Googlebot
+Crawl-delay: 1
+
+# Sitemap-Verweis
+Sitemap: https://laufplanerpro.de/sitemap.xml
