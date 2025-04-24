@@ -129,6 +129,7 @@
 <style>
 	.why-plan {
 		padding: 5rem 0;
+		background-color: var(--dark-gray);
 	}
 
 	.why-plan-content {

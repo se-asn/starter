@@ -129,7 +129,7 @@
 <style>
 	.example-week {
 		padding: 5rem 0;
-		background-color: var(--dark-gray);
+		background-color: var(--dark);
 	}
 
 	.week-table-container {

@@ -223,7 +223,8 @@
 <style>
 	.testimonials {
 		padding: 5rem 0;
-		background-color: var(--dark);
+		/* Geändert von var(--dark) zu var(--dark-gray) für besseren visuellen Rhythmus */
+		background-color: var(--dark-gray);
 	}
 
 	.section-header {
@@ -274,6 +275,7 @@
 		min-width: 100%;
 		padding: 2.5rem 2rem;
 		box-sizing: border-box;
+		/* Unverändert var(--dark-gray), da es bereits gut kontrastiert */
 		background-color: var(--dark-gray);
 	}
 
@@ -432,7 +434,8 @@
 
 	.stat-item {
 		text-align: center;
-		background-color: var(--dark-gray);
+		/* Hintergrund zu var(--dark) geändert für besseren Kontrast zum Haupthintergrund */
+		background-color: var(--dark);
 		padding: 1.5rem;
 		border-radius: 0.5rem;
 		transition:

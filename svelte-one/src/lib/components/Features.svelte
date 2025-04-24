@@ -159,6 +159,7 @@
 <style>
 	.features {
 		padding: 5rem 0;
+		/* Geändert von var(--dark) zu var(--dark-gray) */
 		background-color: var(--dark-gray);
 	}
 
@@ -176,6 +177,7 @@
 	}
 
 	.feature-item {
+		/* Von var(--dark-gray) zu var(--dark) geändert für besseren Kontrast */
 		background-color: var(--dark);
 		border-radius: 0.5rem;
 		padding: 1.5rem;

@@ -173,6 +173,8 @@
 <style>
 	.faq {
 		padding: 5rem 0;
+		/* Angepasst für den visuellen Rhythmus */
+		background-color: var(--dark-gray);
 	}
 
 	.faq-container {
@@ -192,7 +194,8 @@
 
 	.faq-question {
 		width: 100%;
-		background-color: var(--dark-gray);
+		/* Dunkler als Hintergrund für Kontrast */
+		background-color: var(--dark);
 		padding: 1.25rem;
 		border-radius: 0.5rem;
 		text-align: left;
@@ -231,7 +234,8 @@
 	}
 
 	.faq-answer {
-		background-color: var(--dark-gray);
+		/* Gleiche Farbe wie Fragen für Konsistenz */
+		background-color: var(--dark);
 		padding: 1.25rem;
 		border-bottom-left-radius: 0.5rem;
 		border-bottom-right-radius: 0.5rem;
@@ -245,12 +249,13 @@
 
 	/* Neuer Info-Box-Stil anstatt der CTA */
 	.faq-info-box {
+		/* Gleiche Farbe wie Fragen für Konsistenz */
+		background-color: var(--dark);
+		border-left: 3px solid var(--primary);
 		max-width: 48rem;
 		margin: 3rem auto 0;
 		padding: 2rem;
-		background-color: rgba(0, 242, 254, 0.05);
 		border-radius: 0.5rem;
-		border-left: 3px solid var(--primary);
 	}
 
 	.info-box-title {

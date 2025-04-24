@@ -414,7 +414,7 @@
 <style>
 	.signup-section {
 		padding: 5rem 0;
-		background-color: var(--dark-gray);
+		background-color: var(--dark);
 	}
 
 	.signup-card {
