@@ -2,7 +2,6 @@
 <script>
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { slide } from 'svelte/transition';
 
 	let mobileMenuVisible = false;
 	let activeSection = 'home';
@@ -140,6 +139,11 @@
 					</div>
 				</div>
 				<div class="nav-right">
+					<div class="search-container">
+						<button class="search-button" aria-label="Suchen">
+							<i class="fas fa-search"></i>
+						</button>
+					</div>
 					<a href="#signup" class="btn-primary pulse-animation" on:click={handleLinkClick}
 						>JETZT STARTEN</a
 					>
@@ -396,6 +400,30 @@
 
 	.skip-link:focus {
 		top: 0;
+	}
+
+	.search-container {
+		margin-right: 15px;
+		display: none;
+	}
+
+	@media (min-width: 768px) {
+		.search-container {
+			display: block;
+		}
+	}
+
+	.search-button {
+		background: transparent;
+		border: none;
+		color: #a0a0a0;
+		cursor: pointer;
+		padding: 5px 10px;
+		transition: color 0.3s;
+	}
+
+	.search-button:hover {
+		color: white;
 	}
 
 	.breadcrumbs {
