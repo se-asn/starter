@@ -12,7 +12,9 @@
 		<div class="nav-content">
 			<div class="nav-left">
 				<div class="nav-logo">
-					<span class="logo">LAUF<span class="text-primary">PLANER</span> PRO</span>
+					<a href="/" class="logo-link">
+						<span class="logo">LAUF<span class="text-primary">PLANER</span> PRO</span>
+					</a>
 				</div>
 				<div class="nav-links-desktop">
 					<a href="#laufplaene" class="nav-link">LAUFPLÄNE</a>
@@ -68,6 +70,17 @@
 	.nav-logo {
 		display: flex;
 		align-items: center;
+	}
+
+	.logo-link {
+		text-decoration: none;
+		color: inherit;
+		display: inline-block;
+		transition: transform 0.2s ease;
+	}
+
+	.logo-link:hover {
+		transform: scale(1.05);
 	}
 
 	.logo {
