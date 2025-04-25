@@ -1,6 +1,5 @@
 // src/routes/blog/[slug]/+page.server.js
-import { getAllPosts, getPostBySlug } from '$lib/blog/utils';
-import { marked } from 'marked';
+import { getPostBySlug } from '$lib/blog/utils';
 import { error } from '@sveltejs/kit';
 
 export function load({ params }) {
@@ -10,24 +9,8 @@ export function load({ params }) {
 		throw error(404, 'Post nicht gefunden');
 	}
 
-	const htmlContent = marked(post.content || '');
-
-	// Hole verwandte Posts basierend auf Tags oder Kategorie
-	const allPosts = getAllPosts();
-	const relatedPosts = allPosts
-		.filter(
-			(p) =>
-				p.slug !== post.slug &&
-				((post.tags && p.tags && p.tags.some((tag) => post.tags.includes(tag))) ||
-					p.category === post.category)
-		)
-		.slice(0, 3); // Zeige maximal 3 verwandte Posts
-
+	// Mit mdsvex wird die Markdown-Konvertierung bereits beim Import erledigt
 	return {
-		post: {
-			...post,
-			htmlContent
-		},
-		relatedPosts
+		post
 	};
 }

@@ -1,27 +1,72 @@
 <!-- src/lib/components/Navigation.svelte -->
 <script>
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { slide } from 'svelte/transition';
+	import { onMount, tick } from 'svelte';
 
+	// Elementare Variablen
 	let mobileMenuVisible = false;
-	let activeSection = 'home';
+	let activeSection = '';
 	let scrollY = 0;
 	let isScrolled = false;
-	let lastScrollY = 0;
 	let ticking = false;
 
 	function toggleMobileMenu() {
 		mobileMenuVisible = !mobileMenuVisible;
 	}
 
-	// Track active section based on scroll position with improved performance
-	function updateActiveSection() {
+	// WICHTIGSTE ÄNDERUNG: Vereinfachter Link-Handler
+	function handleLinkClick(e) {
+		// Mobile Menü immer schließen
+		mobileMenuVisible = false;
+
+		const href = e.currentTarget.getAttribute('href');
+
+		// Wenn es ein Anker-Link auf der Hauptseite ist
+		if (href && href.startsWith('#') && $page.url.pathname === '/') {
+			// Verhindern der Standard-Navigation
+			e.preventDefault();
+			e.stopPropagation();
+
+			const targetId = href.substring(1);
+			const targetElement = document.getElementById(targetId);
+
+			if (targetElement) {
+				// Scroll zum Element
+				targetElement.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start'
+				});
+
+				// Aktualisiere aktiven Abschnitt
+				activeSection = targetId;
+			}
+		}
+		// Sonst lassen wir das Browser-Standardverhalten für Navigation zu
+	}
+
+	// Verbesserte getHref-Funktion
+	function getHref(anchorLink) {
+		// Wenn nicht auf der Hauptseite, füge / vor dem Anker hinzu
+		if (anchorLink && anchorLink.startsWith('#') && $page.url.pathname !== '/') {
+			return '/' + anchorLink; // z.B. /#features
+		}
+		return anchorLink;
+	}
+
+	// Verbesserte updateActiveSection mit einem Reset
+	async function updateActiveSection() {
+		// Keine aktive Sektion außerhalb der Hauptseite
+		if ($page.url.pathname !== '/') {
+			activeSection = '';
+			return;
+		}
+
 		if (!ticking) {
+			ticking = true;
+			await tick();
+
 			window.requestAnimationFrame(() => {
 				const sections = document.querySelectorAll('section[id]');
-
-				// Find the section that's most in view
 				let currentSection = null;
 				let maxVisibleArea = 0;
 
@@ -29,7 +74,7 @@
 					const rect = section.getBoundingClientRect();
 					const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
 
-					if (visibleHeight > maxVisibleArea) {
+					if (visibleHeight > maxVisibleArea && visibleHeight > 0) {
 						maxVisibleArea = visibleHeight;
 						currentSection = section;
 					}
@@ -37,50 +82,38 @@
 
 				if (currentSection && currentSection.id) {
 					activeSection = currentSection.id;
-					// Update URL hash without scrolling
-					history.replaceState(null, null, `#${activeSection}`);
 				}
 
-				// Check if page is scrolled for styling
 				isScrolled = scrollY > 50;
-				lastScrollY = scrollY;
 				ticking = false;
 			});
-
-			ticking = true;
-		}
-	}
-
-	// Close mobile menu when a link is clicked
-	function handleLinkClick(e) {
-		mobileMenuVisible = false;
-
-		// Implement smooth scrolling
-		const href = e.currentTarget.getAttribute('href');
-		if (href && href.startsWith('#')) {
-			e.preventDefault();
-			const targetId = href.substring(1);
-			const targetElement = document.getElementById(targetId);
-
-			if (targetElement) {
-				targetElement.scrollIntoView({
-					behavior: 'smooth',
-					block: 'start'
-				});
-
-				// Update active section after scroll
-				setTimeout(() => {
-					activeSection = targetId;
-				}, 500);
-			}
 		}
 	}
 
 	onMount(() => {
+		// Reset activeSection wenn nicht auf der Hauptseite
+		if ($page.url.pathname !== '/') {
+			activeSection = '';
+		}
+
+		// Initialen aktiven Abschnitt erkennen
+		if ($page.url.pathname === '/' && window.location.hash) {
+			const hash = window.location.hash.substring(1);
+			const element = document.getElementById(hash);
+			if (element) {
+				activeSection = hash;
+			}
+		}
+
 		window.addEventListener('scroll', () => {
 			scrollY = window.scrollY;
-			updateActiveSection();
+			if ($page.url.pathname === '/') {
+				updateActiveSection();
+			}
 		});
+
+		// Initial ausführen
+		updateActiveSection();
 	});
 </script>
 
@@ -108,47 +141,81 @@
 					</div>
 					<!-- Desktop Navigation -->
 					<div class="nav-links-desktop" role="menubar">
+						<!-- Hauptseite-Link, immer zur Root-URL -->
 						<a
-							href="#laufplaene"
-							class="nav-link {activeSection === 'laufplaene' ? 'active' : ''}"
+							href="/"
+							class="nav-link {$page.url.pathname === '/' ? 'active' : ''}"
+							role="menuitem"
+						>
+							HOME
+						</a>
+
+						<!-- Laufpläne-Link, kontextsensitiv -->
+						<a
+							href={getHref('#laufplaene')}
+							class="nav-link {activeSection === 'laufplaene' && $page.url.pathname === '/'
+								? 'active'
+								: ''}"
 							role="menuitem"
 							on:click={handleLinkClick}>LAUFPLÄNE</a
 						>
+
+						<!-- Features-Link, kontextsensitiv -->
 						<a
-							href="#features"
-							class="nav-link {activeSection === 'features' ? 'active' : ''}"
+							href={getHref('#features')}
+							class="nav-link {activeSection === 'features' && $page.url.pathname === '/'
+								? 'active'
+								: ''}"
 							role="menuitem"
 							on:click={handleLinkClick}>FEATURES</a
 						>
-						<!-- Neuer Blog-Link -->
+
+						<!-- Blog-Link, direkte URL -->
 						<a
 							href="/blog"
 							class="nav-link {$page.url.pathname.startsWith('/blog') ? 'active' : ''}"
-							role="menuitem">BLOG</a
+							role="menuitem"
 						>
+							BLOG
+						</a>
+
+						<!-- ERFOLGE-Link korrigiert -->
 						<a
-							href="#testimonials"
-							class="nav-link {activeSection === 'testimonials' ? 'active' : ''}"
+							href={getHref('#testimonials')}
+							class="nav-link {activeSection === 'testimonials' && $page.url.pathname === '/'
+								? 'active'
+								: ''}"
 							role="menuitem"
 							on:click={handleLinkClick}>ERFOLGE</a
 						>
+
+						<!-- ÜBER UNS-Link korrigiert -->
 						<a
-							href="#about"
-							class="nav-link {activeSection === 'about' ? 'active' : ''}"
+							href={getHref('#about')}
+							class="nav-link {activeSection === 'about' && $page.url.pathname === '/'
+								? 'active'
+								: ''}"
 							role="menuitem"
 							on:click={handleLinkClick}>ÜBER UNS</a
 						>
+
+						<!-- FAQ-Link korrigiert -->
 						<a
-							href="#faq"
-							class="nav-link {activeSection === 'faq' ? 'active' : ''}"
+							href={getHref('#faq')}
+							class="nav-link {activeSection === 'faq' && $page.url.pathname === '/'
+								? 'active'
+								: ''}"
 							role="menuitem"
 							on:click={handleLinkClick}>FAQ</a
 						>
 					</div>
 				</div>
 				<div class="nav-right">
-					<a href="#signup" class="btn-primary pulse-animation" on:click={handleLinkClick}
-						>JETZT STARTEN</a
+					<!-- JETZT STARTEN-Button korrigiert -->
+					<a
+						href={getHref('#signup')}
+						class="btn-primary pulse-animation"
+						on:click={handleLinkClick}>JETZT STARTEN</a
 					>
 				</div>
 				<div class="nav-mobile-button">
@@ -166,42 +233,63 @@
 			{#if mobileMenuVisible}
 				<div class="mobile-menu" role="menu">
 					<a
-						href="#laufplaene"
-						class="mobile-link {activeSection === 'laufplaene' ? 'active' : ''}"
+						href={getHref('#laufplaene')}
+						class="mobile-link {activeSection === 'laufplaene' && $page.url.pathname === '/'
+							? 'active'
+							: ''}"
 						role="menuitem"
 						on:click={handleLinkClick}>LAUFPLÄNE</a
 					>
+
 					<a
-						href="#features"
-						class="mobile-link {activeSection === 'features' ? 'active' : ''}"
+						href={getHref('#features')}
+						class="mobile-link {activeSection === 'features' && $page.url.pathname === '/'
+							? 'active'
+							: ''}"
 						role="menuitem"
 						on:click={handleLinkClick}>FEATURES</a
 					>
-					<!-- Neuer Blog-Link -->
+
 					<a
 						href="/blog"
 						class="mobile-link {$page.url.pathname.startsWith('/blog') ? 'active' : ''}"
 						role="menuitem">BLOG</a
 					>
+
+					<!-- Mobile ERFOLGE-Link korrigiert -->
 					<a
-						href="#testimonials"
-						class="mobile-link {activeSection === 'testimonials' ? 'active' : ''}"
+						href={getHref('#testimonials')}
+						class="mobile-link {activeSection === 'testimonials' && $page.url.pathname === '/'
+							? 'active'
+							: ''}"
 						role="menuitem"
 						on:click={handleLinkClick}>ERFOLGE</a
 					>
+
+					<!-- Mobile ÜBER UNS-Link korrigiert -->
 					<a
-						href="#about"
-						class="mobile-link {activeSection === 'about' ? 'active' : ''}"
+						href={getHref('#about')}
+						class="mobile-link {activeSection === 'about' && $page.url.pathname === '/'
+							? 'active'
+							: ''}"
 						role="menuitem"
 						on:click={handleLinkClick}>ÜBER UNS</a
 					>
+
+					<!-- Mobile FAQ-Link korrigiert -->
 					<a
-						href="#faq"
-						class="mobile-link {activeSection === 'faq' ? 'active' : ''}"
+						href={getHref('#faq')}
+						class="mobile-link {activeSection === 'faq' && $page.url.pathname === '/'
+							? 'active'
+							: ''}"
 						role="menuitem"
 						on:click={handleLinkClick}>FAQ</a
 					>
-					<a href="#signup" class="mobile-button" on:click={handleLinkClick}>JETZT STARTEN</a>
+
+					<!-- Mobile JETZT STARTEN-Button korrigiert -->
+					<a href={getHref('#signup')} class="mobile-button" on:click={handleLinkClick}
+						>JETZT STARTEN</a
+					>
 				</div>
 			{/if}
 		</div>
@@ -281,6 +369,8 @@
 	.nav-links-desktop {
 		display: none;
 		margin-left: 1.5rem;
+		align-items: center; /* Vertikale Ausrichtung */
+		height: 100%;
 	}
 
 	@media (min-width: 640px) {
@@ -296,8 +386,10 @@
 		font-size: 0.875rem;
 		font-weight: 500;
 		border-bottom: 2px solid transparent;
-		padding-bottom: 0.25rem;
+		padding: 0.25rem 0.5rem; /* Konsistentes Padding für alle Links */
 		transition: all 0.3s ease;
+		display: inline-flex; /* Verbesserte Ausrichtung */
+		align-items: center; /* Vertikale Zentrierung */
 	}
 
 	.nav-link:hover {
@@ -376,7 +468,7 @@
 	.mobile-link {
 		color: #d0d0d0;
 		text-decoration: none;
-		padding: 0.5rem 0.75rem;
+		padding: 0.75rem; /* Konsistentes Padding */
 		font-size: 1rem;
 		font-weight: 500;
 		transition:
