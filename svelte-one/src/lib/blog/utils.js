@@ -54,3 +54,55 @@ export function getPostBySlug(slug) {
 		readingTime: stats.text
 	};
 }
+
+/**
+ * Verwandte Posts basierend auf Kategorien und Tags finden
+ * @param {Object} post - Der aktuelle Post
+ * @param {number} limit - Anzahl der verwandten Posts (Standard: 3)
+ * @returns {Array} - Array mit verwandten Posts
+ */
+export async function getRelatedPosts(post, limit = 3) {
+	if (!post) return [];
+
+	// Alle Posts holen (wiederverwendbare Funktion)
+	const allPosts = await getAllPosts();
+
+	// Aktuelle Post ausfiltern
+	const otherPosts = allPosts.filter((p) => p.slug !== post.slug);
+
+	// Relevanz-Score für jeden Post berechnen
+	const scoredPosts = otherPosts.map((otherPost) => {
+		let score = 0;
+
+		// Gleiche Kategorie ist sehr relevant
+		if (post.category && otherPost.category && post.category === otherPost.category) {
+			score += 5;
+		}
+
+		// Übereinstimmende Tags erhöhen die Relevanz
+		if (post.tags && otherPost.tags) {
+			const commonTags = post.tags.filter((tag) => otherPost.tags.includes(tag));
+			score += commonTags.length * 2;
+		}
+
+		return { ...otherPost, relevanceScore: score };
+	});
+
+	// Nach Relevanz sortieren und limitieren
+	const relatedPosts = scoredPosts
+		.filter((p) => p.relevanceScore > 0) // Nur relevante Posts
+		.sort((a, b) => b.relevanceScore - a.relevanceScore)
+		.slice(0, limit);
+
+	// Wenn nicht genug relevante Posts, fülle mit neuesten Posts auf
+	if (relatedPosts.length < limit) {
+		const newestPosts = scoredPosts
+			.filter((p) => !relatedPosts.includes(p))
+			.sort((a, b) => new Date(b.date) - new Date(a.date))
+			.slice(0, limit - relatedPosts.length);
+
+		relatedPosts.push(...newestPosts);
+	}
+
+	return relatedPosts;
+}

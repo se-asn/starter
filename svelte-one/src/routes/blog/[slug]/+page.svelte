@@ -89,21 +89,11 @@
 </svelte:head>
 
 <article class="blog-post" itemscope itemtype="https://schema.org/BlogPosting">
-	<!-- Featured Image Hero -->
+	<!-- Featured Image Hero - ohne Hintergrundbild -->
 	{#if post.featuredImage}
-		<div class="featured-hero">
+		<div class="featured-hero no-image">
 			<div class="featured-gradient"></div>
-			<img
-				src={post.featuredImage}
-				alt={post.title}
-				loading="eager"
-				fetchpriority="high"
-				decoding="sync"
-				class="featured-image-hero"
-				width="1920"
-				height="800"
-				itemprop="image"
-			/>
+			<!-- Bild entfernt -->
 			<div class="hero-content container">
 				<!-- Post Category -->
 				<div class="post-category-badge" itemprop="articleSection">
@@ -425,13 +415,6 @@
 		height: 100%;
 		background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(18, 18, 18, 0.8) 100%);
 		z-index: 1;
-	}
-
-	.featured-image-hero {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center;
 	}
 
 	.hero-content {
