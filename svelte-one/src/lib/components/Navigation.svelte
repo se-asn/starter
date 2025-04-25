@@ -106,6 +106,7 @@
 						</a>
 						<meta itemprop="logo" content="/images/logo.png" />
 					</div>
+					<!-- Desktop Navigation -->
 					<div class="nav-links-desktop" role="menubar">
 						<a
 							href="#laufplaene"
@@ -118,6 +119,12 @@
 							class="nav-link {activeSection === 'features' ? 'active' : ''}"
 							role="menuitem"
 							on:click={handleLinkClick}>FEATURES</a
+						>
+						<!-- Neuer Blog-Link -->
+						<a
+							href="/blog"
+							class="nav-link {$page.url.pathname.startsWith('/blog') ? 'active' : ''}"
+							role="menuitem">BLOG</a
 						>
 						<a
 							href="#testimonials"
@@ -155,7 +162,7 @@
 				</div>
 			</div>
 
-			<!-- Mobile menu with improved accessibility -->
+			<!-- Mobile Navigation -->
 			{#if mobileMenuVisible}
 				<div class="mobile-menu" role="menu">
 					<a
@@ -169,6 +176,12 @@
 						class="mobile-link {activeSection === 'features' ? 'active' : ''}"
 						role="menuitem"
 						on:click={handleLinkClick}>FEATURES</a
+					>
+					<!-- Neuer Blog-Link -->
+					<a
+						href="/blog"
+						class="mobile-link {$page.url.pathname.startsWith('/blog') ? 'active' : ''}"
+						role="menuitem">BLOG</a
 					>
 					<a
 						href="#testimonials"
