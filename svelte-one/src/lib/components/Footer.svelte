@@ -1,4 +1,14 @@
 <!-- src/lib/components/Footer.svelte -->
+<script>
+	import { page } from '$app/stores';
+
+	// Prüfen, ob es eine Blog-Seite ist
+	$: isBlogPage = $page.url.pathname.startsWith('/blog');
+
+	// Dynamische Links - auf Blog-Seiten zur Homepage verlinken
+	$: getLink = (anchor) => (isBlogPage ? `/#${anchor}` : `#${anchor}`);
+</script>
+
 <footer class="footer">
 	<div class="container">
 		<div class="footer-content">
@@ -8,16 +18,18 @@
 			</div>
 
 			<div class="footer-links">
-				<a href="#plans" class="footer-link">Laufpläne</a>
-				<a href="#faq" class="footer-link">FAQ</a>
-				<a href="#signup" class="footer-link">Anmelden</a>
+				<!-- Hier die ID von "plans" auf die tatsächliche ID ändern -->
+				<a href={getLink('laufplaene')} class="footer-link">Laufpläne</a>
+				<a href={getLink('faq')} class="footer-link">FAQ</a>
+				<a href={getLink('signup')} class="footer-link">Anmelden</a>
 				<a href="mailto:support@laufplanerpro.de" class="footer-link contact-link">
 					<i class="fas fa-envelope"></i> Kontakt
 				</a>
 			</div>
 		</div>
 
-		<!-- Neue Trust Signals Sektion -->
+		<!-- Rest des Footers unverändert -->
+		<!-- Trust Signals Sektion -->
 		<div class="trust-signals">
 			<div class="trust-item">
 				<i class="fas fa-lock"></i>
@@ -123,7 +135,7 @@
 		gap: 0.5rem;
 	}
 
-	/* Neue Styles für Trust Signals */
+	/* Trust Signals Styles */
 	.trust-signals {
 		display: flex;
 		flex-wrap: wrap;
@@ -147,7 +159,7 @@
 		color: var(--primary);
 	}
 
-	/* Styles für Zahlungsoptionen */
+	/* Zahlungsoptionen Styles */
 	.payment-options {
 		display: flex;
 		justify-content: center;

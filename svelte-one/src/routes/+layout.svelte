@@ -24,7 +24,11 @@
 </script>
 
 <svelte:head>
-	<!-- Alle bestehenden Meta-Tags... -->
+	<!-- Font Awesome global einbinden -->
+	<link
+		rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+	/>
 </svelte:head>
 
 <!-- Navigation auf ALLEN Seiten zeigen, auch auf Blog-Seiten -->

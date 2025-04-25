@@ -11,7 +11,6 @@
 	import FAQ from '$lib/components/FAQ.svelte';
 	import Signup from '$lib/components/Signup.svelte';
 	import Testimonials from '$lib/components/Testimonials.svelte';
-	import Footer from '$lib/components/Footer.svelte';
 </script>
 
 <svelte:head>
@@ -37,4 +36,3 @@
 <FAQ />
 <Signup />
 <Testimonials />
-<Footer />
