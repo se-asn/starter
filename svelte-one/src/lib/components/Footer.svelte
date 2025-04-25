@@ -9,7 +9,9 @@
 	$: getLink = (anchor) => (isBlogPage ? `/#${anchor}` : `#${anchor}`);
 </script>
 
-<footer class="footer">
+<footer class="footer" itemscope itemtype="https://schema.org/Organization">
+	<meta itemprop="name" content="LaufPlanerPro" />
+	<link itemprop="url" href="https://laufplanerpro.de" />
 	<div class="container">
 		<div class="footer-content">
 			<div class="footer-logo">
@@ -17,22 +19,23 @@
 				<p class="footer-tagline">Dein Weg zum nächsten Laufziel beginnt hier.</p>
 			</div>
 
-			<div class="footer-links">
-				<!-- Hier die ID von "plans" auf die tatsächliche ID ändern -->
-				<a href={getLink('laufplaene')} class="footer-link">Laufpläne</a>
+			<nav class="footer-links" aria-label="Footer-Navigation">
+				<a href={getLink('laufplaene')} class="footer-link" title="Unsere Laufpläne entdecken"
+					>Laufpläne</a
+				>
 				<a href={getLink('faq')} class="footer-link">FAQ</a>
 				<a href={getLink('signup')} class="footer-link">Anmelden</a>
 				<a href="mailto:support@laufplanerpro.de" class="footer-link contact-link">
 					<i class="fas fa-envelope"></i> Kontakt
 				</a>
-			</div>
+			</nav>
 		</div>
 
 		<!-- Rest des Footers unverändert -->
 		<!-- Trust Signals Sektion -->
 		<div class="trust-signals">
 			<div class="trust-item">
-				<i class="fas fa-lock"></i>
+				<i class="fas fa-lock" aria-hidden="true"></i>
 				<span>Sichere Zahlungsmethoden</span>
 			</div>
 			<div class="trust-item">
