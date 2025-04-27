@@ -19,9 +19,9 @@
 		},
 		{
 			id: 3,
-			question: 'Wie schnell erhalte ich meinen Lauftrainingsplan?',
+			question: 'Wie erhalte ich Zugang zu meinem individuellen Lauftrainingsplan?',
 			answer:
-				'Nach Eingang deiner Anfrage mit allen erforderlichen Informationen erhältst du deinen individuellen Trainingsplan innerhalb von 24 Stunden als PDF-Dokument per E-Mail. Bei komplexeren Anforderungen nehmen wir vorab noch einmal Kontakt mit dir auf, um alle Details zu besprechen und sicherzustellen, dass der Plan optimal auf dich zugeschnitten ist.'
+				'Nach erfolgreicher Registrierung prüfen wir deine Angaben und schalten deinen persönlichen Zugang innerhalb von 24 Stunden frei. Du erhältst dann per E-Mail deine Login-Daten für unseren exklusiven Mitgliederbereich, wo dein individueller Trainingsplan auf dich wartet. Bei komplexeren Anforderungen nehmen wir vorab Kontakt mit dir auf, um alle Details zu besprechen.'
 		},
 		{
 			id: 4,
@@ -43,15 +43,15 @@
 		},
 		{
 			id: 7,
-			question: 'Wie detailliert sind die Trainingspläne aufgebaut?',
+			question: 'Wie detailliert sind die Trainingspläne im Mitgliederbereich aufgebaut?',
 			answer:
-				'Jeder Trainingsplan enthält einen vollständigen Überblick über alle Trainingswochen bis zu deinem Ziel sowie detaillierte Tagesangaben mit genauen Trainingseinheiten (Distanz/Dauer, Intensität, Tempovorgaben). Zusätzlich erhältst du Hinweise zu Warm-up und Cool-down, ergänzenden Übungen sowie individuell angepasste Trainingshinweise für deine persönliche Situation und Zielsetzung.'
+				'In deinem persönlichen Mitgliederbereich findest du einen vollständigen Überblick über alle Trainingswochen bis zu deinem Ziel sowie detaillierte Tagesangaben mit genauen Trainingseinheiten (Distanz/Dauer, Intensität, Tempovorgaben). Das Dashboard bietet zusätzlich Hinweise zu Warm-up und Cool-down, ergänzenden Übungen sowie individuell angepasste Trainingshinweise für deine persönliche Situation und Zielsetzung.'
 		},
 		{
 			id: 8,
 			question: 'Was passiert, wenn ich eine Verletzung oder Krankheit habe?',
 			answer:
-				'Gesundheit geht vor! Bei Verletzungen oder Krankheiten solltest du dein Training unterbrechen oder anpassen. In deinem Trainingsplan findest du Hinweise zum Umgang mit Trainingspausen und wie du danach wieder einsteigen kannst. Bei längeren Auszeiten helfen wir dir gerne, deinen Plan anzupassen - kontaktiere uns einfach, wenn du Unterstützung benötigst.'
+				'Gesundheit geht vor! Bei Verletzungen oder Krankheiten solltest du dein Training unterbrechen oder anpassen. In deinem Trainingsplan im Mitgliederbereich findest du Hinweise zum Umgang mit Trainingspausen und wie du danach wieder einsteigen kannst. Bei längeren Auszeiten kannst du uns direkt über den Support-Bereich im Mitgliederportal kontaktieren - wir helfen dir, deinen Plan anzupassen.'
 		},
 		{
 			id: 9,
@@ -61,9 +61,9 @@
 		},
 		{
 			id: 10,
-			question: 'In welchem Format erhalte ich meinen Trainingsplan?',
+			question: 'Wie ist mein Trainingsplan im Mitgliederbereich aufgebaut?',
 			answer:
-				'Du erhältst deinen individuellen Trainingsplan als übersichtlich gestaltetes PDF-Dokument, das du ausdrucken oder auf all deinen Geräten nutzen kannst. Das PDF enthält sowohl eine Gesamtübersicht als auch detaillierte Wochenpläne mit allen relevanten Informationen zu deinen Trainingseinheiten.'
+				'Im Mitgliederbereich findest du deinen personalisierten Trainingsplan in einem übersichtlichen Dashboard-Format. Du kannst zwischen der Gesamtübersicht und detaillierten Wochenplänen wechseln. Alle Trainingseinheiten sind präzise aufgeführt mit genauen Angaben zu Distanz, Dauer, Intensität und speziellen Hinweisen. Der Zugriff ist von jedem Gerät aus jederzeit möglich - du brauchst lediglich deine Login-Daten.'
 		}
 	];
 
@@ -135,17 +135,19 @@
 			{/each}
 		</div>
 
+		<!-- Änderung der Info-Box im unteren Bereich -->
 		<div class="faq-info-box">
 			<h3 class="info-box-title">Dein individueller Lauftrainingsplan</h3>
 			<p>
-				Wir erstellen für dich einen maßgeschneiderten Trainingsplan als übersichtliche PDF-Datei,
-				die genau auf deine Ziele und deinen aktuellen Fitnesslevel abgestimmt ist.
+				Wir erstellen für dich einen maßgeschneiderten Trainingsplan, der exklusiv in deinem
+				persönlichen Mitgliederbereich verfügbar ist und genau auf deine Ziele und deinen aktuellen
+				Fitnesslevel abgestimmt wird.
 			</p>
 			<div class="info-box-features">
 				<div class="feature-item">
 					<span class="feature-icon">⏱️</span>
 					<span class="feature-text"
-						>Lieferung innerhalb von 24 Stunden nach Erhalt aller Daten</span
+						>Zugang innerhalb von 24 Stunden nach Registrierung und Freischaltung</span
 					>
 				</div>
 				<div class="feature-item">
@@ -158,7 +160,7 @@
 				</div>
 				<div class="feature-item">
 					<span class="feature-icon">📱</span>
-					<span class="feature-text">Als PDF auf allen deinen Geräten nutzbar</span>
+					<span class="feature-text">Auf allen Geräten mit deinem persönlichen Login abrufbar</span>
 				</div>
 			</div>
 		</div>
