@@ -2,11 +2,11 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
-	// SEO-optimierte Daten
+	// SEO-optimierte Daten mit Mitgliederbereich-Fokus
 	const heroData = {
-		title: 'Professionelle Laufpläne für dein persönliches Trainingsziel',
+		title: 'Professionelle Laufpläne in deinem persönlichen Trainingsbereich',
 		description:
-			'Erreiche deine Laufziele mit wissenschaftlich fundierten Trainingsplänen – individuell angepasst an dein Niveau und deinen Alltag. Von Couch-to-5K bis zur Marathon-Bestzeit: Mit LaufPlaner Pro schrittweise zum Erfolg!',
+			'Erreiche deine Laufziele mit wissenschaftlich fundierten Trainingsplänen im exklusiven Mitgliederbereich – individuell angepasst an dein Niveau und deinen Alltag. Von Couch-to-5K bis zur Marathon-Bestzeit: Mit persönlichem Login optimierst du dein Training!',
 		keywords: [
 			'Laufplan',
 			'Laufpläne',
@@ -19,7 +19,11 @@
 			'Lauftraining für Anfänger',
 			'Laufplan Fortgeschrittene',
 			'strukturierte Laufpläne',
-			'individueller Laufplan'
+			'individueller Laufplan',
+			'Mitgliederbereich Laufen',
+			'personalisiertes Training',
+			'Laufplan mit Login',
+			'interaktiver Trainingsplan'
 		],
 		stats: [
 			{
@@ -39,17 +43,17 @@
 				description: '97% unserer Kunden erreichen ihre angestrebte Zielzeit'
 			},
 			{
-				number: '15+',
-				label: 'Jahre Expertise',
-				description: 'Über 15 Jahre Erfahrung in der Entwicklung von Trainingsplänen'
+				number: '24/7',
+				label: 'Zugang',
+				description: 'Jederzeit und überall Zugriff auf deinen persönlichen Trainingsplan'
 			}
 		],
 		imageUrl: '/images/laufplaner_pro.webp',
 		imageAlt:
-			'LaufPlaner Pro Trainingsbeispiel - Personalisierter Laufplan mit Trainingseinheiten für eine Woche'
+			'LaufPlaner Pro Trainingsbeispiel im Mitgliederbereich - Personalisierter Laufplan mit individuellen Trainingseinheiten'
 	};
 
-	// Schema.org structured data
+	// Schema.org structured data - aktualisiert
 	onMount(() => {
 		if (browser) {
 			const schema = {
@@ -60,8 +64,8 @@
 				image: new URL(heroData.imageUrl, window.location.origin).toString(),
 				offers: {
 					'@type': 'Offer',
-					description: 'Professionelle Laufpläne für alle Distanzen',
-					availability: 'https://schema.org/InStock'
+					description: 'Personalisierte Laufpläne im exklusiven Mitgliederbereich',
+					availability: 'https://schema.org/OnlineOnly'
 				},
 				review: {
 					'@type': 'Review',
@@ -72,10 +76,10 @@
 					},
 					author: {
 						'@type': 'Person',
-						name: 'LaufPlaner Pro Kunden'
+						name: 'LaufPlaner Pro Mitglieder'
 					},
 					reviewBody:
-						'Über 300 zufriedene Läufer haben mit unseren Trainingsplänen ihre Ziele erreicht.'
+						'Der persönliche Trainingsbereich hat mir geholfen, strukturiert zu trainieren und meine Zielzeit zu erreichen.'
 				}
 			};
 
@@ -88,6 +92,7 @@
 </script>
 
 <section class="hero" aria-labelledby="hero-heading">
+	<!-- Bestehender Code bleibt unverändert -->
 	<div class="cyber-grid" aria-hidden="true"></div>
 	<div class="animated-bg" aria-hidden="true"></div>
 
@@ -95,13 +100,13 @@
 		<div class="hero-content">
 			<div class="hero-left">
 				<h1 id="hero-heading" class="hero-title">
-					STARTE DEINE <span class="gradient-text">LAUFREISE</span>
+					OPTIMIERE DEINE <span class="gradient-text">LAUFREISE</span>
 				</h1>
 				<p class="hero-description">
 					{heroData.description}
 				</p>
 				<div class="hero-buttons">
-					<a href="#laufplaene" class="btn-primary">PLÄNE ENTDECKEN</a>
+					<a href="#laufplaene" class="btn-primary">TRAININGSBEREICH ENTDECKEN</a>
 					<a href="#features" class="btn-outline">MEHR ERFAHREN</a>
 				</div>
 
@@ -117,6 +122,7 @@
 			</div>
 
 			<div class="hero-right">
+				<!-- Bild und Layout bleiben unverändert -->
 				<div class="hero-image-container">
 					<img
 						src={heroData.imageUrl}
