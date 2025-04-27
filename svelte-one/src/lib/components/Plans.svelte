@@ -139,16 +139,16 @@
 		}
 	];
 
-	// Erweiterte SEO-Texte mit abwechslungsreichen Formulierungen
+	// SEO-Beschreibungen für Tab-Inhalte aktualisiert
 	const seoTexts = {
 		beginnerTitle: 'Laufpläne für Anfänger - vom ersten Kilometer bis zum Marathon',
 		advancedTitle: 'Performance-Pläne für ambitionierte Läufer und Wettkämpfer',
 		beginnerDesc:
-			'Von Experten konzipierte Laufpläne für Einsteiger - strukturiert, motivierend und erfolgsorientiert.',
+			'Von Experten konzipierte Laufpläne für Einsteiger - im exklusiven Mitgliederbereich verfügbar mit persönlichem Login und 24/7-Zugriff.',
 		advancedDesc:
-			'Hochentwickelte Trainingssysteme für ambitionierte Läufer - fokussiert auf Bestzeiten und effektive Wettkampfvorbereitung.',
+			'Hochentwickelte Trainingssysteme für ambitionierte Läufer - im Mitgliederbereich jederzeit abrufbar mit individueller Anpassung und Support.',
 		metaDescription:
-			'Maßgeschneiderte, von Experten entwickelte Laufpläne für 5K, 10K, Halbmarathon und Marathon - für Anfänger und Fortgeschrittene. Trainiere mit System und erreiche deine Ziele!'
+			'Maßgeschneiderte, von Experten entwickelte Laufpläne für 5K, 10K, Halbmarathon und Marathon - mit persönlichem Zugang zum exklusiven Mitgliederbereich!'
 	};
 
 	// Add additional SEO metadata
@@ -194,7 +194,9 @@
 						url: window.location.href + '#' + plan.id,
 						priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
 							.toISOString()
-							.split('T')[0]
+							.split('T')[0],
+						description:
+							'Zugang zum exklusiven Mitgliederbereich mit personalisiertem Trainingsplan'
 					},
 					brand: {
 						'@type': 'Brand',
@@ -382,9 +384,9 @@
 									class="btn-primary btn-buy pulse-animation"
 									itemprop="url"
 									rel="nofollow"
-									aria-label="Plan {plan.title} jetzt sichern"
+									aria-label="Plan {plan.title} im Mitgliederbereich freischalten"
 								>
-									<span class="btn-text">Jetzt sichern</span>
+									<span class="btn-text">Zugang sichern</span>
 									<span class="btn-icon">→</span>
 								</a>
 							</div>
@@ -473,45 +475,22 @@
 			{/each}
 		</div>
 
-		<!-- Footer information with additional rich snippets -->
-		<div
-			class="plan-section-footer mt-24 text-center"
-			itemscope
-			itemtype="https://schema.org/FAQPage"
-		>
-			<div
-				class="max-w-2xl mx-auto py-6"
-				itemprop="mainEntity"
-				itemscope
-				itemtype="https://schema.org/Question"
-			>
-				<!-- Enhanced spacers before the FAQ heading for more vertical space -->
-				<div class="spacer py-6"></div>
-				<div class="spacer py-6"></div>
+		<!-- Plan-Section-Footer mit weiteren Infos zum Mitgliederbereich -->
+		<div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
+			<div class="text-gray-300 mb-12 leading-relaxed" itemprop="text">
+				<p class="mb-10">
+					Wähle den passenden Plan basierend auf deinem Fitnesslevel, Lauferfahrungen und
+					persönlichen Zielen. Nach der Registrierung erhältst du Zugang zu unserem exklusiven
+					Mitgliederbereich mit deinem individualisierten Trainingsplan.
+				</p>
 
-				<h4 class="text-lg font-semibold mb-6" itemprop="name">
-					Wie finde ich den richtigen Laufplan?
-				</h4>
-
-				<!-- Added spacer div between question and answer -->
 				<div class="spacer py-4"></div>
 
-				<div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
-					<div class="text-gray-300 mb-12 leading-relaxed" itemprop="text">
-						<p class="mb-10">
-							Wähle den passenden Plan basierend auf deinem Fitnesslevel, Lauferfahrungen und
-							persönlichen Zielen.
-						</p>
-
-						<!-- Added spacer div for more vertical space -->
-						<div class="spacer py-4"></div>
-
-						<p class="mt-4">
-							Anfänger sollten mit den Einstiegsplänen beginnen, während erfahrene Läufer von
-							unseren leistungsorientierten Plänen profitieren.
-						</p>
-					</div>
-				</div>
+				<p class="mt-4">
+					Anfänger sollten mit den Einstiegsplänen beginnen, während erfahrene Läufer von unseren
+					leistungsorientierten Plänen profitieren. Alle Pläne sind jederzeit über deinen
+					persönlichen Login abrufbar.
+				</p>
 			</div>
 		</div>
 	</div>
