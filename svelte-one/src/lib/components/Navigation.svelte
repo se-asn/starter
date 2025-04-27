@@ -210,14 +210,15 @@
 						>
 					</div>
 				</div>
+				<!-- Desktop Navigation Button ändern -->
 				<div class="nav-right">
-					<!-- JETZT STARTEN-Button korrigiert -->
 					<a
 						href={getHref('#signup')}
 						class="btn-primary pulse-animation"
-						on:click={handleLinkClick}>JETZT STARTEN</a
+						on:click={handleLinkClick}>MITGLIEDERBEREICH</a
 					>
 				</div>
+
 				<div class="nav-mobile-button">
 					<button
 						on:click={toggleMobileMenu}
@@ -288,7 +289,7 @@
 
 					<!-- Mobile JETZT STARTEN-Button korrigiert -->
 					<a href={getHref('#signup')} class="mobile-button" on:click={handleLinkClick}
-						>JETZT STARTEN</a
+						>MITGLIEDERBEREICH</a
 					>
 				</div>
 			{/if}
