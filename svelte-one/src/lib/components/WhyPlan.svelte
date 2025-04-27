@@ -1,32 +1,32 @@
 <!-- src/lib/components/WhyPlan.svelte -->
 <script>
-	// Strukturierte Daten für SEO
+	// Strukturierte Daten für SEO - ausbalancierter
 	const schemaData = {
 		'@context': 'https://schema.org',
 		'@type': 'HowTo',
-		name: 'Warum ein strukturierter Laufplan wichtig ist',
+		name: 'Warum ein strukturierter Laufplan dein Training verbessert',
 		description:
-			'Entdecke, warum ein strukturierter Trainingsplan für Läufer essentiell ist, um Verletzungen zu vermeiden, Motivation zu steigern und Ziele zu erreichen.',
+			'Entdecke, wie ein professionell erstellter Trainingsplan essentiell ist, um Verletzungen zu vermeiden, Motivation zu steigern und Laufziele zu erreichen.',
 		step: [
 			{
 				'@type': 'HowToStep',
-				name: 'Verletzungsprävention',
-				text: 'Mit einer durchdachten Struktur aus Belastung und Erholung schützt du deinen Körper vor Überlastung.'
+				name: 'Verletzungsprävention durch ausgewogenes Training',
+				text: 'Mit dem richtigen Verhältnis aus Belastung und Erholung schützt du deinen Körper vor Überlastung.'
 			},
 			{
 				'@type': 'HowToStep',
-				name: 'Motivationssteigerung',
+				name: 'Kontinuierliche Motivationssteigerung',
 				text: 'Kleine, erreichbare Schritte und messbare Fortschritte helfen dir, auch an schwierigen Tagen dranzubleiben.'
 			},
 			{
 				'@type': 'HowToStep',
 				name: 'Realistische Zielsetzung',
-				text: 'Ein guter Plan basiert auf deiner aktuellen Fitness, nicht auf unrealistischen Wunschvorstellungen.'
+				text: 'Dein Plan basiert auf deiner aktuellen Fitness und entwickelt sich mit dir weiter.'
 			},
 			{
 				'@type': 'HowToStep',
-				name: 'Sicherheit am Start',
-				text: 'Mit einem soliden Plan weißt du, dass du optimal vorbereitet an der Startlinie stehst.'
+				name: 'Optimale Wettkampfvorbereitung',
+				text: 'Mit systematischem Training stehst du perfekt vorbereitet an jeder Startlinie.'
 			}
 		]
 	};
@@ -35,13 +35,13 @@
 <section id="why-plan" class="why-plan" aria-labelledby="why-plan-title">
 	<div class="container">
 		<div class="section-header">
-			<span class="section-tag">Lauftraining optimieren</span>
+			<span class="section-tag">Effektives Lauftraining</span>
 			<h1 id="why-plan-title" class="section-title">
-				WARUM EIN TRAININGSPLAN DEIN LAUFTRAINING REVOLUTIONIERT
+				WARUM EIN STRUKTURIERTER TRAININGSPLAN DEIN LAUFTRAINING VERBESSERT
 			</h1>
 			<p class="section-subtitle">
-				Strukturiertes Lauftraining mit Plan führt nachweislich schneller zu Fortschritten als
-				planloses Training - für Anfänger und Fortgeschrittene.
+				Durchdachtes, strukturiertes Training führt nachweislich schneller zu Fortschritten - für
+				Anfänger und ambitionierte Läufer gleichermaßen.
 			</p>
 		</div>
 
@@ -50,7 +50,7 @@
 				<div class="image-container">
 					<img
 						src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-						alt="Läufer mit Trainingsplan - strukturiertes Lauftraining für bessere Ergebnisse"
+						alt="Läufer mit strukturiertem Trainingsplan - bessere Ergebnisse durch professionelles Training"
 						loading="lazy"
 						width="800"
 						height="533"
@@ -62,7 +62,7 @@
 			<div class="why-plan-text">
 				<p class="intro-text">
 					Ein <strong>strukturierter Laufplan</strong> bringt dich nachweislich effizienter ans Ziel
-					und verbessert deine Laufleistung deutlich schneller als unstrukturiertes Training.
+					und verbessert deine Laufleistung deutlich schneller als improvisiertes Training ohne Plan.
 				</p>
 
 				<div class="reason-list">
@@ -93,9 +93,8 @@
 						<div class="reason-content">
 							<h2 class="reason-title">Individuell angepasste, realistische Laufziele</h2>
 							<p class="reason-text">
-								Dein Trainingsplan basiert auf deinem aktuellen Fitnesslevel und passt sich
-								kontinuierlich an deine Entwicklung an - für maximalen Trainingserfolg ohne
-								Frustration.
+								Dein Trainingsplan basiert auf deinem aktuellen Fitnesslevel und entwickelt sich mit
+								dir weiter - für maximalen Trainingserfolg ohne Frustration.
 							</p>
 						</div>
 					</article>
@@ -105,16 +104,16 @@
 						<div class="reason-content">
 							<h2 class="reason-title">Optimale Wettkampfvorbereitung garantiert</h2>
 							<p class="reason-text">
-								Mit systematischem Training nach Plan stehst du perfekt vorbereitet an jedem
-								Startlinie - egal ob 5km-Lauf, Halbmarathon oder Marathon.
+								Mit systematischem Training nach einem professionellen Plan stehst du perfekt
+								vorbereitet an jeder Startlinie - egal ob 5km-Lauf, Halbmarathon oder Marathon.
 							</p>
 						</div>
 					</article>
 				</div>
 
 				<p class="highlight-text">
-					Und das Beste: Du benötigst weder teure Ausrüstung noch jahrelange Erfahrung. Ein
-					konkretes Laufziel und unser strukturierter Trainingsplan reichen für deinen Erfolg!
+					Und das Beste: Du benötigst weder teure Ausrüstung noch jahrelange Erfahrung. Ein klares
+					Laufziel und ein individueller Trainingsplan im Mitgliederbereich reichen völlig aus!
 				</p>
 			</div>
 		</div>

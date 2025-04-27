@@ -1,6 +1,6 @@
 <!-- src/lib/components/ExampleWeek.svelte -->
 <script>
-	// Trainingswochen-Daten
+	// Trainingswochen-Daten bleiben unverändert
 	const trainingWeek = [
 		{
 			day: 'Montag',
@@ -39,33 +39,39 @@
 		}
 	];
 
-	// Strukturierte Daten für SEO (Schema.org)
+	// Strukturierte Daten für SEO (Schema.org) - ANGEPASST für Mitgliederbereich
 	const schemaData = {
 		'@context': 'https://schema.org',
 		'@type': 'ExercisePlan',
-		name: 'Anfänger 10K Trainingsplan - Beispielwoche',
+		name: 'Anfänger 10K Trainingsplan - Beispielwoche aus dem Mitgliederbereich',
 		description:
-			'Beispielhafte Trainingswoche für einen 10K-Lauf in 8 Wochen - ideal für Laufanfänger',
+			'Beispielhafte Trainingswoche für einen 10K-Lauf in 8 Wochen - verfügbar im exklusiven Mitgliederbereich mit persönlichem Dashboard',
 		category: 'Lauftraining',
 		activityFrequency: '7 Tage pro Woche',
 		exerciseType: 'Laufen',
 		intensity: 'Anfänger bis Fortgeschrittener',
 		repetitions: '8 Wochen',
 		restPeriods: '3 Ruhetage pro Woche',
-		workload: 'Progressiv steigernd'
+		workload: 'Progressiv steigernd',
+		offers: {
+			'@type': 'Offer',
+			availability: 'https://schema.org/OnlineOnly',
+			description: 'Zugang zum interaktiven Trainingsplan über den exklusiven Mitgliederbereich'
+		}
 	};
 </script>
 
 <section id="example-week" class="example-week" aria-labelledby="example-week-title">
 	<div class="container">
 		<div class="section-header">
-			<span class="section-tag">Ein Blick in den Plan</span>
+			<span class="section-tag">Einblick ins Dashboard</span>
 			<h2 id="example-week-title" class="section-title">SO SIEHT EINE TRAININGSWOCHE AUS</h2>
 			<p class="section-subtitle">
-				Beispiel: <strong>Anfänger – 10K in 8 Wochen</strong> Trainingsplan
+				Beispiel: <strong>Anfänger – 10K in 8 Wochen</strong> aus deinem persönlichen Mitgliederbereich
 			</p>
 		</div>
 
+		<!-- Tabellen-Container und Tabelle bleiben im Wesentlichen unverändert -->
 		<div class="week-table-container">
 			<div class="table-wrapper">
 				<table class="week-table" aria-label="Trainingsplan für eine Woche des 10K Laufprogramms">
@@ -95,32 +101,34 @@
 			</div>
 			<div class="table-footer">
 				<p>
-					Jede Woche steigert sich leicht – mit <strong
-						>Fokus auf Erholung und kontinuierlichen Fortschritt</strong
-					> für optimale Laufleistung.
+					Im <strong>interaktiven Mitgliederbereich</strong> erhältst du einen detaillierten Plan
+					mit
+					<strong>wöchentlichen Steigerungen und personalisierten Hinweisen</strong> für deine optimale
+					Laufentwicklung.
 				</p>
 				<div class="benefits">
-					<h3 class="benefits-title">Vorteile dieses Trainingsplans:</h3>
+					<h3 class="benefits-title">Vorteile im Mitgliederbereich:</h3>
 					<ul class="benefits-list">
-						<li>Ausgewogene Balance zwischen Training und Erholung</li>
-						<li>Vielseitige Trainingseinheiten für ganzheitlichen Fortschritt</li>
-						<li>Schrittweise Steigerung ohne Übertraining</li>
-						<li>Ideal für Laufanfänger und Wiedereinsteiger</li>
+						<li>Vollständiger Zugang zu allen Trainingswochen mit detaillierten Anweisungen</li>
+						<li>Personalisierte Trainingseinheiten basierend auf deinem Fitnesslevel</li>
+						<li>Progression wird automatisch an deine Fortschritte angepasst</li>
+						<li>Jederzeit von allen Geräten auf dein Dashboard zugreifen</li>
 					</ul>
 				</div>
 			</div>
 		</div>
 
 		<div class="training-resources">
-			<h3 class="resources-title">Ergänzende Trainingstipps:</h3>
+			<h3 class="resources-title">Exklusiv im Mitgliederbereich:</h3>
 			<p>
-				Für maximalen Erfolg kombiniere diesen Plan mit einer ausgewogenen Ernährung und ausreichend
-				Schlaf. Die Ruhetage sind essentiell für deine Fortschritte!
+				Dein personalisierter Plan enthält zusätzlich spezielle Tipps zu Ernährung, Regeneration und
+				ergänzenden Übungen. Der Online-Zugang ermöglicht dir eine übersichtliche Trainingsplanung
+				und Fortschrittskontrolle - perfekt auf dich abgestimmt!
 			</p>
 		</div>
 	</div>
 
-	<!-- Strukturierte Daten für Suchmaschinen -->
+	<!-- Strukturierte Daten für Suchmaschinen - aktualisiert -->
 	<script type="application/ld+json">
         {@html JSON.stringify(schemaData)}
 	</script>
