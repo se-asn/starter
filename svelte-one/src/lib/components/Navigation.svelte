@@ -1,9 +1,9 @@
 <!-- src/lib/components/Navigation.svelte -->
 <script>
 	import { page } from '$app/stores';
-	import { onMount, tick } from 'svelte';
+	import { onMount, tick, onDestroy } from 'svelte';
 	import { authStore } from '$lib/stores/authStore';
-	import { onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 
 	// Elementare Variablen
 	let mobileMenuVisible = false;
@@ -15,14 +15,15 @@
 	// Authzustand
 	let isAuthenticated = false;
 
-	// Store abonnieren
-	if (browser) {
+	// Subscription erst nach dem Mounting durchführen
+	onMount(() => {
+		// Jetzt ist sicher, dass wir im Browser sind
 		const unsubscribe = authStore.subscribe((state) => {
 			isAuthenticated = state.isAuthenticated;
 		});
 
-		onDestroy(unsubscribe);
-	}
+		return unsubscribe; // onDestroy wird automatisch aufgerufen
+	});
 
 	function toggleMobileMenu() {
 		mobileMenuVisible = !mobileMenuVisible;

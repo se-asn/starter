@@ -2,11 +2,11 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
-	// SEO-optimierte Daten mit Mitgliederbereich-Fokus
+	// SEO-optimierte Daten mit Fokus auf Laufpläne und Vorteile
 	const heroData = {
-		title: 'Professionelle Laufpläne in deinem persönlichen Trainingsbereich',
+		title: 'Professionelle Laufpläne für jedes Niveau',
 		description:
-			'Erreiche deine Laufziele mit wissenschaftlich fundierten Trainingsplänen im exklusiven Mitgliederbereich – individuell angepasst an dein Niveau und deinen Alltag. Von Couch-to-5K bis zur Marathon-Bestzeit: Mit persönlichem Login optimierst du dein Training!',
+			'Erreiche deine Laufziele mit wissenschaftlich fundierten Trainingsplänen – individuell angepasst an dein Niveau und deinen Alltag. Von Couch-to-5K bis zur Marathon-Bestzeit: Optimiere dein Training mit strukturierten Plänen und erlebe messbare Fortschritte!',
 		keywords: [
 			'Laufplan',
 			'Laufpläne',
@@ -20,9 +20,9 @@
 			'Laufplan Fortgeschrittene',
 			'strukturierte Laufpläne',
 			'individueller Laufplan',
-			'Mitgliederbereich Laufen',
 			'personalisiertes Training',
-			'Laufplan mit Login',
+			'Laufleistung verbessern',
+			'effektives Lauftraining',
 			'interaktiver Trainingsplan'
 		],
 		stats: [
@@ -44,16 +44,16 @@
 			},
 			{
 				number: '24/7',
-				label: 'Zugang',
-				description: 'Jederzeit und überall Zugriff auf deinen persönlichen Trainingsplan'
+				label: 'Verfügbarkeit',
+				description: 'Jederzeit und überall Zugriff auf deine persönlichen Trainingsdaten'
 			}
 		],
 		imageUrl: '/images/laufplaner_pro.webp',
 		imageAlt:
-			'LaufPlaner Pro Trainingsbeispiel im Mitgliederbereich - Personalisierter Laufplan mit individuellen Trainingseinheiten'
+			'LaufPlaner Pro Trainingsbeispiel - Personalisierter Laufplan mit individuellen Trainingseinheiten und Leistungsdaten'
 	};
 
-	// Schema.org structured data - aktualisiert
+	// Schema.org structured data - aktualisiert für bessere SEO
 	onMount(() => {
 		if (browser) {
 			const schema = {
@@ -64,7 +64,7 @@
 				image: new URL(heroData.imageUrl, window.location.origin).toString(),
 				offers: {
 					'@type': 'Offer',
-					description: 'Personalisierte Laufpläne im exklusiven Mitgliederbereich',
+					description: 'Professionelle Laufpläne für alle Leistungsniveaus',
 					availability: 'https://schema.org/OnlineOnly'
 				},
 				review: {
@@ -76,10 +76,10 @@
 					},
 					author: {
 						'@type': 'Person',
-						name: 'LaufPlaner Pro Mitglieder'
+						name: 'LaufPlaner Pro Nutzer'
 					},
 					reviewBody:
-						'Der persönliche Trainingsbereich hat mir geholfen, strukturiert zu trainieren und meine Zielzeit zu erreichen.'
+						'Die strukturierten Trainingspläne haben mir geholfen, kontinuierlich meine Leistung zu verbessern und meine Zielzeit zu erreichen.'
 				}
 			};
 
@@ -99,9 +99,33 @@
 	<div class="container mx-auto px-4">
 		<div class="hero-content">
 			<div class="hero-left">
+				<!-- Ersetze den aktuellen h1-Titel mit einer dieser Optionen: -->
+
+				<!-- Option 1: Konkreter Fokus auf die Pläne -->
 				<h1 id="hero-heading" class="hero-title">
-					OPTIMIERE DEINE <span class="gradient-text">LAUFREISE</span>
+					PROFESSIONELLE <span class="gradient-text">LAUFPLÄNE</span>
 				</h1>
+
+				<!-- Option 2: Fokus auf das Ziel -->
+				<!-- <h1 id="hero-heading" class="hero-title">
+					ERREICHE DEINE <span class="gradient-text">LAUFZIELE</span>
+				</h1> -->
+
+				<!-- Option 3: Leistungsversprechen -->
+				<!-- <h1 id="hero-heading" class="hero-title">
+					LAUFE BESSER MIT <span class="gradient-text">PROFI-PLÄNEN</span>
+				</h1> -->
+
+				<!-- Option 4: Direkter und konkret -->
+				<!-- <h1 id="hero-heading" class="hero-title">
+					DEIN WEG ZUM <span class="gradient-text">LAUFERFOLG</span>
+				</h1> -->
+
+				<!-- Option 5: Konkrete Distanz-Fokussierung -->
+				<!-- <h1 id="hero-heading" class="hero-title">
+					VON 5K BIS <span class="gradient-text">MARATHON</span>
+				</h1> -->
+
 				<p class="hero-description">
 					{heroData.description}
 				</p>
