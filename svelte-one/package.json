@@ -27,6 +27,7 @@
 		"vite": "^6.2.5"
 	},
 	"dependencies": {
+		"jose": "^6.0.10",
 		"svelte-latest": "file:"
 	}
 }

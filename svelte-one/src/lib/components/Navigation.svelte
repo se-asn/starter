@@ -2,6 +2,8 @@
 <script>
 	import { page } from '$app/stores';
 	import { onMount, tick } from 'svelte';
+	import { authStore } from '$lib/stores/authStore';
+	import { onDestroy } from 'svelte';
 
 	// Elementare Variablen
 	let mobileMenuVisible = false;
@@ -9,6 +11,18 @@
 	let scrollY = 0;
 	let isScrolled = false;
 	let ticking = false;
+
+	// Authzustand
+	let isAuthenticated = false;
+
+	// Store abonnieren
+	if (browser) {
+		const unsubscribe = authStore.subscribe((state) => {
+			isAuthenticated = state.isAuthenticated;
+		});
+
+		onDestroy(unsubscribe);
+	}
 
 	function toggleMobileMenu() {
 		mobileMenuVisible = !mobileMenuVisible;
@@ -213,10 +227,11 @@
 				<!-- Desktop Navigation Button ändern -->
 				<div class="nav-right">
 					<a
-						href={getHref('#signup')}
+						href={isAuthenticated ? '/member/dashboard' : '/login'}
 						class="btn-primary pulse-animation"
-						on:click={handleLinkClick}>MITGLIEDERBEREICH</a
 					>
+						{isAuthenticated ? 'MEIN DASHBOARD' : 'MITGLIEDERBEREICH LOGIN'}
+					</a>
 				</div>
 
 				<div class="nav-mobile-button">

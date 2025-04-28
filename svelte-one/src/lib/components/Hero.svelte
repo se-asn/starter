@@ -106,7 +106,7 @@
 					{heroData.description}
 				</p>
 				<div class="hero-buttons">
-					<a href="#laufplaene" class="btn-primary">TRAININGSBEREICH ENTDECKEN</a>
+					<a href="#laufplaene" class="btn-primary">LAUFPLÄNE ENTDECKEN</a>
 					<a href="#features" class="btn-outline">MEHR ERFAHREN</a>
 				</div>
 
