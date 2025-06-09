@@ -1,27 +1,32 @@
-# wrangler.toml - Konfiguration für Cloudflare Workers und D1
-name = "svelte-training-app"
+# wrangler.toml - Konfiguration für Cloudflare Pages
+name = "triathlon-coach"
 compatibility_date = "2023-09-04"
 compatibility_flags = ["nodejs_compat"]
 
+# Cloudflare Pages configuration
+pages_build_output_dir = ".svelte-kit/output/client"
+
 # Konfiguration der Cloudflare D1 Datenbank
 [[d1_databases]]
-binding = "DB" # Dies ist der Name, der in deinem Code als env.DB verfügbar sein wird
+binding = "DB"
 database_name = "training_plans_db"
 database_id = "30ca8fe2-fb17-4cfa-963e-a3eeda8cb5c5"
 
-# Entwicklungsmodus für lokale Entwicklung
-[env.development]
-vars = { NODE_ENV = "development" }
-workers_dev = true
+# Preview environment
+[env.preview]
+vars = { NODE_ENV = "preview" }
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "training_plans_db"
+database_id = "30ca8fe2-fb17-4cfa-963e-a3eeda8cb5c5"
 
-# Produktionsmodus mit spezifischen Einstellungen
+# Production environment
 [env.production]  
 vars = { NODE_ENV = "production" }
-workers_dev = false
-
-# Umgebungsvariablen
-[vars]
-APP_ENV = "development" # Wird in production automatisch überschrieben
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "training_plans_db"
+database_id = "30ca8fe2-fb17-4cfa-963e-a3eeda8cb5c5"
 # API Keys (werden in Cloudflare Dashboard als Secrets gesetzt)
 # STRAVA_CLIENT_ID = "your_strava_client_id"
 # STRAVA_CLIENT_SECRET = "your_strava_client_secret"

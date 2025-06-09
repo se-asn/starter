@@ -9,7 +9,13 @@ const config = {
 
 	kit: {
 		// Use Cloudflare adapter for Pages deployment
-		adapter: adapter()
+		adapter: adapter({
+			// Enable Pages Functions
+			routes: {
+				include: ['/*'],
+				exclude: ['<all>']
+			}
+		})
 	}
 };
 

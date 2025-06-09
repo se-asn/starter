@@ -142,12 +142,11 @@
         break;
     }
   }
-  
-  function syncIntegration(id: string) {
+    function syncIntegration(id: string) {
     // Trigger manual sync
     fetch(`/api/integrations/${id}?action=sync`, { method: 'GET' })
       .then(response => response.json())
-      .then data => {
+      .then(data => {
         statusMessage = `${id} sync started!`;
         statusType = 'success';
       })
