@@ -22,23 +22,12 @@ const defaultUsers: MockUser[] = [
   }
 ];
 
-// Use globalThis to persist data across requests in Cloudflare Workers
-if (typeof globalThis !== 'undefined') {
-  if (!globalThis.mockUsers) {
-    globalThis.mockUsers = [...defaultUsers];
-  }
-  if (!globalThis.mockTokens) {
-    globalThis.mockTokens = {};
-  }
-} else {
-  // Fallback for environments where globalThis is not available
-  globalThis.mockUsers = [...defaultUsers];
-  globalThis.mockTokens = {};
-}
+// Simplified storage for Cloudflare Pages compatibility
+let mockUsers: MockUser[] = [...defaultUsers];
+let mockTokens: { [token: string]: MockUser } = {};
 
 export function findUserByEmail(email: string): MockUser | null {
-  const users = globalThis?.mockUsers || defaultUsers;
-  return users.find(user => user.email === email) || null;
+  return mockUsers.find(user => user.email === email) || null;
 }
 
 export function createMockUser(email: string, name: string): MockUser {
@@ -48,10 +37,8 @@ export function createMockUser(email: string, name: string): MockUser {
     name
   };
   
-  // Add to global storage for Cloudflare Workers
-  if (globalThis?.mockUsers) {
-    globalThis.mockUsers.push(user);
-  }
+  // Add to local storage
+  mockUsers.push(user);
   
   return user;
 }
@@ -59,17 +46,14 @@ export function createMockUser(email: string, name: string): MockUser {
 export function createMockToken(user: MockUser): string {
   const token = `mock_${Date.now()}_${user.id}`;
   
-  // Store in global storage for Cloudflare Workers
-  if (globalThis?.mockTokens) {
-    globalThis.mockTokens[token] = user;
-  }
+  // Store in token storage
+  mockTokens[token] = user;
   
   return token;
 }
 
 export function verifyMockToken(token: string): MockUser | null {
-  const tokens = globalThis?.mockTokens || {};
-  return tokens[token] || null;
+  return mockTokens[token] || null;
 }
 
 export function isValidMockPassword(password: string): boolean {

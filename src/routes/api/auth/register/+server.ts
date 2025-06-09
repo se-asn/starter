@@ -33,51 +33,29 @@ export const POST: RequestHandler = async ({ request, platform }) => {
       );
     }    // Check if database is available
     const db = (platform as any)?.env?.DB;
-    
-    if (!db) {
-      console.log('Database not available, using improved mock auth');
+      if (!db) {
+      console.log('Database not available, using simple mock auth');
       
-      // Enhanced mock authentication for Cloudflare Pages
-      try {
-        const existingUser = findUserByEmail(email);
-        if (existingUser) {
-          return json(
-            { error: 'User with this email already exists' },
-            { status: 409 }
-          );
-        }
+      // Ultra-simple mock authentication for Cloudflare Pages
+      const userId = crypto.randomUUID();
+      const user = { id: userId, email, name };
+      
+      // Create a simple token (in production, use proper JWT)
+      const tokenPayload = { id: userId, email, name, exp: Date.now() + 24*60*60*1000 };
+      const token = btoa(JSON.stringify(tokenPayload));
+      
+      console.log('Mock user created:', { id: userId, email });
 
-        const user = createMockUser(email, name);
-        const token = createMockToken(user);
-
-        // Store user in mock storage for session persistence
-        console.log('Mock user created:', { id: user.id, email: user.email, name: user.name });
-
-        return json({
-          success: true,
-          message: 'Account created successfully (demo mode)',
-          user: {
-            id: user.id,
-            email: user.email,
-            name: user.name
-          },
-          token
-        });
-      } catch (mockError) {
-        console.error('Mock auth error:', mockError);
-        
-        // Fallback: create user without storage check
-        const userId = crypto.randomUUID();
-        const user = { id: userId, email, name };
-        const token = createMockToken(user);
-        
-        return json({
-          success: true,
-          message: 'Account created successfully (demo mode)',
-          user,
-          token
-        });
-      }
+      return json({
+        success: true,
+        message: 'Account created successfully (demo mode)',
+        user: {
+          id: userId,
+          email,
+          name
+        },
+        token
+      });
     }
 
     try {

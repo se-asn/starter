@@ -26,27 +26,31 @@ export const POST: RequestHandler = async ({ request, platform }) => {
       );
     }
 
-    const db = (platform as any)?.env?.DB;
-
-    if (!db) {
-      console.log('Database not available, using mock auth');
+    const db = (platform as any)?.env?.DB;    if (!db) {
+      console.log('Database not available, using simple mock auth');
       
-      // Use mock authentication for demo
-      if (email === 'demo@triathlon.com' && isValidMockPassword(password)) {
-        const user = findUserByEmail(email);
-        if (user) {
-          const token = createMockToken(user);
-          return json({
-            success: true,
-            message: 'Login successful (demo mode)',
-            user: {
-              id: user.id,
-              email: user.email,
-              name: user.name
-            },
-            token
-          });
-        }
+      // Ultra-simple mock authentication for Cloudflare Pages
+      // Allow any email/password combination for demo
+      if (email && password && password.length >= 6) {
+        const userId = crypto.randomUUID();
+        const user = { id: userId, email, name: email.split('@')[0] };
+        
+        // Create a simple token
+        const tokenPayload = { id: userId, email, name: user.name, exp: Date.now() + 24*60*60*1000 };
+        const token = btoa(JSON.stringify(tokenPayload));
+        
+        console.log('Mock login successful:', { email });
+        
+        return json({
+          success: true,
+          message: 'Login successful (demo mode)',
+          user: {
+            id: userId,
+            email,
+            name: user.name
+          },
+          token
+        });
       }
       
       return json(
