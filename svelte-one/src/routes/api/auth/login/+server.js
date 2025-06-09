@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { authenticateUser } from '$lib/server/auth';
+import { authenticateUser, createJWT } from '$lib/server/auth';
+import { randomUUID } from 'crypto';
 
 export async function POST({ request, cookies }) {
 	try {
@@ -13,8 +14,14 @@ export async function POST({ request, cookies }) {
 			return json({ success: false, message: 'Ungültige Anmeldedaten' }, { status: 401 });
 		}
 
+		// JWT Token erstellen
+		const jwt = await createJWT(user.id, rememberMe ? '30d' : '7d');
+
+		// Session-ID erstellen
+		const sessionId = randomUUID();
+
 		// Session setzen
-		cookies.set('session', 'test-session-123', {
+		cookies.set('session', sessionId, {
 			path: '/',
 			httpOnly: true,
 			sameSite: 'strict',

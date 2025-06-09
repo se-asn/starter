@@ -1,6 +1,7 @@
 <!-- src/routes/blog/[slug]/+page.svelte -->
 <script>
 	import { onMount } from 'svelte';
+	import Comments from '$lib/components/blog/Comments.svelte';
 	export let data;
 	const { post, relatedPosts } = data;
 
@@ -38,7 +39,7 @@
 			navigator.share({
 				title: post.title,
 				text: post.excerpt,
-				url: `https://laufplanerpro.de/blog/${post.slug}`
+				url: `https://laufplanerpro.de/blog/${post.slug}``
 			});
 		}
 	}
@@ -208,6 +209,9 @@
 							Zurück zur Blog-Übersicht
 						</a>
 					</div>
+					
+					<!-- Comments Section -->
+					<Comments postSlug={post.slug} />
 				</div>
 
 				<!-- Sidebar -->

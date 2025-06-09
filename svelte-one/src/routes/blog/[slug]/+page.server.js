@@ -3,6 +3,7 @@ import { getPostBySlug, getRelatedPosts } from '$lib/blog/utils';
 import { error } from '@sveltejs/kit';
 import { estimateReadingTime, generateTableOfContents } from '$lib/blog/helpers';
 import { dev } from '$app/environment';
+import { getSecurityHeaders } from '$lib/server/security';
 
 // Cache für Posts, um wiederholte Festplatten-I/O zu vermeiden
 const postCache = new Map();
@@ -83,15 +84,13 @@ export async function load({ params, setHeaders }) {
 			relatedPosts,
 			schemaData
 		};
-
 		// Für Produktion: Caching-Header setzen
 		if (!dev) {
+			const securityHeaders = getSecurityHeaders();
+
 			setHeaders({
 				'Cache-Control': 'max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
-				'X-Content-Type-Options': 'nosniff',
-				'X-Frame-Options': 'DENY',
-				'Content-Security-Policy':
-					"default-src 'self'; img-src 'self' https://laufplanerpro.de *.cloudinary.com data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+				...securityHeaders
 			});
 
 			// In Cache speichern

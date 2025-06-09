@@ -42,13 +42,19 @@ function createAuthStore() {
 				isLoading: false
 			}));
 		},
-
 		logout: () => {
 			set({
 				user: null,
 				isAuthenticated: false,
 				isLoading: false
 			});
+		},
+
+		updateUser: (user) => {
+			update((state) => ({
+				...state,
+				user
+			}));
 		}
 	};
 }

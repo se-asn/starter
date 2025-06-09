@@ -1,5 +1,6 @@
 <!-- src/routes/blog/+page.svelte -->
 <script>
+	import Newsletter from '$lib/components/blog/Newsletter.svelte';
 	export let data;
 	const { posts } = data;
 </script>
@@ -60,10 +61,12 @@
 						</div>
 					</div>
 				</article>
-			{/each}
-		</div>
+			{/each}		</div>
 	</div>
 </section>
+
+<!-- Newsletter Section -->
+<Newsletter />
 
 <style>
 	.blog-hero {
