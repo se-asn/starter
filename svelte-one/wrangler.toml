@@ -2,13 +2,20 @@
 name = "svelte-training-app"
 compatibility_date = "2023-09-04"
 compatibility_flags = ["nodejs_compat"]
-main = "workers-site/index.js"
 
 # Konfiguration der Cloudflare D1 Datenbank
 [[d1_databases]]
 binding = "DB" # Dies ist der Name, der in deinem Code als env.DB verfügbar sein wird
 database_name = "training_plans_db"
 database_id = "YOUR_DATABASE_ID" # Dies wird von Cloudflare nach der Datenbankerstellung bereitgestellt
+
+# Lokale Entwicklung
+[env.development]
+vars = { NODE_ENV = "development" }
+
+# Produktion
+[env.production]  
+vars = { NODE_ENV = "production" }
 
 # Entwicklungsmodus für lokale Entwicklung
 [env.development]
