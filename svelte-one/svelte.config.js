@@ -4,7 +4,11 @@ import adapter from '@sveltejs/adapter-cloudflare';
 const config = {
 	kit: {
 		// Use Cloudflare adapter for Cloudflare Pages deployment
-		adapter: adapter()
+		adapter: adapter(),
+		prerender: {
+			handleMissingId: 'warn',
+			handleHttpError: 'warn'
+		}
 	}
 };
 

@@ -33,13 +33,12 @@
 	onMount(() => {
 		canUseShareAPI = typeof navigator !== 'undefined' && navigator.share !== undefined;
 	});
-
 	function handleShare() {
 		if (canUseShareAPI) {
 			navigator.share({
 				title: post.title,
 				text: post.excerpt,
-				url: `https://laufplanerpro.de/blog/${post.slug}``
+				url: `https://laufplanerpro.de/blog/${post.slug}`
 			});
 		}
 	}

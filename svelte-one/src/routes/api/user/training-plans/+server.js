@@ -56,13 +56,11 @@ export async function GET({ url, locals, getClientAddress, platform }) {
 					}
 				}
 			);
-		}
-
-		// Parameter für Abfrage von Details eines Plans
+		}		// Parameter für Abfrage von Details eines Plans
 		const planId = url.searchParams.get('planId');
 
 		// Datenbankverbindung herstellen
-		const { db, status } = await getDb(platform);
+		const { db } = await getDb(platform);
 
 		if (planId) {
 			// Spezifischen Plan mit Details zurückgeben
@@ -204,12 +202,11 @@ export async function POST({ request, locals, getClientAddress, platform }) {
 
 		const { planId, startDate, targetDate, targetEvent } = await request.json();
 
-		if (!planId) {
-			return json({ error: 'Plan-ID ist erforderlich' }, { status: 400 });
+		if (!planId) {		return json({ error: 'Plan-ID ist erforderlich' }, { status: 400 });
 		}
 
 		// Datenbankverbindung herstellen
-		const { db, status } = await getDb(platform);
+		const { db } = await getDb(platform);
 
 		let planExists = false;
 
@@ -380,7 +377,6 @@ export async function PATCH({ request, locals, getClientAddress, platform }) {
 				}
 			);
 		}
-
 		const data = await request.json();
 		const { planId } = data;
 
@@ -389,7 +385,7 @@ export async function PATCH({ request, locals, getClientAddress, platform }) {
 		}
 
 		// Datenbankverbindung herstellen
-		const { db, status } = await getDb(platform);
+		const { db } = await getDb(platform);
 
 		// Überprüfen, ob der Plan existiert
 		let existingPlan = null;
@@ -532,13 +528,12 @@ export async function DELETE({ url, locals, getClientAddress, platform }) {
 		}
 
 		const planId = url.searchParams.get('planId');
-
 		if (!planId) {
 			return json({ error: 'Plan-ID ist erforderlich' }, { status: 400 });
 		}
 
 		// Datenbankverbindung herstellen
-		const { db, status } = await getDb(platform);
+		const { db } = await getDb(platform);
 
 		// Überprüfen, ob der Plan existiert
 		let existingPlan = null;
@@ -562,12 +557,13 @@ export async function DELETE({ url, locals, getClientAddress, platform }) {
 			const newPlans = userTrainingPlans.filter(
 				(p) => !(p.userId === userId && p.planId === planId)
 			);
+		if (newPlans.length === initialLength) {
+			return json({ error: 'Trainingsplan nicht gefunden' }, { status: 404 });
+		}
 
-			if (newPlans.length === initialLength) {
-				return json({ error: 'Trainingsplan nicht gefunden' }, { status: 404 });
-			}
-
-			userTrainingPlans = newPlans;
+		// Update the userTrainingPlans array by clearing and refilling it
+		userTrainingPlans.length = 0;
+		userTrainingPlans.push(...newPlans);
 		}
 
 		return json(

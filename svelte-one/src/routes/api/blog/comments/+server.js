@@ -2,12 +2,10 @@
 import { json } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
 import { checkRateLimit, getSecurityHeaders } from '$lib/server/security';
-
-// In production, this would use a database instead of in-memory storage
-export let commentsData = {};
+import { getComments, addComment } from '$lib/server/blog-data.js';
 
 // GET: Fetch comments for a specific blog post
-export async function GET({ url, request }) {
+export async function GET({ url }) {
 	try {
 		const slug = url.searchParams.get('slug');
 
@@ -17,9 +15,8 @@ export async function GET({ url, request }) {
 
 		// Apply security headers
 		const headers = getSecurityHeaders();
-
 		// Return comments for the specified blog post
-		const comments = commentsData[slug] || [];
+		const comments = getComments(slug);
 
 		return json({ comments }, { headers });
 	} catch (error) {
@@ -60,8 +57,7 @@ export async function POST({ request, getClientAddress }) {
 
 		// Create a new comment object
 		const newComment = {
-			id: uuidv4(),
-			content: comment.content,
+			id: uuidv4(),			content: comment.content,
 			author: comment.author,
 			email: comment.email || '',
 			avatar: comment.avatar || null,
@@ -70,18 +66,13 @@ export async function POST({ request, getClientAddress }) {
 			isApproved: true // In production, you might want to moderate comments
 		};
 
-		// Initialize the comments array for this post if it doesn't exist
-		if (!commentsData[postSlug]) {
-			commentsData[postSlug] = [];
-		}
-
-		// Add the comment to the post
-		commentsData[postSlug].push(newComment);
+		// Add the comment to the post using the helper function
+		const savedComment = addComment(postSlug, newComment);
 
 		return json(
 			{
 				message: 'Comment added successfully',
-				comment: newComment
+				comment: savedComment
 			},
 			{ status: 201 }
 		);

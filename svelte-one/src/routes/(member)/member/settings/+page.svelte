@@ -1,7 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
 	import { authStore } from '$lib/stores/authStore';
-	import NotificationSettings from '$lib/components/member/NotificationSettings.svelte';
 	
 	let user;
 	let isLoading = true;
@@ -13,6 +12,11 @@
 		privacy: {
 			shareProgress: false,
 			publicProfile: false
+		},
+		notifications: {
+			email: true,
+			push: false,
+			reminderTime: '18:00'
 		},
 		units: {
 			distanceUnit: "km",
@@ -30,82 +34,93 @@
 		user = state.user;
 	});
 	
-	// Seite initialisieren
 	onMount(() => {
-		// In einer echten App hier API-Anfrage für Benutzereinstellungen
-		loadUserSettings();
-		
+		loadSettings();
 		return unsubscribe;
 	});
 	
-	// Einstellungen laden (simuliert)
-	function loadUserSettings() {
-		// Simulierte API-Anfrage
-		setTimeout(() => {
-			// In einer echten App würden die Einstellungen vom Server kommen
+	async function loadSettings() {
+		if (!user) {
 			isLoading = false;
-		}, 800);
-	}
-	
-	// Einstellungen speichern
-	async function saveSettings() {
-		isLoading = true;
-		message = '';
+			return;
+		}
 		
 		try {
-			// Simulierte API-Anfrage
-			await new Promise(resolve => setTimeout(resolve, 800));
-			
-			// Erfolgsmeldung
-			message = 'Einstellungen erfolgreich gespeichert!';
-			messageType = 'success';
+			const response = await fetch('/api/user/settings');
+			if (response.ok) {
+				const data = await response.json();
+				if (data.settings) {
+					settings = { ...settings, ...data.settings };
+				}
+			}
 		} catch (error) {
-			console.error('Error saving settings:', error);
-			message = 'Fehler beim Speichern der Einstellungen';
-			messageType = 'error';
+			console.error('Fehler beim Laden der Einstellungen:', error);
 		} finally {
 			isLoading = false;
 		}
+	}
+	
+	async function saveSettings(event) {
+		event.preventDefault();
+		
+		try {
+			const response = await fetch('/api/user/settings', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ settings })
+			});
+			
+			const data = await response.json();
+			
+			if (data.success) {
+				message = 'Einstellungen erfolgreich gespeichert';
+				messageType = 'success';
+			} else {
+				message = data.message || 'Fehler beim Speichern';
+				messageType = 'error';
+			}
+		} catch (error) {
+			message = 'Ein Fehler ist aufgetreten. Versuche es erneut.';
+			messageType = 'error';
+		}
+		
+		// Nachricht nach 3 Sekunden ausblenden
+		setTimeout(() => {
+			message = '';
+			messageType = '';
+		}, 3000);
 	}
 </script>
 
 <div class="settings-page">
 	<div class="page-header">
 		<h1>Einstellungen</h1>
+		<p>Personalisiere deine Training-App nach deinen Wünschen</p>
 	</div>
 	
 	{#if message}
-		<div class="alert {messageType === 'success' ? 'alert-success' : 'alert-error'}">
+		<div class="message {messageType}">
 			{message}
 		</div>
 	{/if}
 	
 	{#if isLoading}
-		<div class="loading-container">
-			<div class="loading-spinner"></div>
+		<div class="loading">
 			<p>Einstellungen werden geladen...</p>
 		</div>
 	{:else}
-		<form on:submit|preventDefault={saveSettings} class="settings-form">			<!-- Trainings-Benachrichtigungen -->
-			<NotificationSettings />
-			
-			<!-- Datenschutzeinstellungen -->
-					</div>
-					
-					<label class="toggle">
-						<input type="checkbox" bind:checked={settings.notifications.email} />
-						<span class="toggle-slider"></span>
-					</label>
-				</div>
+		<form on:submit|preventDefault={saveSettings} class="settings-form">
+			<!-- Benachrichtigungen -->
+			<div class="settings-section">
+				<h2>Benachrichtigungen</h2>
 				
 				<div class="settings-option">
 					<div class="option-info">
-						<h3>Push-Benachrichtigungen</h3>
-						<p>Erhalte Push-Benachrichtigungen für anstehende Trainingseinheiten</p>
+						<h3>E-Mail-Benachrichtigungen</h3>
+						<p>Erhalte E-Mails über deinen Trainingsfortschritt</p>
 					</div>
-					
 					<label class="toggle">
-						<input type="checkbox" bind:checked={settings.notifications.pushNotifications} />
+						<input type="checkbox" bind:checked={settings.notifications.email} />
 						<span class="toggle-slider"></span>
 					</label>
 				</div>
@@ -115,86 +130,40 @@
 						<h3>Erinnerungszeit</h3>
 						<p>Wann möchtest du an dein Training erinnert werden?</p>
 					</div>
-					
 					<div class="option-control">
 						<input type="time" bind:value={settings.notifications.reminderTime} />
 					</div>
 				</div>
 			</div>
 			
-			<!-- Datenschutzeinstellungen -->
+			<!-- Datenschutz -->
 			<div class="settings-section">
 				<h2>Datenschutz</h2>
 				
 				<div class="settings-option">
 					<div class="option-info">
 						<h3>Fortschritt teilen</h3>
-						<p>Erlaube uns, deinen Fortschritt zu nutzen, um unsere Trainingspläne zu verbessern</p>
+						<p>Erlaube uns, deinen Fortschritt zu nutzen, um Trainingspläne zu verbessern</p>
 					</div>
-					
 					<label class="toggle">
 						<input type="checkbox" bind:checked={settings.privacy.shareProgress} />
 						<span class="toggle-slider"></span>
 					</label>
 				</div>
-				
-				<div class="settings-option">
-					<div class="option-info">
-						<h3>Öffentliches Profil</h3>
-						<p>Zeige dein Profil und deine Fortschritte anderen Nutzern an</p>
-					</div>
-					
-					<label class="toggle">
-						<input type="checkbox" bind:checked={settings.privacy.publicProfile} />
-						<span class="toggle-slider"></span>
-					</label>
-				</div>
 			</div>
 			
-			<!-- Einheiten & Maße -->
+			<!-- Einheiten -->
 			<div class="settings-section">
-				<h2>Einheiten & Maße</h2>
+				<h2>Einheiten</h2>
 				
 				<div class="settings-option">
 					<div class="option-info">
-						<h3>Distanzeinheit</h3>
-						<p>Wähle deine bevorzugte Einheit für Laufstrecken</p>
+						<h3>Entfernungseinheit</h3>
 					</div>
-					
-					<div class="option-control">
-						<select bind:value={settings.units.distanceUnit}>
-							<option value="km">Kilometer (km)</option>
-							<option value="mi">Meilen (mi)</option>
-						</select>
-					</div>
-				</div>
-				
-				<div class="settings-option">
-					<div class="option-info">
-						<h3>Tempo-Einheit</h3>
-						<p>Wähle deine bevorzugte Einheit für Lauftempo</p>
-					</div>
-					
-					<div class="option-control">
-						<select bind:value={settings.units.paceUnit}>
-							<option value="min/km">min/km</option>
-							<option value="min/mi">min/mi</option>
-						</select>
-					</div>
-				</div>
-				
-				<div class="settings-option">
-					<div class="option-info">
-						<h3>Gewichtseinheit</h3>
-						<p>Wähle deine bevorzugte Einheit für Gewichtsangaben</p>
-					</div>
-					
-					<div class="option-control">
-						<select bind:value={settings.units.weightUnit}>
-							<option value="kg">Kilogramm (kg)</option>
-							<option value="lb">Pfund (lb)</option>
-						</select>
-					</div>
+					<select bind:value={settings.units.distanceUnit}>
+						<option value="km">Kilometer</option>
+						<option value="mi">Meilen</option>
+					</select>
 				</div>
 			</div>
 			
@@ -205,53 +174,182 @@
 				<div class="settings-option">
 					<div class="option-info">
 						<h3>Dunkler Modus</h3>
-						<p>Verwende dunkle Farbgebung für die Benutzeroberfläche</p>
+						<p>Verwende ein dunkles Design</p>
 					</div>
-					
 					<label class="toggle">
 						<input type="checkbox" bind:checked={settings.appearance.darkMode} />
 						<span class="toggle-slider"></span>
 					</label>
 				</div>
-				
-				<div class="settings-option">
-					<div class="option-info">
-						<h3>Kompakte Ansicht</h3>
-						<p>Reduziere den Abstand zwischen Elementen für mehr Inhalte auf dem Bildschirm</p>
-					</div>
-					
-					<label class="toggle">
-						<input type="checkbox" bind:checked={settings.appearance.compactView} />
-						<span class="toggle-slider"></span>
-					</label>
-				</div>
 			</div>
 			
-			<!-- Kontoeinstellungen -->
-			<div class="settings-section">
-				<h2>Konto</h2>
-				
-				<div class="account-actions">
-					<a href="/member/profile" class="btn btn-outline">Profil bearbeiten</a>
-					<a href="/member/delete-account" class="btn btn-danger">Konto löschen</a>
-				</div>
-			</div>
-			
-			<div class="form-actions">
-				<button type="submit" class="btn btn-primary" disabled={isLoading}>
-					{#if isLoading}
-						<span class="spinner"></span>
-						Speichern...
-					{:else}
-						Einstellungen speichern
-					{/if}
-				</button>
-			</div>
+			<button type="submit" class="btn-primary">
+				Einstellungen speichern
+			</button>
 		</form>
 	{/if}
 </div>
 
 <style>
+	.settings-page {
+		max-width: 800px;
+		margin: 0 auto;
+		padding: 2rem;
+	}
+	
+	.page-header {
+		margin-bottom: 2rem;
+	}
+	
+	.page-header h1 {
+		color: var(--primary);
+		margin-bottom: 0.5rem;
+	}
+	
+	.page-header p {
+		color: var(--text-secondary);
+	}
+	
+	.message {
+		padding: 1rem;
+		border-radius: 8px;
+		margin-bottom: 1rem;
+	}
+	
+	.message.success {
+		background-color: #d4edda;
+		color: #155724;
+		border: 1px solid #c3e6cb;
+	}
+	
+	.message.error {
+		background-color: #f8d7da;
+		color: #721c24;
+		border: 1px solid #f5c6cb;
+	}
+	
+	.loading {
+		text-align: center;
+		padding: 2rem;
+	}
+	
+	.settings-form {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+	
+	.settings-section {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 12px;
+		padding: 1.5rem;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	
+	.settings-section h2 {
+		color: var(--primary);
+		margin-bottom: 1rem;
+	}
+	
+	.settings-option {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem 0;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	
+	.settings-option:last-child {
+		border-bottom: none;
+	}
+	
+	.option-info h3 {
+		margin: 0 0 0.25rem 0;
+		color: var(--text-primary);
+	}
+	
+	.option-info p {
+		margin: 0;
+		color: var(--text-secondary);
+		font-size: 0.9rem;
+	}
+	
+	.toggle {
+		position: relative;
+		display: inline-block;
+		width: 50px;
+		height: 24px;
+	}
+	
+	.toggle input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+	
+	.toggle-slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #ccc;
+		transition: 0.4s;
+		border-radius: 24px;
+	}
+	
+	.toggle-slider:before {
+		position: absolute;
+		content: "";
+		height: 18px;
+		width: 18px;
+		left: 3px;
+		bottom: 3px;
+		background-color: white;
+		transition: 0.4s;
+		border-radius: 50%;
+	}
+	
+	.toggle input:checked + .toggle-slider {
+		background-color: var(--primary);
+	}
+	
+	.toggle input:checked + .toggle-slider:before {
+		transform: translateX(26px);
+	}
+	
+	select, input[type="time"] {
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 8px;
+		padding: 0.5rem;
+		color: var(--text-primary);
+		min-width: 120px;
+	}
+	
+	select:focus, input[type="time"]:focus {
+		outline: none;
+		border-color: var(--primary);
+	}
+	
+	.btn-primary {
+		background: linear-gradient(135deg, var(--primary) 0%, #0891b2 100%);
+		color: white;
+		border: none;
+		padding: 1rem 2rem;
+		border-radius: 8px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		align-self: flex-start;
+	}
+	
+	.btn-primary:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 25px rgba(0, 242, 254, 0.3);
+	}
+	
 	.settings-page {
 		padding: 2rem;
 		max-width: 800px;
@@ -377,11 +475,11 @@
 	
 	/* Form Controls Styling */
 	select, input[type="time"] {
-		background-color: rgba(0, 0, 0, 0.2);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background-color: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		padding: 0.5rem 0.75rem;
 		border-radius: 4px;
-		color: var(--text);
+		color: var(--text-primary);
 		font-size: 0.9rem;
 		min-width: 140px;
 	}

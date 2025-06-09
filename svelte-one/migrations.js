@@ -58,8 +58,10 @@ export async function runMigrations(env) {
 		console.log('🩺 Prüfe Datenbankstatus...');
 		const trainingPlansCount = await getTableCount(db, 'training_plans');
 		const userPlansCount = await getTableCount(db, 'user_training_plans');
-		
-		console.log(`📈 Statistik: ${trainingPlansCount} Trainingspläne, ${userPlansCount} Benutzertrainingspläne`);
+
+		console.log(
+			`📈 Statistik: ${trainingPlansCount} Trainingspläne, ${userPlansCount} Benutzertrainingspläne`
+		);
 		console.log('🎉 Alle Migrationen erfolgreich abgeschlossen!');
 	} catch (error) {
 		console.error('❌ Fehler bei der Migration:', error);

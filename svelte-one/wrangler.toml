@@ -9,22 +9,15 @@ binding = "DB" # Dies ist der Name, der in deinem Code als env.DB verfügbar sei
 database_name = "training_plans_db"
 database_id = "YOUR_DATABASE_ID" # Dies wird von Cloudflare nach der Datenbankerstellung bereitgestellt
 
-# Lokale Entwicklung
-[env.development]
-vars = { NODE_ENV = "development" }
-
-# Produktion
-[env.production]  
-vars = { NODE_ENV = "production" }
-
 # Entwicklungsmodus für lokale Entwicklung
 [env.development]
+vars = { NODE_ENV = "development" }
 workers_dev = true
 
 # Produktionsmodus mit spezifischen Einstellungen
-[env.production]
+[env.production]  
+vars = { NODE_ENV = "production" }
 workers_dev = false
-# Hier können zusätzliche Produktionseinstellungen hinzugefügt werden
 
 # Umgebungsvariablen
 [vars]

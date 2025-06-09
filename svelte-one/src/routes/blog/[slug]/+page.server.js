@@ -112,5 +112,5 @@ export async function load({ params, setHeaders }) {
 	}
 }
 
-// Optional: Prerendering für bessere SEO und Performance
-export const prerender = true;
+// Disable prerendering for dynamic blog routes
+export const prerender = false;

@@ -1,9 +1,6 @@
 // filepath: src/routes/api/blog/comments/[commentId]/like/+server.js
 import { json } from '@sveltejs/kit';
-
-// In production, this would use a database
-// For now, we're reusing the same in-memory storage from the main comments API
-import { commentsData } from '../../+server.js';
+import { likeComment } from '$lib/server/blog-data.js';
 
 // POST: Like a comment
 export async function POST({ params, request }) {
@@ -15,19 +12,15 @@ export async function POST({ params, request }) {
 			return json({ error: 'Post slug is required' }, { status: 400 });
 		}
 
-		const postComments = commentsData[postSlug] || [];
-		const commentIndex = postComments.findIndex((comment) => comment.id === commentId);
+		const updatedComment = likeComment(postSlug, commentId);
 
-		if (commentIndex === -1) {
+		if (!updatedComment) {
 			return json({ error: 'Comment not found' }, { status: 404 });
 		}
 
-		// Increment the likes count
-		postComments[commentIndex].likes += 1;
-
 		return json({
 			message: 'Comment liked successfully',
-			likes: postComments[commentIndex].likes
+			likes: updatedComment.likes
 		});
 	} catch (error) {
 		console.error('Error liking comment:', error);

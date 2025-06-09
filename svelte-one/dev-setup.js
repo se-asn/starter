@@ -5,21 +5,21 @@ import { runMigrations } from './migrations.js';
 
 // Mock environment for local development
 const mockEnv = {
-    DB: {
-        // Mock D1 database interface
-        prepare: (query) => ({
-            bind: (...params) => ({
-                all: async () => ({ results: [], success: true }),
-                first: async () => null,
-                run: async () => ({ success: true, meta: { changes: 0 } })
-            }),
-            all: async () => ({ results: [], success: true }),
-            first: async () => null,
-            run: async () => ({ success: true, meta: { changes: 0 } })
-        }),
-        batch: async (statements) => ({ success: true, results: [] }),
-        exec: async (query) => ({ success: true, results: [] })
-    }
+	DB: {
+		// Mock D1 database interface
+		prepare: (query) => ({
+			bind: (...params) => ({
+				all: async () => ({ results: [], success: true }),
+				first: async () => null,
+				run: async () => ({ success: true, meta: { changes: 0 } })
+			}),
+			all: async () => ({ results: [], success: true }),
+			first: async () => null,
+			run: async () => ({ success: true, meta: { changes: 0 } })
+		}),
+		batch: async (statements) => ({ success: true, results: [] }),
+		exec: async (query) => ({ success: true, results: [] })
+	}
 };
 
 console.log('🏠 Local development setup');
