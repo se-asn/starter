@@ -42,9 +42,7 @@
       }
     }
 
-    loading = true;
-
-    try {
+    loading = true;    try {
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
       const body = isLogin 
         ? { email, password }
@@ -58,23 +56,36 @@
         body: JSON.stringify(body)
       });
 
+      if (!response.ok) {
+        // Try to get error message from response
+        let errorMessage = 'Authentication failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
       const data = await response.json();
 
-      if (response.ok) {
-        // Store token and user info
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        success = data.message;
-        setTimeout(() => {
-          goto('/dashboard');
-        }, 1000);
-      } else {
-        error = data.error || 'Authentication failed';
-      }
+      // Store token and user info
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      success = data.message || (isLogin ? 'Login successful!' : 'Registration successful!');
+      setTimeout(() => {
+        goto('/dashboard');
+      }, 1000);
+
     } catch (err) {
-      error = 'Network error. Please try again.';
       console.error('Auth error:', err);
+      if (err instanceof Error) {
+        error = err.message;
+      } else {
+        error = 'Network error. Please try again.';
+      }
     } finally {
       loading = false;
     }
