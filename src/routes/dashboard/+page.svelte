@@ -5,17 +5,23 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { ClientAuth } from '$lib/client-auth';
   
   // User state
   let user = null;
   let authToken = '';
   
-  // Database connection status
+  // Database connection status (simulated for GitHub Pages)
   let databaseStatus = {
-    connected: false,
-    loading: true,
-    tables: [],
-    recordCounts: {},
+    connected: true,
+    loading: false,
+    tables: ['athletes', 'activities', 'training_plans', 'api_connections'],
+    recordCounts: {
+      athletes: 156,
+      activities: 2847,
+      training_plans: 42,
+      api_connections: 89
+    },
     error: null
   };
   
@@ -61,27 +67,23 @@
   
   let statusMessage = '';
   let statusType: 'success' | 'error' | '' = '';
-    onMount(() => {
-    // Check authentication
-    authToken = localStorage.getItem('authToken') || '';
-    const userStr = localStorage.getItem('user');
-    
-    if (!authToken) {
+  onMount(() => {
+    // Check authentication using ClientAuth
+    if (!ClientAuth.isAuthenticated()) {
       goto('/auth');
       return;
     }
     
-    if (userStr) {
-      try {
-        user = JSON.parse(userStr);
-      } catch (e) {
-        console.error('Error parsing user data:', e);
-        localStorage.removeItem('user');
-        localStorage.removeItem('authToken');
-        goto('/auth');
-        return;
-      }
-    }
+    user = ClientAuth.getCurrentUser();
+    authToken = localStorage.getItem('authToken') || '';
+    
+    // Simulate some connected integrations for demo    integrations[0].connected = true; // Strava
+    integrations[0].lastSync = new Date().toISOString();
+    integrations[0].activities = 127;
+    
+    integrations[1].connected = true; // Garmin
+    integrations[1].lastSync = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // 2 hours ago
+    integrations[1].activities = 89;
     
     // Check URL params for OAuth callbacks
     const urlParams = new URLSearchParams($page.url.search);
@@ -167,10 +169,8 @@
       }
     }
   }
-  
-  function logout() {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    function logout() {
+    ClientAuth.logout();
     goto('/auth');
   }
   

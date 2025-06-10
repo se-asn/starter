@@ -3,6 +3,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { ClientAuth } from '$lib/client-auth';
   
   let mounted = false;
   let glowIntensity = 0;
@@ -22,8 +23,7 @@
     }, 1000);
     
     // Check if user is already authenticated
-    const token = localStorage.getItem('authToken');
-    if (token) {
+    if (ClientAuth.isAuthenticated()) {
       goto('/dashboard');
     }
     

@@ -3,6 +3,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { ClientAuth } from '$lib/client-auth';
 
 	let isLogin = true;
 	let email = '';
@@ -18,8 +19,7 @@
 	onMount(() => {
 		mounted = true;
 		// Check if user is already authenticated
-		const token = localStorage.getItem('authToken');
-		if (token) {
+		if (ClientAuth.isAuthenticated()) {
 			goto('/dashboard');
 		}
 	});
@@ -50,45 +50,25 @@
 
 		loading = true;
 		try {
-			const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-			const body = isLogin ? { email, password } : { email, password, name };
+			const result = isLogin 
+				? await ClientAuth.login(email, password)
+				: await ClientAuth.register(email, password, name);
 
-			const response = await fetch(endpoint, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(body)
-			});
+			if (result.success && result.user && result.token) {
+				// Store token and user info
+				localStorage.setItem('authToken', result.token);
+				localStorage.setItem('user', JSON.stringify(result.user));
 
-			if (!response.ok) {
-				let errorMessage = 'Neural authentication failed';
-				try {
-					const errorData = await response.json();
-					errorMessage = errorData.error || errorMessage;
-				} catch {
-					errorMessage = `System error ${response.status}: ${response.statusText}`;
-				}
-				throw new Error(errorMessage);
+				success = result.message || (isLogin ? 'Neural link established' : 'Identity verified and registered');
+				setTimeout(() => {
+					goto('/dashboard');
+				}, 1500);
+			} else {
+				error = result.message || 'Neural authentication failed';
 			}
-
-			const data = await response.json();
-
-			// Store token and user info
-			localStorage.setItem('authToken', data.token);
-			localStorage.setItem('user', JSON.stringify(data.user));
-
-			success = data.message || (isLogin ? 'Neural link established' : 'Identity verified and registered');
-			setTimeout(() => {
-				goto('/dashboard');
-			}, 1500);
 		} catch (err) {
 			console.error('Neural auth error:', err);
-			if (err instanceof Error) {
-				error = err.message;
-			} else {
-				error = 'Neural network connectivity issues detected.';
-			}
+			error = 'Neural network connectivity issues detected.';
 		} finally {
 			loading = false;
 			scanningEffect = false;
