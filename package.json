@@ -3,6 +3,7 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"description": "LaufplanerPro - Hosted on GitHub Pages (NOT Cloudflare Pages)",
 	"scripts": {
 		"dev": "node dev-setup.js && vite dev --host 0.0.0.0",
 		"dev:local": "vite dev --host 0.0.0.0",

@@ -1,585 +1,1076 @@
-<!-- Activities page -->
-<!-- src/routes/activities/+page.svelte -->
+<!-- Smart Triathlete Neural Activities -->
 
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { ClientAuth } from '$lib/client-auth';
 
-  // Authentication
-  let user = null;
-  let authToken = '';
-  
-  // Activities data
-  let activities = [];
-  let summary = [];
-  let loading = true;
-  let error = '';
-  
-  // Filters and pagination
-  let activityType = '';
-  let currentPage = 0;
-  let pageSize = 10;
-  let totalActivities = 0;
-  let hasMore = false;
+	// Authentication
+	let user = null;
 
-  onMount(async () => {
-    // Check authentication
-    authToken = localStorage.getItem('authToken') || '';
-    const userStr = localStorage.getItem('user');
-    
-    if (!authToken) {
-      goto('/auth');
-      return;
-    }
-    
-    if (userStr) {
-      try {
-        user = JSON.parse(userStr);
-      } catch (e) {
-        goto('/auth');
-        return;
-      }
-    }
-    
-    await loadActivities();
-  });
+	// Sample Activities Data
+	let activities = [
+		{
+			id: 1,
+			sport: 'run',
+			name: 'Neural Endurance Protocol',
+			date: '2025-06-09',
+			duration: '01:45:32',
+			distance: '21.1km',
+			pace: '4:58/km',
+			tss: 94,
+			hr_avg: 165,
+			hr_max: 182,
+			calories: 1247,
+			elevation: 234,
+			weather: 'Quantum Clear, 18°C'
+		},
+		{
+			id: 2,
+			sport: 'bike',
+			name: 'Quantum Power Analysis',
+			date: '2025-06-08',
+			duration: '01:32:15',
+			distance: '45.2km',
+			power_avg: 287,
+			power_max: 342,
+			tss: 128,
+			hr_avg: 172,
+			calories: 892,
+			elevation: 145,
+			weather: 'Neural Conditions, 22°C'
+		},
+		{
+			id: 3,
+			sport: 'swim',
+			name: 'Adaptive Threshold Matrix',
+			date: '2025-06-07',
+			duration: '01:15:20',
+			distance: '3.2km',
+			pace: '1:34/100m',
+			tss: 75,
+			stroke_rate: 68,
+			calories: 445,
+			pool_length: '50m',
+			weather: 'Indoor Pool'
+		},
+		{
+			id: 4,
+			sport: 'bike',
+			name: 'Easy Recovery Ride',
+			date: '2025-06-06',
+			duration: '02:12:45',
+			distance: '65.8km',
+			power_avg: 185,
+			tss: 89,
+			hr_avg: 142,
+			calories: 1156,
+			elevation: 567,
+			weather: 'Sunny, 25°C'
+		},
+		{
+			id: 5,
+			sport: 'run',
+			name: 'Track Speed Work',
+			date: '2025-06-05',
+			duration: '00:52:30',
+			distance: '12.5km',
+			pace: '4:12/km',
+			tss: 67,
+			hr_avg: 178,
+			hr_max: 194,
+			calories: 678,
+			elevation: 23,
+			weather: 'Overcast, 16°C'
+		}
+	];
 
-  async function loadActivities() {
-    loading = true;
-    error = '';
-    
-    try {
-      const params = new URLSearchParams({
-        limit: pageSize.toString(),
-        offset: (currentPage * pageSize).toString()
-      });
-      
-      if (activityType) {
-        params.append('type', activityType);
-      }
-      
-      const response = await fetch(`/api/activities?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        activities = data.activities;
-        summary = data.summary;
-        totalActivities = data.pagination.total;
-        hasMore = data.pagination.hasMore;
-      } else {
-        error = data.error || 'Failed to load activities';
-        if (response.status === 401) {
-          goto('/auth');
-        }
-      }
-    } catch (err) {
-      error = 'Failed to load activities';
-      console.error('Activities error:', err);
-    } finally {
-      loading = false;
-    }
-  }
+	// Summary data
+	let weekSummary = {
+		totalDistance: { swim: '12.8km', bike: '387km', run: '68.5km' },
+		totalTime: { swim: '4:35:20', bike: '12:15:45', run: '6:48:12' },
+		totalTSS: { swim: 287, bike: 456, run: 342 },
+		totalCalories: 4418
+	};
 
-  function formatDuration(seconds) {
-    if (!seconds) return '—';
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    return `${minutes}m`;
-  }
+	// Filters
+	let selectedSport = 'all';
+	let selectedWeek = 'this-week';
+	let loading = false;
+	let error = '';
 
-  function formatDistance(meters) {
-    if (!meters) return '—';
-    if (meters >= 1000) {
-      return `${(meters / 1000).toFixed(1)} km`;
-    }
-    return `${Math.round(meters)} m`;
-  }
+	// Pagination
+	let currentPage = 0;
+	let itemsPerPage = 5;
 
-  function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
+	$: filteredActivities = activities.filter(
+		(activity) => selectedSport === 'all' || activity.sport === selectedSport
+	);
 
-  function getActivityIcon(type) {
-    switch (type) {
-      case 'swim': return '🏊‍♂️';
-      case 'bike': case 'cycling': return '🚴‍♂️';
-      case 'run': case 'running': return '🏃‍♂️';
-      case 'brick': return '🧱';
-      default: return '💪';
-    }
-  }
+	$: paginatedActivities = filteredActivities.slice(
+		currentPage * itemsPerPage,
+		(currentPage + 1) * itemsPerPage
+	);
 
-  function filterByType(type) {
-    activityType = activityType === type ? '' : type;
-    currentPage = 0;
-    loadActivities();
-  }
+	$: totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
 
-  function nextPage() {
-    if (hasMore) {
-      currentPage++;
-      loadActivities();
-    }
-  }
+	onMount(() => {
+		user = ClientAuth.getCurrentUser();
+		if (!user) {
+			goto('/auth');
+			return;
+		}
+	});
+	function getSportIcon(sport) {
+		return sport; // Return sport name for CSS class
+	}
 
-  function prevPage() {
-    if (currentPage > 0) {
-      currentPage--;
-      loadActivities();
-    }
-  }
+	function getSportColor(sport) {
+		switch (sport) {
+			case 'swim':
+				return '#00D4FF';
+			case 'bike':
+				return '#FF6B35';
+			case 'run':
+				return '#4CAF50';
+			default:
+				return '#ffffff';
+		}
+	}
+
+	function formatDate(dateStr) {
+		return new Date(dateStr).toLocaleDateString('en-US', {
+			month: 'short',
+			day: 'numeric',
+			year: 'numeric'
+		});
+	}
+
+	function nextPage() {
+		if (currentPage < totalPages - 1) {
+			currentPage++;
+		}
+	}
+
+	function prevPage() {
+		if (currentPage > 0) {
+			currentPage--;
+		}
+	}
 </script>
 
 <svelte:head>
-  <title>Activities - Triathlon Coach</title>
+	<title>Smart Triathlete - Neural Activities</title>
+	<meta name="description" content="Quantum analysis of your neural training sessions" />
 </svelte:head>
 
-<div class="activities-page">
-  <header class="page-header">
-    <h1>🏃‍♂️ Your Activities</h1>
-    <div class="header-actions">
-      <a href="/dashboard" class="back-btn">← Dashboard</a>
-    </div>
-  </header>
+<div class="activities-container">
+	<!-- Header -->
+	<header class="page-header">
+		<div class="header-content">
+			<div class="title-section">
+				<div class="logo">
+					<div class="icon-neural"></div>
+					<h1>Smart Triathlete</h1>
+				</div>
+				<p>Neural Activity Analysis</p>
+			</div>
+			<div class="header-actions">
+				<a href="/dashboard" class="back-btn">
+					<div class="icon-back"></div>
+					Dashboard
+				</a>
+			</div>
+		</div>
+	</header>
+	<!-- Weekly Summary -->
+	<section class="weekly-summary">
+		<h2>Neural Activity Matrix</h2>
+		<div class="summary-grid">
+			<div class="summary-card swim">
+				<div class="card-header">
+					<div class="icon-swim"></div>
+					<span class="sport-name">Neural Swimming</span>
+				</div>
+				<div class="stats-grid">
+					<div class="stat-item">
+						<span class="stat-label">Distance</span>
+						<span class="stat-value">{weekSummary.totalDistance.swim}</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Time</span>
+						<span class="stat-value">{weekSummary.totalTime.swim}</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">TSS</span>
+						<span class="stat-value">{weekSummary.totalTSS.swim}</span>
+					</div>
+				</div>
+			</div>
 
-  {#if loading}
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>Loading activities...</p>
-    </div>
-  {:else if error}
-    <div class="error">
-      <p>{error}</p>
-      <button on:click={loadActivities} class="retry-btn">Try Again</button>
-    </div>
-  {:else}
-    <!-- Summary Cards -->
-    {#if summary.length > 0}
-      <section class="summary">
-        <h2>Last 30 Days Summary</h2>
-        <div class="summary-cards">
-          {#each summary as stat}
-            <div class="summary-card">
-              <div class="summary-icon">{getActivityIcon(stat.activity_type)}</div>
-              <div class="summary-info">
-                <h3>{stat.activity_type}</h3>
-                <p class="summary-count">{stat.count} activities</p>
-                <p class="summary-stats">
-                  {formatDistance(stat.total_distance)} • {formatDuration(stat.total_duration)}
-                </p>
-              </div>
-            </div>
-          {/each}
-        </div>
-      </section>
-    {/if}
+			<div class="summary-card bike">
+				<div class="card-header">
+					<div class="icon-bike"></div>
+					<span class="sport-name">Quantum Cycling</span>
+				</div>
+				<div class="stats-grid">
+					<div class="stat-item">
+						<span class="stat-label">Distance</span>
+						<span class="stat-value">{weekSummary.totalDistance.bike}</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Time</span>
+						<span class="stat-value">{weekSummary.totalTime.bike}</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">TSS</span>
+						<span class="stat-value">{weekSummary.totalTSS.bike}</span>
+					</div>
+				</div>
+			</div>
 
-    <!-- Activity Filters -->
-    <section class="filters">
-      <h2>Activity Type</h2>
-      <div class="filter-buttons">
-        <button 
-          class="filter-btn" 
-          class:active={activityType === ''}
-          on:click={() => filterByType('')}
-        >
-          All
-        </button>
-        <button 
-          class="filter-btn" 
-          class:active={activityType === 'swim'}
-          on:click={() => filterByType('swim')}
-        >
-          🏊‍♂️ Swim
-        </button>
-        <button 
-          class="filter-btn" 
-          class:active={activityType === 'bike'}
-          on:click={() => filterByType('bike')}
-        >
-          🚴‍♂️ Bike
-        </button>
-        <button 
-          class="filter-btn" 
-          class:active={activityType === 'run'}
-          on:click={() => filterByType('run')}
-        >
-          🏃‍♂️ Run
-        </button>
-      </div>
-    </section>
+			<div class="summary-card run">
+				<div class="card-header">
+					<div class="icon-run"></div>
+					<span class="sport-name">Adaptive Running</span>
+				</div>
+				<div class="stats-grid">
+					<div class="stat-item">
+						<span class="stat-label">Distance</span>
+						<span class="stat-value">{weekSummary.totalDistance.run}</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">Time</span>
+						<span class="stat-value">{weekSummary.totalTime.run}</span>
+					</div>
+					<div class="stat-item">
+						<span class="stat-label">TSS</span>
+						<span class="stat-value">{weekSummary.totalTSS.run}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 
-    <!-- Activities List -->
-    <section class="activities">
-      <h2>Activities ({totalActivities})</h2>
-      {#if activities.length === 0}
-        <div class="empty-state">
-          <p>No activities found. Connect your training apps to import your workouts!</p>
-          <a href="/dashboard" class="connect-btn">Connect Apps</a>
-        </div>
-      {:else}
-        <div class="activities-list">
-          {#each activities as activity}
-            <div class="activity-card">
-              <div class="activity-icon">
-                {getActivityIcon(activity.activity_type)}
-              </div>
-              <div class="activity-info">
-                <h3>{activity.name || `${activity.activity_type} activity`}</h3>
-                <p class="activity-date">{formatDate(activity.start_time)}</p>
-                <div class="activity-stats">
-                  <span class="stat">
-                    <strong>{formatDistance(activity.distance_meters)}</strong>
-                  </span>
-                  <span class="stat">
-                    <strong>{formatDuration(activity.duration_seconds)}</strong>
-                  </span>
-                  {#if activity.avg_heart_rate}
-                    <span class="stat">
-                      <strong>{Math.round(activity.avg_heart_rate)} bpm</strong>
-                    </span>
-                  {/if}
-                </div>
-                <div class="activity-source">
-                  <span class="provider">{activity.provider}</span>
-                </div>
-              </div>
-            </div>
-          {/each}
-        </div>
+	<!-- Filters -->
+	<section class="filters">
+		<div class="filter-group">
+			<label for="sport-filter">Sport:</label>
+			<select id="sport-filter" bind:value={selectedSport}>
+				<option value="all">All Sports</option>
+				<option value="swim">Swimming</option>
+				<option value="bike">Cycling</option>
+				<option value="run">Running</option>
+			</select>
+		</div>
 
-        <!-- Pagination -->
-        <div class="pagination">
-          <button 
-            on:click={prevPage} 
-            disabled={currentPage === 0}
-            class="page-btn"
-          >
-            ← Previous
-          </button>
-          <span class="page-info">
-            Page {currentPage + 1} of {Math.ceil(totalActivities / pageSize)}
-          </span>
-          <button 
-            on:click={nextPage} 
-            disabled={!hasMore}
-            class="page-btn"
-          >
-            Next →
-          </button>
-        </div>
-      {/if}
-    </section>
-  {/if}
+		<div class="filter-group">
+			<label for="week-filter">Period:</label>
+			<select id="week-filter" bind:value={selectedWeek}>
+				<option value="this-week">This Week</option>
+				<option value="last-week">Last Week</option>
+				<option value="this-month">This Month</option>
+			</select>
+		</div>
+	</section>
+	<!-- Activities List -->
+	<section class="activities-list">
+		<h2>Neural Activity Log</h2>
+
+		{#if loading}
+			<div class="loading">
+				<div class="icon-sync loading"></div>
+				Analyzing neural patterns...
+			</div>
+		{:else if error}
+			<div class="error">
+				<div class="icon-error"></div>
+				{error}
+			</div>
+		{:else if paginatedActivities.length === 0}
+			<div class="empty-state">
+				<div class="icon-quantum"></div>
+				<h3>No neural activities detected</h3>
+				<p>Begin your quantum training to initialize activity patterns!</p>
+			</div>
+		{:else}
+			<div class="activities-grid">
+				{#each paginatedActivities as activity}
+					<div class="activity-card" style="border-left-color: {getSportColor(activity.sport)}">
+						<div class="activity-header">
+							<div class="activity-title">
+								<div class="icon-{activity.sport}"></div>
+								<div class="title-info">
+									<h3>{activity.name}</h3>
+									<span class="activity-date">{formatDate(activity.date)}</span>
+								</div>
+							</div>
+							<div class="tss-badge">
+								TSS: {activity.tss}
+							</div>
+						</div>
+
+						<div class="activity-stats">
+							<div class="primary-stats">
+								<div class="stat">
+									<span class="stat-label">Duration</span>
+									<span class="stat-value">{activity.duration}</span>
+								</div>
+								<div class="stat">
+									<span class="stat-label">Distance</span>
+									<span class="stat-value">{activity.distance}</span>
+								</div>
+								{#if activity.pace}
+									<div class="stat">
+										<span class="stat-label">Pace</span>
+										<span class="stat-value">{activity.pace}</span>
+									</div>
+								{:else if activity.power_avg}
+									<div class="stat">
+										<span class="stat-label">Avg Power</span>
+										<span class="stat-value">{activity.power_avg}W</span>
+									</div>
+								{/if}
+							</div>
+
+							<div class="secondary-stats">
+								{#if activity.hr_avg}
+									<div class="stat">
+										<span class="stat-label">
+											<div class="icon-heart"></div>
+											Avg HR
+										</span>
+										<span class="stat-value">{activity.hr_avg} bpm</span>
+									</div>
+								{/if}
+								<div class="stat">
+									<span class="stat-label">
+										<div class="icon-energy"></div>
+										Energy
+									</span>
+									<span class="stat-value">{activity.calories}</span>
+								</div>
+								{#if activity.elevation}
+									<div class="stat">
+										<span class="stat-label">
+											<div class="icon-elevation"></div>
+											Elevation
+										</span>
+										<span class="stat-value">{activity.elevation}m</span>
+									</div>
+								{/if}
+							</div>
+						</div>
+
+						<div class="activity-footer">
+							<span class="weather">
+								<div class="icon-weather"></div>
+								{activity.weather}
+							</span>
+						</div>
+					</div>
+				{/each}
+			</div>
+
+			<!-- Pagination -->
+			{#if totalPages > 1}
+				<div class="pagination">
+					<button on:click={prevPage} disabled={currentPage === 0} class="page-btn">
+						← Previous
+					</button>
+
+					<span class="page-info">
+						Page {currentPage + 1} of {totalPages}
+					</span>
+
+					<button on:click={nextPage} disabled={currentPage >= totalPages - 1} class="page-btn">
+						Next →
+					</button>
+				</div>
+			{/if}
+		{/if}
+	</section>
 </div>
 
 <style>
-  .activities-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
+	/* Neural/Quantum Activities Design */
+	* {
+		box-sizing: border-box;
+	}
 
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e9ecef;
-  }
+	.activities-container {
+		min-height: 100vh;
+		background: var(--neural-bg);
+		color: var(--neural-text);
+		font-family: var(--font-neural);
+		padding: 1rem;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
 
-  .page-header h1 {
-    margin: 0;
-    color: #333;
-    font-size: 2rem;
-  }
+	/* Neural Icons */
+	.icon-neural,
+	.icon-back,
+	.icon-swim,
+	.icon-bike,
+	.icon-run,
+	.icon-sync,
+	.icon-error,
+	.icon-quantum,
+	.icon-heart,
+	.icon-energy,
+	.icon-elevation,
+	.icon-weather {
+		width: 24px;
+		height: 24px;
+		border-radius: 6px;
+		position: relative;
+		flex-shrink: 0;
+	}
 
-  .back-btn {
-    padding: 0.5rem 1rem;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    color: #495057;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s;
-  }
+	.icon-neural {
+		background: radial-gradient(circle at center, var(--neural-accent) 30%, transparent 70%);
+		border: 1px solid var(--neural-accent);
+		animation: neuralPulse 2s ease-in-out infinite;
+	}
 
-  .back-btn:hover {
-    background: #e9ecef;
-  }
+	.icon-neural:before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 8px;
+		height: 8px;
+		background: var(--neural-accent);
+		border-radius: 50%;
+		transform: translate(-50%, -50%);
+		animation: pulse 1.5s ease-in-out infinite;
+	}
 
-  .loading {
-    text-align: center;
-    padding: 3rem;
-  }
+	.icon-back {
+		background: linear-gradient(135deg, var(--neural-secondary), var(--neural-accent));
+		clip-path: polygon(40% 20%, 20% 50%, 40% 80%, 35% 80%, 15% 50%, 35% 20%);
+		margin-right: 0.5rem;
+	}
 
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e9ecef;
-    border-top: 4px solid #007bff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-  }
+	.icon-swim {
+		background: linear-gradient(135deg, #00d4ff, #0099cc);
+		clip-path: polygon(20% 40%, 40% 20%, 80% 60%, 60% 80%);
+	}
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+	.icon-bike {
+		background: linear-gradient(135deg, #ff6b35, #cc5429);
+		border-radius: 50%;
+		position: relative;
+	}
 
-  .error {
-    text-align: center;
-    padding: 2rem;
-    color: #dc3545;
-  }
+	.icon-bike:before,
+	.icon-bike:after {
+		content: '';
+		position: absolute;
+		width: 6px;
+		height: 6px;
+		background: var(--neural-bg);
+		border-radius: 50%;
+		top: 50%;
+		transform: translateY(-50%);
+	}
 
-  .retry-btn {
-    padding: 0.5rem 1rem;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 1rem;
-  }
+	.icon-bike:before {
+		left: 3px;
+	}
+	.icon-bike:after {
+		right: 3px;
+	}
 
-  .summary {
-    margin-bottom: 2rem;
-  }
+	.icon-run {
+		background: linear-gradient(135deg, #4caf50, #2e7d32);
+		clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+	}
 
-  .summary h2 {
-    margin-bottom: 1rem;
-    color: #333;
-  }
+	.icon-sync {
+		background: var(--neural-accent);
+		border-radius: 50%;
+		margin-right: 0.5rem;
+	}
 
-  .summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-  }
+	.icon-sync.loading {
+		animation: rotate 1s linear infinite;
+	}
 
-  .summary-card {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
+	.icon-error {
+		background: #ff4444;
+		border-radius: 50%;
+		position: relative;
+		margin-right: 0.5rem;
+	}
 
-  .summary-icon {
-    font-size: 2rem;
-  }
+	.icon-error:before {
+		content: '!';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: white;
+		font-size: 12px;
+		font-weight: bold;
+	}
 
-  .summary-info h3 {
-    margin: 0 0 0.25rem 0;
-    text-transform: capitalize;
-    color: #333;
-  }
+	.icon-quantum {
+		background: linear-gradient(45deg, var(--neural-accent), var(--neural-secondary));
+		border-radius: 50%;
+		position: relative;
+		width: 48px;
+		height: 48px;
+		margin: 0 auto 1rem;
+	}
 
-  .summary-count {
-    font-weight: 600;
-    color: #007bff;
-    margin: 0;
-  }
+	.icon-quantum:before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 12px;
+		height: 12px;
+		background: var(--neural-bg);
+		border-radius: 50%;
+		transform: translate(-50%, -50%);
+		animation: quantumSpin 3s linear infinite;
+	}
 
-  .summary-stats {
-    font-size: 0.9rem;
-    color: #666;
-    margin: 0;
-  }
+	.icon-heart {
+		width: 16px;
+		height: 16px;
+		background: #ff6b6b;
+		border-radius: 50%;
+		margin-right: 0.5rem;
+	}
 
-  .filters {
-    margin-bottom: 2rem;
-  }
+	.icon-energy {
+		width: 16px;
+		height: 16px;
+		background: linear-gradient(45deg, #ff6b35, #ffab00);
+		clip-path: polygon(
+			50% 0%,
+			61% 35%,
+			98% 35%,
+			68% 57%,
+			79% 91%,
+			50% 70%,
+			21% 91%,
+			32% 57%,
+			2% 35%,
+			39% 35%
+		);
+		margin-right: 0.5rem;
+	}
 
-  .filters h2 {
-    margin-bottom: 1rem;
-    color: #333;
-  }
+	.icon-elevation {
+		width: 16px;
+		height: 16px;
+		background: linear-gradient(135deg, #4caf50, #2e7d32);
+		clip-path: polygon(0% 70%, 50% 0%, 100% 70%, 100% 100%, 0% 100%);
+		margin-right: 0.5rem;
+	}
 
-  .filter-buttons {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
+	.icon-weather {
+		width: 16px;
+		height: 16px;
+		background: linear-gradient(135deg, #00d4ff, #0099cc);
+		border-radius: 50%;
+		margin-right: 0.5rem;
+	}
 
-  .filter-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid #dee2e6;
-    background: white;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+	@keyframes neuralPulse {
+		0%,
+		100% {
+			box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7);
+		}
+		50% {
+			box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+		}
+	}
 
-  .filter-btn:hover {
-    background: #f8f9fa;
-  }
+	@keyframes pulse {
+		0%,
+		100% {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1);
+		}
+		50% {
+			opacity: 0.5;
+			transform: translate(-50%, -50%) scale(1.2);
+		}
+	}
 
-  .filter-btn.active {
-    background: #007bff;
-    color: white;
-    border-color: #007bff;
-  }
+	@keyframes quantumSpin {
+		from {
+			transform: translate(-50%, -50%) rotate(0deg);
+		}
+		to {
+			transform: translate(-50%, -50%) rotate(360deg);
+		}
+	}
 
-  .activities h2 {
-    margin-bottom: 1rem;
-    color: #333;
-  }
+	@keyframes rotate {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
-  .empty-state {
-    text-align: center;
-    padding: 3rem;
-    color: #666;
-  }
+	/* Header */
+	.page-header {
+		margin-bottom: 2rem;
+	}
 
-  .connect-btn {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    background: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    margin-top: 1rem;
-  }
+	.header-content {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 2rem;
+		max-width: 1200px;
+		margin: 0 auto;
+	}
 
-  .activities-list {
-    display: grid;
-    gap: 1rem;
-  }
+	.logo {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
 
-  .activity-card {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: box-shadow 0.2s;
-  }
+	.title-section h1 {
+		font-size: 2.5rem;
+		font-weight: 200;
+		margin: 0;
+		letter-spacing: 0.02em;
+		background: var(--neural-gradient);
+		background-clip: text;
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
 
-  .activity-card:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
+	.title-section p {
+		opacity: 0.8;
+		margin: 0;
+		font-size: 1.1rem;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
 
-  .activity-icon {
-    font-size: 2rem;
-    flex-shrink: 0;
-  }
+	.back-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem 1.5rem;
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-radius: 12px;
+		color: var(--neural-text);
+		text-decoration: none;
+		transition: all var(--neural-transition);
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
 
-  .activity-info {
-    flex: 1;
-  }
+	.back-btn:hover {
+		background: var(--neural-hover);
+		transform: translateY(-2px);
+		box-shadow: var(--neural-shadow);
+	}
 
-  .activity-info h3 {
-    margin: 0 0 0.25rem 0;
-    color: #333;
-  }
+	/* Weekly Summary */
+	.weekly-summary {
+		max-width: 1200px;
+		margin: 0 auto 3rem auto;
+	}
 
-  .activity-date {
-    color: #666;
-    font-size: 0.9rem;
-    margin: 0 0 0.5rem 0;
-  }
+	.weekly-summary h2 {
+		font-size: 1.5rem;
+		font-weight: 300;
+		margin: 0 0 2rem 0;
+		letter-spacing: 0.02em;
+		opacity: 0.9;
+	}
 
-  .activity-stats {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-  }
+	.summary-grid {
+		display: grid;
+		gap: 1.5rem;
+		grid-template-columns: 1fr;
+	}
 
-  .stat {
-    font-size: 0.9rem;
-    color: #495057;
-  }
+	.summary-card {
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-radius: 16px;
+		padding: 2rem;
+		backdrop-filter: blur(20px);
+		transition: all var(--neural-transition);
+	}
 
-  .provider {
-    background: #e9ecef;
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    color: #495057;
-    text-transform: capitalize;
-  }
+	.summary-card:hover {
+		background: var(--neural-hover);
+		transform: translateY(-4px);
+		box-shadow: var(--neural-shadow);
+	}
 
-  .pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #dee2e6;
-  }
+	.summary-card.swim {
+		border-left: 4px solid #00d4ff;
+	}
+	.summary-card.bike {
+		border-left: 4px solid #ff6b35;
+	}
+	.summary-card.run {
+		border-left: 4px solid #4caf50;
+	}
 
-  .page-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid #dee2e6;
-    background: white;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+	.card-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 2rem;
+	}
 
-  .page-btn:hover:not(:disabled) {
-    background: #f8f9fa;
-  }
+	.sport-name {
+		font-size: 1.2rem;
+		font-weight: 300;
+		letter-spacing: 0.02em;
+	}
 
-  .page-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1.5rem;
+	}
 
-  .page-info {
-    color: #666;
-  }
+	.stat-item {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
 
-  @media (max-width: 768px) {
-    .activities-page {
-      padding: 1rem;
-    }
-    
-    .page-header {
-      flex-direction: column;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-    
-    .summary-cards {
-      grid-template-columns: 1fr;
-    }
-    
-    .activity-card {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    
-    .activity-stats {
-      flex-wrap: wrap;
-    }
-    
-    .pagination {
-      flex-direction: column;
-      gap: 1rem;
-    }
-  }
+	.stat-label {
+		font-size: 0.8rem;
+		opacity: 0.7;
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+		font-weight: 300;
+	}
+
+	.stat-value {
+		font-size: 1.2rem;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	/* Filters */
+	.filters {
+		max-width: 1200px;
+		margin: 0 auto 2rem auto;
+		display: flex;
+		gap: 2rem;
+		flex-wrap: wrap;
+	}
+
+	.filter-group {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.filter-group label {
+		font-size: 0.9rem;
+		font-weight: 300;
+		opacity: 0.8;
+		letter-spacing: 0.01em;
+	}
+
+	.filter-group select {
+		padding: 1rem;
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-radius: 12px;
+		color: var(--neural-text);
+		cursor: pointer;
+		font-size: 0.9rem;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+		transition: all var(--neural-transition);
+	}
+
+	.filter-group select:focus {
+		outline: none;
+		border-color: var(--neural-accent);
+		box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+		background: var(--neural-hover);
+	}
+
+	/* Activities List */
+	.activities-list {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.activities-list h2 {
+		font-size: 1.5rem;
+		font-weight: 300;
+		margin: 0 0 2rem 0;
+		letter-spacing: 0.02em;
+		opacity: 0.9;
+	}
+
+	.activities-grid {
+		display: grid;
+		gap: 1.5rem;
+		grid-template-columns: 1fr;
+	}
+
+	.activity-card {
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-left: 4px solid #00d4ff;
+		border-radius: 16px;
+		padding: 2rem;
+		backdrop-filter: blur(20px);
+		transition: all var(--neural-transition);
+	}
+
+	.activity-card:hover {
+		background: var(--neural-hover);
+		transform: translateY(-4px);
+		box-shadow: var(--neural-shadow);
+	}
+
+	.activity-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 2rem;
+	}
+
+	.activity-title {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.title-info h3 {
+		font-size: 1.2rem;
+		font-weight: 300;
+		margin: 0 0 0.5rem 0;
+		letter-spacing: 0.01em;
+	}
+
+	.activity-date {
+		font-size: 0.9rem;
+		opacity: 0.7;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	.tss-badge {
+		padding: 0.75rem 1.25rem;
+		background: rgba(0, 212, 255, 0.2);
+		border: 1px solid rgba(0, 212, 255, 0.3);
+		border-radius: 20px;
+		font-size: 0.8rem;
+		font-weight: 300;
+		color: var(--neural-accent);
+		letter-spacing: 0.02em;
+	}
+
+	.activity-stats {
+		display: grid;
+		gap: 2rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.primary-stats,
+	.secondary-stats {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 1.5rem;
+	}
+
+	.stat {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.stat .stat-label {
+		font-size: 0.8rem;
+		opacity: 0.7;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.stat .stat-value {
+		font-size: 1.1rem;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	.activity-footer {
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--neural-border);
+	}
+
+	.weather {
+		font-size: 0.9rem;
+		opacity: 0.8;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	/* States */
+	.loading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		text-align: center;
+		padding: 4rem;
+		font-size: 1.1rem;
+		opacity: 0.8;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	.error {
+		background: rgba(255, 68, 68, 0.15);
+		border: 1px solid rgba(255, 68, 68, 0.3);
+		border-radius: 12px;
+		padding: 2rem;
+		text-align: center;
+		color: #ff6b6b;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 4rem 2rem;
+	}
+
+	.empty-state h3 {
+		font-size: 1.5rem;
+		font-weight: 300;
+		margin: 0 0 1rem 0;
+		letter-spacing: 0.02em;
+	}
+
+	.empty-state p {
+		opacity: 0.8;
+		margin: 0;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	/* Pagination */
+	.pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 2rem;
+		margin: 3rem 0 2rem 0;
+	}
+
+	.page-btn {
+		padding: 1rem 2rem;
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-radius: 12px;
+		color: var(--neural-text);
+		cursor: pointer;
+		transition: all var(--neural-transition);
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	.page-btn:hover:not(:disabled) {
+		background: var(--neural-hover);
+		transform: translateY(-2px);
+		box-shadow: var(--neural-shadow);
+	}
+
+	.page-btn:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+		transform: none;
+	}
+
+	.page-info {
+		font-size: 0.9rem;
+		opacity: 0.8;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+	}
+
+	/* Responsive Design */
+	@media (min-width: 768px) {
+		.activities-container {
+			padding: 2rem;
+		}
+
+		.summary-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		.activities-grid {
+			grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+		}
+
+		.filters {
+			flex-direction: row;
+			justify-content: flex-start;
+		}
+
+		.title-section h1 {
+			font-size: 3rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.header-content {
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.title-section h1 {
+			font-size: 2rem;
+		}
+
+		.activities-card {
+			padding: 1.5rem;
+		}
+
+		.activity-header {
+			flex-direction: column;
+			gap: 1rem;
+			align-items: flex-start;
+		}
+
+		.stats-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.primary-stats,
+		.secondary-stats {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
 </style>

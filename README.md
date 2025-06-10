@@ -2,6 +2,15 @@
 
 **Live Site:** [laufplanerpro.de](https://laufplanerpro.de)
 
+## ⚠️ WICHTIG: Hosting Information
+
+**DIESES PROJEKT WIRD BEI GITHUB PAGES GEHOSTET - NICHT BEI CLOUDFLARE PAGES!**
+
+- ✅ **Aktuell**: GitHub Pages mit SvelteKit Static Adapter
+- ❌ **Nicht**: Cloudflare Pages (wurde umgestellt)
+- 🔗 **Domain**: laufplanerpro.de zeigt auf GitHub Pages
+- 🛠️ **Adapter**: @sveltejs/adapter-static (nicht adapter-cloudflare)
+
 ## 🚀 Deployment Status
 
 This app is configured for **GitHub Pages** deployment with automatic builds.
