@@ -7,9 +7,8 @@ import { verifyPassword, createToken, isValidEmail } from '$lib/server/auth';
 import type { AuthUser } from '$lib/server/auth';
 import { findUserByEmail, createMockToken, isValidMockPassword } from '$lib/server/mock-auth';
 
-export const POST: RequestHandler = async ({ request, platform }) => {
-  try {
-    const { email, password } = await request.json();
+export const POST: RequestHandler = async ({ request, platform }) => {  try {
+    const { email, password } = await request.json() as { email: string; password: string };
 
     // Validate input
     if (!email || !password) {

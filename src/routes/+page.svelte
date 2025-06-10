@@ -53,11 +53,10 @@
         <span class="logo-text">LaufplanerPro</span>
         <span class="logo-version">2.0</span>
       </div>
-      
-      <nav class="neural-nav">
+        <nav class="neural-nav">
         <a href="#capabilities" class="nav-link">Capabilities</a>
         <a href="#integration" class="nav-link">Integration</a>
-        <a href="#analytics" class="nav-link">Analytics</a>
+        <a href="#capabilities" class="nav-link">Analytics</a>
         <button on:click={handleLogin} class="neural-btn neural-btn-ghost">Access</button>
       </nav>
     </div>

@@ -6,9 +6,8 @@ import { json } from '@sveltejs/kit';
 import { hashPassword, createToken, isValidEmail, isValidPassword } from '$lib/server/auth';
 import { createMockUser, createMockToken, findUserByEmail } from '$lib/server/mock-auth';
 
-export const POST: RequestHandler = async ({ request, platform }) => {
-  try {
-    const { email, password, name } = await request.json();
+export const POST: RequestHandler = async ({ request, platform }) => {  try {
+    const { email, password, name } = await request.json() as { email: string; password: string; name: string };
 
     // Validate input
     if (!email || !password || !name) {

@@ -1,6 +1,8 @@
 // Database utilities für Cloudflare D1
 // src/lib/server/database.ts
 
+/// <reference types="@cloudflare/workers-types" />
+
 export interface DatabaseEnv {
   DB: D1Database;
 }

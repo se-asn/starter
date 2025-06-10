@@ -406,9 +406,8 @@
 	.mode-indicator.register-mode {
 		transform: translateX(100%);
 	}
-
 	.neural-form {
-		space-y: var(--space-lg);
+		/* Spacing handled by individual form-field margin-bottom */
 	}
 
 	.form-field {
