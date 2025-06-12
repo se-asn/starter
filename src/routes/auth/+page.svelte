@@ -48,7 +48,7 @@
 				console.log('🔐 Attempting login with:', email);
 				const result = await ClientAuth.login(email, password);
 				console.log('🔐 Login result:', result);
-				
+
 				if (result.success) {
 					// Store token and user data
 					if (result.token) {
@@ -73,7 +73,8 @@
 					error = 'Password confirmation does not match.';
 					loading = false;
 					return;
-				}				const result = await ClientAuth.register(email, password, name || 'Neural Athlete');
+				}
+				const result = await ClientAuth.register(email, password, name || 'Neural Athlete');
 				if (result.success) {
 					// Store token and user data
 					if (result.token) {
@@ -171,7 +172,8 @@
 						required
 						disabled={loading}
 					/>
-				</div>				{#if !isLogin}
+				</div>
+				{#if !isLogin}
 					<div class="form-group">
 						<label for="name">Neural Identity (Name)</label>
 						<input
@@ -226,7 +228,8 @@
 
 	<!-- Footer -->
 	<footer class="auth-footer">
-		<p>© 2025 Smart Triathlete - Neural Training System</p>		<div class="footer-links">
+		<p>© 2025 Smart Triathlete - Neural Training System</p>
+		<div class="footer-links">
 			<a href="/">Home</a>
 			<span>•</span>
 			<span class="disabled">About</span>
@@ -689,7 +692,8 @@
 		color: var(--neural-accent);
 		text-decoration: none;
 		transition: color var(--neural-transition);
-	}	.footer-links a:hover {
+	}
+	.footer-links a:hover {
 		color: var(--neural-text);
 	}
 

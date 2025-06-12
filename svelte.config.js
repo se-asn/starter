@@ -8,13 +8,13 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		// Use static adapter for GitHub Pages
+		// Use Static adapter for GitHub Pages deployment
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: undefined,
+			fallback: 'index.html',
 			precompress: false,
-			strict: false  // Ignore API routes for static deployment
+			strict: true
 		}),
 		paths: {
 			base: process.env.NODE_ENV === 'production' ? '' : ''

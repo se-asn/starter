@@ -53,7 +53,8 @@
 			duration: '01:00:00',
 			scheduled: '2025-06-12 06:30'
 		}
-	];	function getSportIcon(sport: string): string {
+	];
+	function getSportIcon(sport: string): string {
 		const icons: { [key: string]: string } = { swim: 'swim', bike: 'bike', run: 'run' };
 		return icons[sport] || 'fitness';
 	}
@@ -81,7 +82,8 @@
 		error: null
 	};
 	// API Integrations
-	let integrations = [		{
+	let integrations = [
+		{
 			id: 'strava',
 			name: 'Strava',
 			description: 'Sync activities, segments and performance data',
@@ -120,10 +122,11 @@
 	];
 
 	let statusMessage = '';
-	let statusType: 'success' | 'error' | '' = '';	onMount(() => {
+	let statusType: 'success' | 'error' | '' = '';
+	onMount(() => {
 		// Check authentication using ClientAuth
 		console.log('🎯 Dashboard: Checking authentication...');
-		
+
 		if (!ClientAuth.isAuthenticated()) {
 			console.log('🎯 Dashboard: User not authenticated, redirecting to /auth');
 			goto('/auth');
@@ -217,7 +220,8 @@
 			});
 	}
 
-	function disconnectIntegration(id: string) {		if (confirm(`Are you sure you want to disconnect ${id}?`)) {
+	function disconnectIntegration(id: string) {
+		if (confirm(`Are you sure you want to disconnect ${id}?`)) {
 			// TODO: Implement disconnect
 			const integration = integrations.find((i) => i.id === id);
 			if (integration) {
@@ -234,10 +238,11 @@
 
 	// Test database connection
 	async function testDatabaseConnection() {
-		databaseStatus.loading = true;		try {
+		databaseStatus.loading = true;
+		try {
 			const response = await fetch('/api/test/database');
 			const data: any = await response.json();
-			
+
 			if (data.success) {
 				databaseStatus = {
 					connected: true,
