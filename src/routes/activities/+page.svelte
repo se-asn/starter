@@ -168,24 +168,6 @@
 <Navigation />
 
 <div class="activities-container">
-	<!-- Header -->
-	<header class="page-header">
-		<div class="header-content">
-			<div class="title-section">
-				<div class="logo">
-					<div class="icon-neural"></div>
-					<h1>Smart Triathlete</h1>
-				</div>
-				<p>Neural Activity Analysis</p>
-			</div>
-			<div class="header-actions">
-				<a href="/dashboard" class="back-btn">
-					<div class="icon-back"></div>
-					Dashboard
-				</a>
-			</div>
-		</div>
-	</header>
 	<!-- Weekly Summary -->
 	<section class="weekly-summary">
 		<h2>Neural Activity Matrix</h2>

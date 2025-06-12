@@ -28,22 +28,6 @@
 <Navigation />
 
 <div class="training-plans-page">
-	<header class="page-header">
-		<div class="container">
-			<div class="title-section">
-				<div class="logo">
-					<div class="icon-neural"></div>
-					<h1>Smart Triathlete</h1>
-				</div>
-				<p>Neural Training Matrix</p>
-			</div>
-			<a href="/dashboard" class="back-link">
-				<div class="icon-back"></div>
-				Dashboard
-			</a>
-		</div>
-	</header>
-
 	<main class="container">
 		<div class="plans-card">
 			<div class="card-header">

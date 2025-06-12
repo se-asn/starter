@@ -168,11 +168,15 @@
 		font-weight: 300;
 		letter-spacing: 0.02em;
 	}
-
 	.user-menu:hover {
 		background: var(--neural-hover);
 		transform: translateY(-2px);
 		box-shadow: var(--neural-shadow);
+	}
+
+	.user-name {
+		font-size: 0.9rem;
+		font-weight: 300;
 	}
 
 	/* Icons */

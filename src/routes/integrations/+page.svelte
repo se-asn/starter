@@ -153,24 +153,6 @@
 <Navigation />
 
 <div class="integrations-container">
-	<!-- Navigation Header -->
-	<nav class="top-nav">
-		<div class="nav-brand">
-			<button class="back-btn" on:click={() => goto('/dashboard')} aria-label="Back to Dashboard">
-				<div class="icon-back"></div>
-			</button>
-			<div class="logo">
-				<div class="icon-neural"></div>
-				<span class="logo-text">API Integrations</span>
-			</div>
-		</div>
-		<div class="nav-actions">
-			<div class="connection-summary">
-				{Object.values(apiIntegrations).filter((api) => api.connected).length}/3 Connected
-			</div>
-		</div>
-	</nav>
-
 	<!-- Main Content -->
 	<div class="integrations-content">
 		<!-- Overview Section -->

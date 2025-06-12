@@ -28,22 +28,6 @@
 <Navigation />
 
 <div class="profile-page">
-	<header class="page-header">
-		<div class="container">
-			<div class="title-section">
-				<div class="logo">
-					<div class="icon-neural"></div>
-					<h1>Smart Triathlete</h1>
-				</div>
-				<p>Neural Profile Matrix</p>
-			</div>
-			<a href="/dashboard" class="back-link">
-				<div class="icon-back"></div>
-				Dashboard
-			</a>
-		</div>
-	</header>
-
 	<main class="container">
 		<div class="profile-grid">
 			<!-- Neural Profile Card -->
