@@ -7,7 +7,8 @@ import type { AthleteProfile, RaceGoal } from '$lib/ai-training-generator';
 // POST /api/ai/generate-plan
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const { athlete, goal, options } = await request.json();
+    const requestData: any = await request.json();
+    const { athlete, goal, options } = requestData;
 
     console.log('🤖 AI Training Plan Generation Request:', {
       athlete: `${athlete.firstName} ${athlete.lastName}`,
@@ -151,7 +152,8 @@ export const GET: RequestHandler = async ({ url }) => {
 // PUT /api/ai/feedback
 export const PUT: RequestHandler = async ({ request }) => {
   try {
-    const { planId, userId, feedback, rating } = await request.json();
+    const requestData: any = await request.json();
+    const { planId, userId, feedback, rating } = requestData;
 
     if (!planId || !userId || !feedback) {
       return json({ 
@@ -208,7 +210,94 @@ async function storePlanInDatabase(plan: any) {
 async function getPlanFromDatabase(planId: string) {
   console.log('🔍 Retrieving plan from database:', planId);
   // Mock retrieval - in production this would query your database
-  return null;
+  // Return a mock training plan for testing
+  return {
+    id: planId,
+    name: 'Existing Training Plan',
+    athlete: {
+      id: 1,
+      firstName: 'Test',
+      lastName: 'Athlete',
+      birthDate: new Date('1990-01-01'),
+      gender: 'male' as const,
+      heightCm: 175,
+      weightKg: 70,
+      weeklyHours: 8,
+      experience: 'intermediate' as const,
+      injuries: [],
+      preferences: {
+        morningWorkouts: true,
+        eveningWorkouts: false,
+        weekendLongSessions: true,
+        indoorPreference: false,
+        gymAccess: true,
+        poolAccess: true,
+        equipmentAvailable: ['bike', 'helmet'],
+        daysPerWeek: 6,
+        restDays: [7]
+      }
+    },
+    goal: {
+      raceType: 'olympic' as const,
+      raceDate: new Date('2024-08-15'),
+      priority: 'A' as const,
+      location: 'Local Lake',
+      courseDifficulty: 'moderate' as const
+    },
+    phases: [
+      {
+        name: 'Base Phase',
+        startWeek: 1,
+        endWeek: 8,
+        focus: 'base' as const,
+        weeklyHours: 8,
+        intensity: 'low' as const,
+        description: 'Base building phase'
+      },
+      {
+        name: 'Build Phase',
+        startWeek: 9,
+        endWeek: 11,
+        focus: 'build' as const,
+        weeklyHours: 10,
+        intensity: 'moderate' as const,
+        description: 'Build phase'
+      },
+      {
+        name: 'Taper',
+        startWeek: 12,
+        endWeek: 12,
+        focus: 'race' as const,
+        weeklyHours: 5,
+        intensity: 'low' as const,
+        description: 'Race week taper'
+      }
+    ],
+    weeks: [
+      {
+        weekNumber: 1,
+        phase: 'Base Phase',
+        targetHours: 8,
+        targetTss: 350,
+        sessions: [],
+        notes: 'Week 1 of base building',
+        recoveryFocus: false
+      }
+    ],
+    totalWeeks: 12,
+    estimatedTss: 450,
+    confidence: 0.85,
+    aiModel: 'Smart Triathlete AI v1.0',
+    generatedAt: new Date(),
+    adaptations: [
+      {
+        trigger: 'High fatigue',
+        description: 'Reduce load when fatigued',
+        implementation: 'Scale back intensity',
+        frequency: 'weekly' as const
+      }
+    ]
+  };
 }
 
 async function getPerformanceData(userId: number) {

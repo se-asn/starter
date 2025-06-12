@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 // Webhook für automatische Syncs
 export const POST: RequestHandler = async ({ request, platform }) => {
   try {
-    const data = await request.json();
+    const data: any = await request.json();
     
     // Strava Webhook Event
     if (data.aspect_type === 'create' && data.object_type === 'activity') {

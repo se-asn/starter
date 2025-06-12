@@ -261,7 +261,6 @@
 		padding: 2rem 0;
 		position: relative;
 	}
-
 	.profile-page::before {
 		content: '';
 		position: absolute;
@@ -273,83 +272,12 @@
 		opacity: 0.1;
 		z-index: 0;
 	}
-
-	.page-header {
-		background: rgba(255, 255, 255, 0.05);
-		backdrop-filter: blur(20px);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		padding: 1.5rem 0;
-		margin-bottom: 2rem;
-		position: relative;
-		z-index: 1;
-	}
-
 	.container {
 		max-width: 1400px;
 		margin: 0 auto;
 		padding: 0 1rem;
 		position: relative;
 		z-index: 1;
-	}
-
-	.page-header .container {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.title-section {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.logo {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	.logo h1 {
-		color: var(--neural-text);
-		margin: 0;
-		font-size: 1.75rem;
-		font-weight: 300;
-		letter-spacing: 0.05em;
-		background: var(--neural-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-	}
-
-	.title-section p {
-		color: var(--neural-text-secondary);
-		font-size: 0.9rem;
-		font-weight: 300;
-		letter-spacing: 0.05em;
-		margin: 0;
-	}
-
-	.back-link {
-		color: var(--neural-text-secondary);
-		text-decoration: none;
-		font-size: 0.9rem;
-		font-weight: 300;
-		letter-spacing: 0.05em;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		transition: var(--neural-transition);
-		padding: 0.5rem 1rem;
-		border-radius: 8px;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		background: rgba(255, 255, 255, 0.05);
-	}
-
-	.back-link:hover {
-		color: var(--neural-text);
-		background: rgba(255, 255, 255, 0.1);
-		transform: translateY(-2px);
 	}
 
 	.profile-grid {
@@ -810,14 +738,6 @@
 		border-radius: 50%;
 	}
 
-	.icon-back {
-		width: 16px;
-		height: 16px;
-		border-left: 2px solid currentColor;
-		border-bottom: 2px solid currentColor;
-		transform: rotate(45deg);
-	}
-
 	/* Animations */
 	@keyframes neuralPulse {
 		0%,
@@ -925,18 +845,7 @@
 			grid-row: unset;
 		}
 	}
-
 	@media (max-width: 768px) {
-		.page-header .container {
-			flex-direction: column;
-			gap: 1rem;
-			text-align: center;
-		}
-
-		.logo {
-			justify-content: center;
-		}
-
 		.profile-card {
 			padding: 1.5rem;
 		}

@@ -122,11 +122,11 @@
 			return;
 		}
 	});
-	function getSportIcon(sport) {
+	function getSportIcon(sport: string): string {
 		return sport; // Return sport name for CSS class
 	}
 
-	function getSportColor(sport) {
+	function getSportColor(sport: string): string {
 		switch (sport) {
 			case 'swim':
 				return '#00D4FF';
@@ -139,7 +139,7 @@
 		}
 	}
 
-	function formatDate(dateStr) {
+	function formatDate(dateStr: string): string {
 		return new Date(dateStr).toLocaleDateString('en-US', {
 			month: 'short',
 			day: 'numeric',
@@ -605,69 +605,7 @@
 			transform: rotate(360deg);
 		}
 	}
-
 	/* Header */
-	.page-header {
-		margin-bottom: 2rem;
-	}
-
-	.header-content {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		gap: 2rem;
-		max-width: 1200px;
-		margin: 0 auto;
-	}
-
-	.logo {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		margin-bottom: 1rem;
-	}
-
-	.title-section h1 {
-		font-size: 2.5rem;
-		font-weight: 200;
-		margin: 0;
-		letter-spacing: 0.02em;
-		background: var(--neural-gradient);
-		background-clip: text;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-	}
-
-	.title-section p {
-		opacity: 0.8;
-		margin: 0;
-		font-size: 1.1rem;
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	.back-btn {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		padding: 0.75rem 1.5rem;
-		background: var(--neural-glass);
-		border: 1px solid var(--neural-border);
-		border-radius: 12px;
-		color: var(--neural-text);
-		text-decoration: none;
-		transition: all var(--neural-transition);
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	.back-btn:hover {
-		background: var(--neural-hover);
-		transform: translateY(-2px);
-		box-shadow: var(--neural-shadow);
-	}
-
-	/* Weekly Summary */
 	.weekly-summary {
 		max-width: 1200px;
 		margin: 0 auto 3rem auto;
@@ -1018,14 +956,9 @@
 		.activities-grid {
 			grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 		}
-
 		.filters {
 			flex-direction: row;
 			justify-content: flex-start;
-		}
-
-		.title-section h1 {
-			font-size: 3rem;
 		}
 	}
 
@@ -1033,10 +966,6 @@
 		.header-content {
 			flex-direction: column;
 			gap: 1rem;
-		}
-
-		.title-section h1 {
-			font-size: 2rem;
 		}
 
 		.activities-card {

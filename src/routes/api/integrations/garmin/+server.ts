@@ -9,7 +9,8 @@ const GARMIN_CLIENT_SECRET = process.env.GARMIN_CLIENT_SECRET || 'your_garmin_cl
 // POST /api/integrations/garmin - Connect Garmin account
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const { accessToken, userId } = await request.json();
+    const requestData: any = await request.json();
+    const { accessToken, userId } = requestData;
 
     if (!accessToken || !userId) {
       return json({ error: 'Missing required parameters' }, { status: 400 });
@@ -82,10 +83,7 @@ export const GET: RequestHandler = async ({ url }) => {
       mockIntegration.accessToken
     );
 
-    console.log('✅ Garmin sync completed:', syncResult);
-
-    return json({
-      success: true,
+    console.log('✅ Garmin sync completed:', syncResult);    return json({
       ...syncResult,
       lastSync: new Date().toISOString(),
       integration: {

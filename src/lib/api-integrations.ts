@@ -68,7 +68,6 @@ export interface ActivitySplit {
 export class StravaApiService {
   private static readonly BASE_URL = 'https://www.strava.com/api/v3';
   private static readonly RATE_LIMIT = { requests: 100, window: 900 }; // 100 requests per 15 minutes
-
   static async exchangeCodeForToken(code: string, clientId: string, clientSecret: string) {
     const response = await fetch('https://www.strava.com/oauth/token', {
       method: 'POST',
@@ -85,7 +84,7 @@ export class StravaApiService {
       throw new Error(`Strava auth failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     return {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
@@ -94,7 +93,6 @@ export class StravaApiService {
       athlete: this.parseStravaAthlete(data.athlete)
     };
   }
-
   static async refreshToken(refreshToken: string, clientId: string, clientSecret: string) {
     const response = await fetch('https://www.strava.com/oauth/token', {
       method: 'POST',
@@ -111,14 +109,13 @@ export class StravaApiService {
       throw new Error(`Strava token refresh failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     return {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
       expiresAt: new Date(data.expires_at * 1000)
     };
   }
-
   static async getActivities(accessToken: string, page: number = 1, perPage: number = 30): Promise<Activity[]> {
     const response = await fetch(
       `${this.BASE_URL}/athlete/activities?page=${page}&per_page=${perPage}`,
@@ -133,7 +130,7 @@ export class StravaApiService {
       throw new Error(`Strava API error: ${response.statusText}`);
     }
 
-    const activities = await response.json();
+    const activities: any[] = await response.json();
     return activities.map(this.parseStravaActivity);
   }
 
@@ -222,7 +219,6 @@ export class StravaApiService {
 // Garmin API Service (Connect IQ)
 export class GarminApiService {
   private static readonly BASE_URL = 'https://connectapi.garmin.com';
-
   static async getActivities(accessToken: string, limit: number = 50): Promise<Activity[]> {
     const response = await fetch(
       `${this.BASE_URL}/fitness-service/activity?limit=${limit}`,
@@ -238,7 +234,7 @@ export class GarminApiService {
       throw new Error(`Garmin API error: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data: any[] = await response.json();
     return data.map(this.parseGarminActivity);
   }
 

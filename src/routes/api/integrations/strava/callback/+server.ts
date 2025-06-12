@@ -27,12 +27,11 @@ export const GET: RequestHandler = async ({ url, platform, cookies }) => {
       body: JSON.stringify({
         client_id: 'YOUR_STRAVA_CLIENT_ID',
         client_secret: 'YOUR_STRAVA_CLIENT_SECRET',
-        code: code,
-        grant_type: 'authorization_code'
+        code: code,      grant_type: 'authorization_code'
       })
     });
     
-    const tokenData = await tokenResponse.json();
+    const tokenData: any = await tokenResponse.json();
     
     if (!tokenResponse.ok) {
       throw new Error(`Strava token exchange failed: ${tokenData.message}`);
@@ -45,7 +44,7 @@ export const GET: RequestHandler = async ({ url, platform, cookies }) => {
       }
     });
     
-    const athleteData = await athleteResponse.json();
+    const athleteData: any = await athleteResponse.json();
     
     // TODO: Store in D1 Database
     /*

@@ -747,7 +747,8 @@
 		}
 		to {
 			transform: rotate(360deg);
-		}	}
+		}
+	}
 	/* Performance Overview */
 	.performance-overview {
 		padding: 2rem 1.5rem;
@@ -1506,17 +1507,8 @@
 		.nav-link span {
 			display: none;
 		}
-
 		.nav-link {
 			padding: 0.75rem;
-		}
-
-		.action-content h4 {
-			font-size: 1rem;
-		}
-
-		.action-content p {
-			font-size: 0.85rem;
 		}
 	}
 </style>
