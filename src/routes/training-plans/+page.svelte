@@ -2,6 +2,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import Navigation from '$lib/components/Navigation.svelte';
 
 	let user = null;
 
@@ -23,6 +24,8 @@
 <svelte:head>
 	<title>Smart Triathlete - Neural Training Plans</title>
 </svelte:head>
+
+<Navigation />
 
 <div class="training-plans-page">
 	<header class="page-header">

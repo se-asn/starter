@@ -3,9 +3,10 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { ClientAuth } from '$lib/client-auth';
+	import Navigation from '$lib/components/Navigation.svelte';
 
 	// API Integrations State
-	let apiIntegrations = {
+	let apiIntegrations: any = {
 		strava: {
 			connected: false,
 			lastSync: null,
@@ -148,6 +149,8 @@
 		content="Connect your training devices and platforms to Smart Triathlete"
 	/>
 </svelte:head>
+
+<Navigation />
 
 <div class="integrations-container">
 	<!-- Navigation Header -->

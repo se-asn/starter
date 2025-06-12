@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { ClientAuth } from '$lib/client-auth';
+	import Navigation from '$lib/components/Navigation.svelte';
 
 	// Authentication
 	let user = null;
@@ -163,6 +164,8 @@
 	<title>Smart Triathlete - Neural Activities</title>
 	<meta name="description" content="Quantum analysis of your neural training sessions" />
 </svelte:head>
+
+<Navigation />
 
 <div class="activities-container">
 	<!-- Header -->

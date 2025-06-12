@@ -301,8 +301,7 @@
 </svelte:head>
 
 <!-- Professional Mobile-First Dashboard -->
-<div class="dashboard-container">
-	<!-- Top Navigation Bar -->
+<div class="dashboard-container">	<!-- Top Navigation Bar -->
 	<nav class="top-nav">
 		<div class="nav-brand">
 			<div class="logo">
@@ -310,15 +309,89 @@
 				<span class="logo-text">Smart Triathlete</span>
 			</div>
 		</div>
+		
+		<!-- Main Navigation Menu -->
+		<div class="nav-menu">
+			<a href="/dashboard" class="nav-link active">
+				<div class="icon-dashboard"></div>
+				<span>Dashboard</span>
+			</a>
+			<a href="/activities" class="nav-link">
+				<div class="icon-activities"></div>
+				<span>Activities</span>
+			</a>
+			<a href="/training-plans" class="nav-link">
+				<div class="icon-training"></div>
+				<span>Training</span>
+			</a>
+			<a href="/integrations" class="nav-link">
+				<div class="icon-integrations"></div>
+				<span>Integrations</span>
+			</a>
+			<a href="/profile" class="nav-link">
+				<div class="icon-profile"></div>
+				<span>Profile</span>
+			</a>
+		</div>
+		
 		<div class="nav-actions">
 			{#if user}
 				<button class="user-menu" on:click={logout}>
-					<div class="icon-profile"></div>
+					<div class="icon-user"></div>
 					<span class="user-name">{user.name}</span>
+					<div class="icon-chevron"></div>
 				</button>
 			{/if}
+		</div>	</nav>
+
+	<!-- Quick Actions -->
+	<section class="quick-actions">
+		<div class="action-cards">
+			<button class="action-card" on:click={() => goto('/activities')}>
+				<div class="action-icon">
+					<div class="icon-activities"></div>
+				</div>
+				<div class="action-content">
+					<h4>View Activities</h4>
+					<p>See all your workouts and performance data</p>
+				</div>
+				<div class="action-arrow">→</div>
+			</button>
+
+			<button class="action-card" on:click={() => goto('/training-plans')}>
+				<div class="action-icon">
+					<div class="icon-training"></div>
+				</div>
+				<div class="action-content">
+					<h4>Training Plans</h4>
+					<p>AI-generated personalized training programs</p>
+				</div>
+				<div class="action-arrow">→</div>
+			</button>
+
+			<button class="action-card" on:click={() => goto('/integrations')}>
+				<div class="action-icon">
+					<div class="icon-integrations"></div>
+				</div>
+				<div class="action-content">
+					<h4>Connect Apps</h4>
+					<p>Sync with Strava, Garmin, and more</p>
+				</div>
+				<div class="action-arrow">→</div>
+			</button>
+
+			<button class="action-card" on:click={() => goto('/profile')}>
+				<div class="action-icon">
+					<div class="icon-user"></div>
+				</div>
+				<div class="action-content">
+					<h4>Profile Settings</h4>
+					<p>Manage your account and preferences</p>
+				</div>
+				<div class="action-arrow">→</div>
+			</button>
 		</div>
-	</nav>
+	</section>
 
 	<!-- Performance Overview Cards -->
 	<section class="performance-overview">
@@ -557,9 +630,14 @@
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 	}
-
 	.icon-neural,
 	.icon-profile,
+	.icon-dashboard,
+	.icon-activities,
+	.icon-training,
+	.icon-integrations,
+	.icon-user,
+	.icon-chevron,
 	.icon-swim,
 	.icon-bike,
 	.icon-run,
@@ -601,113 +679,133 @@
 		border-radius: 50%;
 	}
 
-	.icon-swim {
-		background: linear-gradient(135deg, #00d4ff, #0099cc);
-		clip-path: polygon(20% 40%, 40% 20%, 80% 60%, 60% 80%);
-	}
-
-	.icon-bike {
-		background: linear-gradient(135deg, #ff6b35, #cc5429);
-		border-radius: 50%;
+	/* Navigation Icons */
+	.icon-dashboard {
+		background: linear-gradient(135deg, #667eea, #764ba2);
+		border-radius: 8px;
 		position: relative;
 	}
 
-	.icon-bike:before,
-	.icon-bike:after {
-		content: '';
-		position: absolute;
-		width: 6px;
-		height: 6px;
-		background: var(--neural-bg);
-		border-radius: 50%;
-		top: 50%;
-		transform: translateY(-50%);
-	}
-
-	.icon-bike:before {
-		left: 3px;
-	}
-
-	.icon-bike:after {
-		right: 3px;
-	}
-
-	.icon-run {
-		background: linear-gradient(135deg, #4caf50, #2e7d32);
-		clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
-	}
-
-	.icon-strava {
-		background: linear-gradient(135deg, #fc4c02, #e34402);
-		clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-	}
-
-	.icon-garmin {
-		background: linear-gradient(135deg, #007cc3, #005c91);
-		border-radius: 4px;
-	}
-
-	.icon-polar {
-		background: linear-gradient(135deg, #00d4ff, #0099cc);
-		border-radius: 50%;
-		position: relative;
-	}
-
-	.icon-polar:before {
+	.icon-dashboard:before {
 		content: '';
 		position: absolute;
 		top: 6px;
 		left: 6px;
 		right: 6px;
 		bottom: 6px;
-		border: 1px solid var(--neural-bg);
-		border-radius: 50%;
+		border: 2px solid white;
+		border-radius: 4px;
+		border-bottom: none;
+		border-right: none;
 	}
 
-	.icon-wahoo {
-		background: linear-gradient(135deg, #00d4ff, #4caf50);
-		clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-	}
-
-	.icon-sync {
-		background: var(--neural-accent);
-		border-radius: 50%;
-		animation: rotate 2s linear infinite;
-		margin-right: 0.5rem;
-	}
-
-	.icon-check {
-		background: #4caf50;
+	.icon-activities {
+		background: linear-gradient(135deg, #4caf50, #45a049);
 		border-radius: 50%;
 		position: relative;
 	}
 
-	.icon-check:before {
-		content: '✓';
+	.icon-activities:before {
+		content: '';
 		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		color: white;
-		font-size: 12px;
-		font-weight: bold;
+		top: 8px;
+		left: 8px;
+		right: 8px;
+		bottom: 8px;
+		border: 2px solid white;
+		border-radius: 50%;
 	}
 
-	.icon-error {
-		background: #ff4444;
+	.icon-training {
+		background: linear-gradient(135deg, #ff9800, #f57c00);
+		border-radius: 6px;
+		position: relative;
+	}
+
+	.icon-training:before {
+		content: '';
+		position: absolute;
+		top: 6px;
+		left: 6px;
+		right: 6px;
+		bottom: 6px;
+		background: white;
+		clip-path: polygon(50% 20%, 80% 80%, 20% 80%);
+	}
+
+	.icon-integrations {
+		background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+		border-radius: 6px;
+		position: relative;
+	}
+
+	.icon-integrations:before,
+	.icon-integrations:after {
+		content: '';
+		position: absolute;
+		width: 8px;
+		height: 8px;
+		background: white;
+		border-radius: 50%;
+	}
+
+	.icon-integrations:before {
+		top: 4px;
+		left: 8px;
+	}
+
+	.icon-integrations:after {
+		bottom: 4px;
+		right: 8px;
+	}
+
+	.icon-user {
+		background: linear-gradient(135deg, var(--neural-accent), #4a90e2);
 		border-radius: 50%;
 		position: relative;
 	}
 
-	.icon-error:before {
-		content: '!';
+	.icon-user:before {
+		content: '';
+		position: absolute;
+		top: 6px;
+		left: 8px;
+		right: 8px;
+		height: 6px;
+		background: white;
+		border-radius: 50%;
+	}
+
+	.icon-user:after {
+		content: '';
+		position: absolute;
+		bottom: 4px;
+		left: 6px;
+		right: 6px;
+		height: 8px;
+		background: white;
+		border-radius: 8px 8px 0 0;
+	}
+
+	.icon-chevron {
+		width: 16px;
+		height: 16px;
+		background: transparent;
+		border: none;
+		position: relative;
+	}
+
+	.icon-chevron:before {
+		content: '';
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%);
-		color: white;
-		font-size: 12px;
-		font-weight: bold;
+		width: 6px;
+		height: 6px;
+		border-right: 2px solid var(--neural-text);
+		border-bottom: 2px solid var(--neural-text);
+		transform: translate(-50%, -50%) rotate(45deg);
+		opacity: 0.7;
 	}
 
 	@keyframes neuralPulse {
@@ -740,7 +838,6 @@
 			transform: rotate(360deg);
 		}
 	}
-
 	/* Top Navigation */
 	.top-nav {
 		display: flex;
@@ -753,6 +850,61 @@
 		position: sticky;
 		top: 0;
 		z-index: 100;
+		gap: 2rem;
+	}
+
+	.nav-brand {
+		flex-shrink: 0;
+	}
+
+	.nav-menu {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex: 1;
+		justify-content: center;
+	}
+
+	.nav-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1rem;
+		border-radius: 12px;
+		color: var(--neural-text);
+		text-decoration: none;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+		transition: all var(--neural-transition);
+		position: relative;
+		opacity: 0.7;
+	}
+
+	.nav-link:hover {
+		background: var(--neural-hover);
+		opacity: 1;
+		transform: translateY(-2px);
+	}
+
+	.nav-link.active {
+		background: rgba(59, 130, 246, 0.15);
+		color: var(--neural-accent);
+		opacity: 1;
+	}
+
+	.nav-link.active::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 2px;
+		background: var(--neural-accent);
+		border-radius: 2px;
+	}
+
+	.nav-actions {
+		flex-shrink: 0;
 	}
 
 	.user-menu {
@@ -779,6 +931,81 @@
 	.user-name {
 		font-size: 0.9rem;
 		font-weight: 300;
+	}
+
+	/* Quick Actions */
+	.quick-actions {
+		padding: 2rem 1.5rem 1rem;
+		background: var(--neural-bg);
+	}
+
+	.action-cards {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.5rem;
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.action-card {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 1.5rem;
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-radius: 16px;
+		cursor: pointer;
+		transition: all var(--neural-transition);
+		text-align: left;
+		width: 100%;
+	}
+
+	.action-card:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--neural-shadow);
+		border-color: var(--neural-accent);
+		background: rgba(59, 130, 246, 0.1);
+	}
+
+	.action-icon {
+		flex-shrink: 0;
+		padding: 1rem;
+		background: var(--neural-glass);
+		border-radius: 12px;
+		border: 1px solid var(--neural-border);
+	}
+
+	.action-content {
+		flex: 1;
+	}
+
+	.action-content h4 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.1rem;
+		font-weight: 300;
+		color: var(--neural-bright);
+		letter-spacing: 0.01em;
+	}
+
+	.action-content p {
+		margin: 0;
+		font-size: 0.9rem;
+		opacity: 0.7;
+		line-height: 1.4;
+		font-weight: 300;
+	}
+
+	.action-arrow {
+		font-size: 1.5rem;
+		color: var(--neural-accent);
+		opacity: 0.7;
+		transition: all var(--neural-transition);
+	}
+
+	.action-card:hover .action-arrow {
+		opacity: 1;
+		transform: translateX(4px);
 	}
 
 	/* Performance Overview */
@@ -1491,6 +1718,65 @@
 
 		.top-nav {
 			padding: 1rem 3rem;
+		}
+	}
+
+	/* Mobile Responsive Design */
+	@media (max-width: 768px) {
+		.top-nav {
+			padding: 1rem;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.nav-menu {
+			order: 3;
+			width: 100%;
+			justify-content: flex-start;
+			overflow-x: auto;
+			padding: 0.5rem 0;
+			gap: 0.25rem;
+		}
+
+		.nav-link {
+			flex-shrink: 0;
+			padding: 0.5rem 0.75rem;
+			white-space: nowrap;
+		}
+
+		.nav-link span {
+			font-size: 0.9rem;
+		}
+
+		.action-cards {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		.action-card {
+			padding: 1rem;
+		}
+
+		.action-icon {
+			padding: 0.75rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.nav-link span {
+			display: none;
+		}
+
+		.nav-link {
+			padding: 0.75rem;
+		}
+
+		.action-content h4 {
+			font-size: 1rem;
+		}
+
+		.action-content p {
+			font-size: 0.85rem;
 		}
 	}
 </style>
