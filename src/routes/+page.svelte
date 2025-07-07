@@ -40,10 +40,10 @@
 </script>
 
 <svelte:head>
-	<title>Smart Triathlete - Neural Training System</title>
+	<title>LaufplanerPro - AI-Powered Training Intelligence</title>
 	<meta
 		name="description"
-		content="Advanced neural-powered triathlon training with quantum analytics and biometric integration"
+		content="Intelligent training optimization through AI analysis of your Garmin, Strava, Whoop, and Apple Health data. Personalized training plans reviewed by experienced coaches."
 	/>
 </svelte:head>
 
@@ -53,14 +53,14 @@
 		<div class="neural-container">
 			<div class="neural-logo">
 				<div class="logo-pulse" style="--glow: {glowIntensity}"></div>
-				<span class="logo-text">Smart Triathlete</span>
+				<span class="logo-text">LaufplanerPro</span>
 				<span class="logo-version">2.0</span>
 			</div>
 			<nav class="neural-nav">
-				<a href="#capabilities" class="nav-link">Capabilities</a>
-				<a href="#integration" class="nav-link">Integration</a>
-				<a href="#capabilities" class="nav-link">Analytics</a>
-				<button on:click={handleLogin} class="neural-btn neural-btn-ghost">Access</button>
+				<a href="#features" class="nav-link">Features</a>
+				<a href="#integration" class="nav-link">Integrations</a>
+				<a href="#process" class="nav-link">How it Works</a>
+				<button on:click={handleLogin} class="neural-btn neural-btn-ghost">Sign In</button>
 			</nav>
 		</div>
 	</header>
@@ -94,49 +94,39 @@
 				</h1>
 
 				<p class="quantum-subtitle">
-					Advanced neural algorithms analyze your biometric data streams to generate precision
-					training protocols for peak performance.
+					Advanced neural networks analyze your biometric data streams to generate precision
+					training protocols for peak performance. Personalized plans reviewed by experienced
+					coaches and optimized by individual AI systems.
 				</p>
 
 				<!-- Quantum Stats -->
 				<div class="quantum-stats">
 					<div class="stat-item">
-						<div class="stat-number">99.7%</div>
-						<div class="stat-label">Accuracy</div>
+						<div class="stat-number">100%</div>
+						<div class="stat-label">Coach-Approved</div>
 						<div class="stat-glow"></div>
 					</div>
 					<div class="stat-item">
-						<div class="stat-number">2.4s</div>
-						<div class="stat-label">Response Time</div>
+						<div class="stat-number">24/7</div>
+						<div class="stat-label">Live Monitoring</div>
 						<div class="stat-glow"></div>
 					</div>
 					<div class="stat-item">
-						<div class="stat-number">15k+</div>
-						<div class="stat-label">Elite Athletes</div>
+						<div class="stat-number">9+</div>
+						<div class="stat-label">Platforms</div>
 						<div class="stat-glow"></div>
 					</div>
-				</div>
-
-				<!-- Neural CTA -->
-				<div class="neural-cta">
-					<button on:click={handleGetStarted} class="neural-btn neural-btn-primary">
-						<span class="btn-text">Initialize Training</span>
-						<div class="btn-glow"></div>
-					</button>
-					<button class="neural-btn neural-btn-outline">
-						<span class="btn-text">View Capabilities</span>
-					</button>
 				</div>
 			</div>
 		</div>
 	</section>
 
 	<!-- Neural Capabilities -->
-	<section id="capabilities" class="neural-section">
+	<section id="features" class="neural-section">
 		<div class="neural-container">
 			<div class="section-header">
-				<h2 class="section-title">Neural Capabilities</h2>
-				<p class="section-subtitle">Advanced systems for peak performance</p>
+				<h2 class="section-title">Intelligent Features</h2>
+				<p class="section-subtitle">AI-powered training optimization with professional coaching</p>
 			</div>
 
 			<div class="capabilities-grid">
@@ -147,13 +137,14 @@
 						</div>
 						<div class="capability-pulse"></div>
 					</div>
-					<h3 class="capability-title">AI Performance Analysis</h3>
+					<h3 class="capability-title">Personalized AI Systems</h3>
 					<p class="capability-text">
-						Neural networks process your training data to identify optimization patterns
+						Each athlete receives an individual GPT system that learns from complete training
+						history and creates tailored plans
 					</p>
 					<div class="capability-tags">
+						<span class="tag">Individual AI</span>
 						<span class="tag">Machine Learning</span>
-						<span class="tag">Predictive</span>
 					</div>
 				</div>
 
@@ -164,11 +155,14 @@
 						</div>
 						<div class="capability-pulse"></div>
 					</div>
-					<h3 class="capability-title">Real-time Biometrics</h3>
-					<p class="capability-text">Live monitoring of heart rate, power, and recovery metrics</p>
+					<h3 class="capability-title">Multi-Platform Integration</h3>
+					<p class="capability-text">
+						Automatic synchronization with Garmin, Strava, Whoop, Apple Health, Oura Ring and other
+						fitness platforms for complete data capture
+					</p>
 					<div class="capability-tags">
-						<span class="tag">Live Data</span>
-						<span class="tag">Sensors</span>
+						<span class="tag">9+ Platforms</span>
+						<span class="tag">Real-time Sync</span>
 					</div>
 				</div>
 
@@ -179,13 +173,14 @@
 						</div>
 						<div class="capability-pulse"></div>
 					</div>
-					<h3 class="capability-title">Adaptive Protocols</h3>
+					<h3 class="capability-title">Coach-Approved Plans</h3>
 					<p class="capability-text">
-						Training plans that evolve based on your progress and performance
+						All AI-generated training plans are reviewed and approved by experienced coaches and
+						sports professionals - safety and quality guaranteed
 					</p>
 					<div class="capability-tags">
-						<span class="tag">Adaptive</span>
-						<span class="tag">Personalized</span>
+						<span class="tag">Professional Coaching</span>
+						<span class="tag">Quality Control</span>
 					</div>
 				</div>
 
@@ -196,12 +191,73 @@
 						</div>
 						<div class="capability-pulse"></div>
 					</div>
-					<h3 class="capability-title">Quantum Analytics</h3>
-					<p class="capability-text">Advanced statistical modeling for performance prediction</p>
+					<h3 class="capability-title">Goal-Based Optimization</h3>
+					<p class="capability-text">
+						Define your individual goals - whether marathon, triathlon, or fitness. AI continuously
+						adapts your training plans to your progress
+					</p>
 					<div class="capability-tags">
-						<span class="tag">Analytics</span>
-						<span class="tag">Prediction</span>
+						<span class="tag">Adaptive Plans</span>
+						<span class="tag">Goal-Oriented</span>
 					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- How It Works Section -->
+	<section id="process" class="how-it-works-section">
+		<div class="neural-container">
+			<div class="section-header">
+				<h2 class="section-title">How It Works</h2>
+				<p class="section-subtitle">From data collection to the perfect training plan</p>
+			</div>
+
+			<div class="process-grid">
+				<div class="process-step">
+					<div class="step-number">01</div>
+					<div class="step-icon">
+						<div class="icon-connect"></div>
+					</div>
+					<h3 class="step-title">Connect Your Apps</h3>
+					<p class="step-text">
+						Link your Garmin, Strava, Whoop and other fitness apps for complete data collection
+					</p>
+				</div>
+
+				<div class="process-step">
+					<div class="step-number">02</div>
+					<div class="step-icon">
+						<div class="icon-target"></div>
+					</div>
+					<h3 class="step-title">Define Your Goal</h3>
+					<p class="step-text">
+						Sprint, Olympic, Half or Full Ironman - we create individually tailored triathlon goals
+						for you
+					</p>
+				</div>
+
+				<div class="process-step">
+					<div class="step-number">03</div>
+					<div class="step-icon">
+						<div class="icon-ai"></div>
+					</div>
+					<h3 class="step-title">AI Creates Your Plan</h3>
+					<p class="step-text">
+						Your personal AI analyzes your history and creates a customized training plan based on
+						your individual triathlon goals
+					</p>
+				</div>
+
+				<div class="process-step">
+					<div class="step-number">04</div>
+					<div class="step-icon">
+						<div class="icon-coach"></div>
+					</div>
+					<h3 class="step-title">Coach Approval</h3>
+					<p class="step-text">
+						Experienced trainers review and approve every plan before it gets activated
+					</p>
 				</div>
 			</div>
 		</div>
@@ -211,8 +267,8 @@
 	<section id="integration" class="integration-section">
 		<div class="neural-container">
 			<div class="section-header">
-				<h2 class="section-title">Integration Matrix</h2>
-				<p class="section-subtitle">Seamless connectivity with elite hardware</p>
+				<h2 class="section-title">Supported Platforms</h2>
+				<p class="section-subtitle">Seamless integration with your favorite fitness apps</p>
 			</div>
 
 			<div class="integration-grid">
@@ -227,13 +283,38 @@
 					<div class="integration-status connected">●</div>
 				</div>
 				<div class="integration-item">
+					<div class="integration-logo">WH</div>
+					<span class="integration-name">Whoop</span>
+					<div class="integration-status connected">●</div>
+				</div>
+				<div class="integration-item">
+					<div class="integration-logo">AH</div>
+					<span class="integration-name">Apple Health</span>
+					<div class="integration-status connected">●</div>
+				</div>
+				<div class="integration-item">
+					<div class="integration-logo">OR</div>
+					<span class="integration-name">Oura Ring</span>
+					<div class="integration-status connected">●</div>
+				</div>
+				<div class="integration-item">
 					<div class="integration-logo">PO</div>
 					<span class="integration-name">Polar</span>
 					<div class="integration-status connected">●</div>
 				</div>
 				<div class="integration-item">
-					<div class="integration-logo">WH</div>
+					<div class="integration-logo">WA</div>
 					<span class="integration-name">Wahoo</span>
+					<div class="integration-status connected">●</div>
+				</div>
+				<div class="integration-item">
+					<div class="integration-logo">FT</div>
+					<span class="integration-name">Fitbit</span>
+					<div class="integration-status connected">●</div>
+				</div>
+				<div class="integration-item">
+					<div class="integration-logo">NR</div>
+					<span class="integration-name">Nextring</span>
 					<div class="integration-status connected">●</div>
 				</div>
 			</div>
@@ -830,6 +911,168 @@
 		border: 1px solid rgba(59, 130, 246, 0.2);
 	}
 
+	/* How It Works Section */
+	.how-it-works-section {
+		padding: var(--space-3xl) 0;
+		background: var(--neural-surface);
+		border-top: 1px solid var(--neural-border);
+	}
+
+	.process-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: var(--space-xl);
+		margin-top: var(--space-3xl);
+	}
+
+	.process-step {
+		text-align: center;
+		position: relative;
+		padding: var(--space-xl);
+	}
+
+	.step-number {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 32px;
+		height: 32px;
+		background: var(--neural-accent);
+		color: white;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-family: var(--font-mono);
+		font-size: 0.875rem;
+		font-weight: 600;
+		box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+	}
+
+	.step-icon {
+		margin: var(--space-lg) auto var(--space-md);
+		width: 64px;
+		height: 64px;
+		background: rgba(59, 130, 246, 0.1);
+		border: 1px solid rgba(59, 130, 246, 0.2);
+		border-radius: var(--radius-lg);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.step-title {
+		font-size: 1.125rem;
+		font-weight: 500;
+		color: var(--neural-bright);
+		margin-bottom: var(--space-sm);
+	}
+
+	.step-text {
+		color: var(--neural-text);
+		line-height: 1.6;
+		font-size: 0.9375rem;
+	}
+
+	/* Step Icons */
+	.icon-connect {
+		width: 32px;
+		height: 32px;
+		position: relative;
+	}
+
+	.icon-connect::before,
+	.icon-connect::after {
+		content: '';
+		position: absolute;
+		width: 12px;
+		height: 12px;
+		border: 2px solid var(--neural-accent);
+		border-radius: 50%;
+	}
+
+	.icon-connect::before {
+		top: 0;
+		left: 0;
+	}
+
+	.icon-connect::after {
+		bottom: 0;
+		right: 0;
+		animation: connect-pulse 2s ease-in-out infinite;
+	}
+
+	@keyframes connect-pulse {
+		0%,
+		100% {
+			opacity: 0.5;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 1;
+			transform: scale(1.1);
+		}
+	}
+
+	.icon-target {
+		width: 32px;
+		height: 32px;
+		border: 3px solid var(--neural-accent);
+		border-radius: 50%;
+		position: relative;
+	}
+
+	.icon-target::before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 8px;
+		height: 8px;
+		background: var(--neural-accent);
+		border-radius: 50%;
+	}
+
+	.icon-ai {
+		width: 32px;
+		height: 32px;
+		background: linear-gradient(45deg, var(--neural-accent), #8b5cf6);
+		border-radius: var(--radius-md);
+		position: relative;
+		animation: ai-glow 3s ease-in-out infinite;
+	}
+
+	@keyframes ai-glow {
+		0%,
+		100% {
+			box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+		}
+		50% {
+			box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+		}
+	}
+
+	.icon-coach {
+		width: 32px;
+		height: 32px;
+		border: 2px solid var(--neural-accent);
+		border-radius: var(--radius-md);
+		position: relative;
+	}
+
+	.icon-coach::before {
+		content: '✓';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: var(--neural-accent);
+		font-weight: bold;
+		font-size: 1.2rem;
+	}
+
 	/* Integration Section */
 	.integration-section {
 		padding: var(--space-3xl) 0;
@@ -840,6 +1083,8 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 		gap: var(--space-lg);
+		max-width: 1000px;
+		margin: 0 auto;
 	}
 
 	.integration-item {
