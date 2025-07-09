@@ -3,40 +3,33 @@
 
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { authenticateRequest } from '$lib/server/auth-middleware';
+import { supabaseServer, getUserFromRequest } from '$lib/server/supabase-server';
 
 export const GET: RequestHandler = async (event) => {
-  // Authenticate the request
-  const authResult = await authenticateRequest(event);
-  
-  // If authentication failed, return the error response
-  if (authResult instanceof Response) {
-    return authResult;
-  }
-  
-  // authResult is now the authenticated user
-  const user = authResult;
-  
-  if (!event.platform?.env?.DB) {
-    return json(
-      { error: 'Database not available' },
-      { status: 500 }
-    );
-  }
-
-  const db = event.platform.env.DB;
-
   try {
-    // Get full user profile from database
-    const userProfile = await db.prepare(`
-      SELECT id, email, name, first_name, last_name, birth_date, gender, 
-             weight_kg, height_cm, ftp_watts, threshold_pace_per_km, 
-             css_pace_per_100m, max_hr, resting_hr, created_at, updated_at
-      FROM athletes 
-      WHERE id = ?
-    `).bind(user.id).first();
+    // Get authenticated user ID
+    const userId = await getUserFromRequest(event.request);
+    
+    if (!userId) {
+      return json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
 
-    if (!userProfile) {
+    // Get full user profile from database
+    const { data: userProfile, error: profileError } = await supabaseServer
+      .from('athletes')
+      .select(`
+        id, email, name, first_name, last_name, birth_date, gender, 
+        weight_kg, height_cm, ftp_watts, threshold_pace_per_km, 
+        css_pace_per_100m, max_hr, resting_hr, created_at, updated_at
+      `)
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      console.error('Profile fetch error:', profileError);
       return json(
         { error: 'User profile not found' },
         { status: 404 }
@@ -44,32 +37,35 @@ export const GET: RequestHandler = async (event) => {
     }
 
     // Get API connections count
-    const apiConnections = await db.prepare(`
-      SELECT COUNT(*) as count 
-      FROM api_connections 
-      WHERE athlete_id = ? AND is_active = true
-    `).bind(user.id).first();
+    const { count: apiConnectionsCount, error: connectionsError } = await supabaseServer
+      .from('api_connections')
+      .select('*', { count: 'exact', head: true })
+      .eq('athlete_id', userId)
+      .eq('is_active', true);
 
-    // Get recent activities count
-    const recentActivities = await db.prepare(`
-      SELECT COUNT(*) as count 
-      FROM activities 
-      WHERE athlete_id = ? AND start_time > datetime('now', '-30 days')
-    `).bind(user.id).first();
+    // Get recent activities count (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const { count: recentActivitiesCount, error: activitiesError } = await supabaseServer
+      .from('activities')
+      .select('*', { count: 'exact', head: true })
+      .eq('athlete_id', userId)
+      .gte('start_time', thirtyDaysAgo.toISOString());
 
     return json({
       success: true,
       profile: userProfile,
       stats: {
-        apiConnections: apiConnections?.count || 0,
-        recentActivities: recentActivities?.count || 0
+        apiConnections: apiConnectionsCount || 0,
+        recentActivities: recentActivitiesCount || 0
       }
     });
 
   } catch (error) {
-    console.error('Profile fetch error:', error);
+    console.error('Profile endpoint error:', error);
     return json(
-      { error: 'Failed to fetch profile' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
