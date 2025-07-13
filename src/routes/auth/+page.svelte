@@ -4,7 +4,8 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { ClientAuth } from '$lib/client-auth';
+	import { supabase } from '$lib/supabase';
+
 	let isLogin = true;
 	let email = '';
 	let password = '';
@@ -25,9 +26,13 @@
 			password = 'demo123';
 		}
 
-		// Redirect if already authenticated
-		if (ClientAuth.isAuthenticated()) {
-			goto('/dashboard');
+		// Redirect if already authenticated (browser only)
+		if (typeof window !== 'undefined') {
+			supabase.auth.getUser().then(({ data: { user } }: { data: { user: any } }) => {
+				if (user) {
+					goto('/dashboard');
+				}
+			});
 		}
 	});
 
@@ -46,18 +51,21 @@
 		try {
 			if (isLogin) {
 				console.log('🔐 Attempting login with:', email);
-				const result = await ClientAuth.login(email, password);
-				console.log('🔐 Login result:', result);
+				const { data, error: authError } = await supabase.auth.signInWithPassword({
+					email,
+					password
+				});
+				console.log('🔐 Login result:', { data, error: authError });
 
-				if (result.success) {
-					// Store token and user data
-					if (result.token) {
-						localStorage.setItem('authToken', result.token);
-						console.log('🔐 Token stored:', result.token);
+				if (data.user && !authError) {
+					// Store user session data
+					if (data.session?.access_token) {
+						localStorage.setItem('authToken', data.session.access_token);
+						console.log('🔐 Token stored:', data.session.access_token);
 					}
-					if (result.user) {
-						localStorage.setItem('user', JSON.stringify(result.user));
-						console.log('🔐 User stored:', result.user);
+					if (data.user) {
+						localStorage.setItem('user', JSON.stringify(data.user));
+						console.log('🔐 User stored:', data.user);
 					}
 					success = 'Neural connection established! Accessing dashboard...';
 					console.log('🔐 Redirecting to dashboard in 1500ms...');
@@ -66,7 +74,7 @@
 						goto('/dashboard');
 					}, 1500);
 				} else {
-					error = result.message || 'Authentication failed. Please verify your credentials.';
+					error = authError?.message || 'Authentication failed. Please verify your credentials.';
 				}
 			} else {
 				if (password !== confirmPassword) {
@@ -74,21 +82,27 @@
 					loading = false;
 					return;
 				}
-				const result = await ClientAuth.register(email, password, name || 'Neural Athlete');
-				if (result.success) {
-					// Store token and user data
-					if (result.token) {
-						localStorage.setItem('authToken', result.token);
+				const { data, error: regError } = await supabase.auth.signUp({
+					email,
+					password,
+					options: {
+						data: { name: name || 'Neural Athlete' }
 					}
-					if (result.user) {
-						localStorage.setItem('user', JSON.stringify(result.user));
+				});
+				if (data.user && !regError) {
+					// Store token and user data
+					if (data.session?.access_token) {
+						localStorage.setItem('authToken', data.session.access_token);
+					}
+					if (data.user) {
+						localStorage.setItem('user', JSON.stringify(data.user));
 					}
 					success = 'Account created successfully! Neural profile initialized.';
 					setTimeout(() => {
 						goto('/dashboard');
 					}, 2000);
 				} else {
-					error = result.message || 'Registration failed. Please try again.';
+					error = regError?.message || 'Registration failed. Please try again.';
 				}
 			}
 		} catch (err) {

@@ -1,8 +1,8 @@
-<!-- Smart Triathlete - API Integrations Page -->
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { ClientAuth } from '$lib/client-auth';
+	import { supabase } from '$lib/supabase';
+
 	import Navigation from '$lib/components/Navigation.svelte';
 
 	// API Integrations State
@@ -131,14 +131,19 @@
 		}, 5000);
 	}
 
-	onMount(() => {
-		if (!ClientAuth.isAuthenticated()) {
-			goto('/auth');
-			return;
-		}
+	onMount(async () => {
+		if (typeof window !== 'undefined') {
+			const {
+				data: { user: currentUser }
+			} = await supabase.auth.getUser();
+			if (!currentUser) {
+				goto('/auth');
+				return;
+			}
 
-		user = ClientAuth.getCurrentUser();
-		console.log('✅ API Integrations page loaded for user:', user);
+			user = currentUser;
+			console.log('✅ API Integrations page loaded for user:', user);
+		}
 	});
 </script>
 

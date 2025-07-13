@@ -1,9 +1,8 @@
-<!-- Smart Triathlete Neural Activities -->
-
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { ClientAuth } from '$lib/client-auth';
+	import { supabase } from '$lib/supabase';
+
 	import Navigation from '$lib/components/Navigation.svelte';
 
 	// Authentication
@@ -115,11 +114,16 @@
 
 	$: totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
 
-	onMount(() => {
-		user = ClientAuth.getCurrentUser();
-		if (!user) {
-			goto('/auth');
-			return;
+	onMount(async () => {
+		if (typeof window !== 'undefined') {
+			const {
+				data: { user: currentUser }
+			} = await supabase.auth.getUser();
+			user = currentUser;
+			if (!user) {
+				goto('/auth');
+				return;
+			}
 		}
 	});
 	function getSportIcon(sport: string): string {

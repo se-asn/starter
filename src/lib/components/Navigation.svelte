@@ -1,22 +1,24 @@
-<!-- Navigation Component - Reusable across all pages -->
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
-	import { ClientAuth } from '$lib/client-auth';
+	import { supabase } from '$lib/supabase';
 	import { onMount } from 'svelte';
 
 	let user: any = null;
 
 	// Initialize user data only on client side
-	onMount(() => {
+	onMount(async () => {
 		if (browser) {
-			user = ClientAuth.getCurrentUser();
+			const {
+				data: { user: currentUser }
+			} = await supabase.auth.getUser();
+			user = currentUser;
 		}
 	});
 
-	function logout() {
-		ClientAuth.logout();
+	async function logout() {
+		await supabase.auth.signOut();
 		goto('/auth');
 	}
 
@@ -32,7 +34,7 @@
 			<span class="logo-text">Smart Triathlete</span>
 		</div>
 	</div>
-	
+
 	<!-- Main Navigation Menu -->
 	<div class="nav-menu">
 		<a href="/dashboard" class="nav-link" class:active={currentPath === '/dashboard'}>
@@ -56,7 +58,7 @@
 			<span>Profile</span>
 		</a>
 	</div>
-	
+
 	<div class="nav-actions">
 		{#if user}
 			<button class="user-menu" on:click={logout}>
@@ -349,7 +351,8 @@
 
 	/* Animations */
 	@keyframes neuralPulse {
-		0%, 100% {
+		0%,
+		100% {
 			box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
 		}
 		50% {
@@ -358,7 +361,8 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% {
+		0%,
+		100% {
 			opacity: 1;
 			transform: translate(-50%, -50%) scale(1);
 		}

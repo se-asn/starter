@@ -1,9 +1,9 @@
-<!-- Smart Triathlete - Neural Dashboard -->
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { ClientAuth } from '$lib/client-auth';
+	import { supabase } from '$lib/supabase';
+
 	import Navigation from '$lib/components/Navigation.svelte';
 	// User state
 	let user: any = null;
@@ -124,21 +124,26 @@
 
 	let statusMessage = '';
 	let statusType: 'success' | 'error' | '' = '';
-	onMount(() => {
-		// Check authentication using ClientAuth
+	onMount(async () => {
+		// Check authentication using Supabase (browser only)
 		console.log('🎯 Dashboard: Checking authentication...');
 
-		if (!ClientAuth.isAuthenticated()) {
-			console.log('🎯 Dashboard: User not authenticated, redirecting to /auth');
-			goto('/auth');
-			return;
-		}
+		if (typeof window !== 'undefined') {
+			const {
+				data: { user: currentUser }
+			} = await supabase.auth.getUser();
+			if (!currentUser) {
+				console.log('🎯 Dashboard: User not authenticated, redirecting to /auth');
+				goto('/auth');
+				return;
+			}
 
-		console.log('🎯 Dashboard: User is authenticated!');
-		user = ClientAuth.getCurrentUser();
-		authToken = localStorage.getItem('authToken') || '';
-		console.log('🎯 Dashboard: Current user:', user);
-		console.log('🎯 Dashboard: Auth token present:', !!authToken);
+			console.log('🎯 Dashboard: User is authenticated!');
+			user = currentUser;
+			authToken = localStorage.getItem('authToken') || '';
+			console.log('🎯 Dashboard: Current user:', user);
+			console.log('🎯 Dashboard: Auth token present:', !!authToken);
+		}
 
 		// Simulate some connected integrations for demo    integrations[0].connected = true; // Strava
 		integrations[0].lastSync = new Date().toISOString();
@@ -232,8 +237,8 @@
 			}
 		}
 	}
-	function logout() {
-		ClientAuth.logout();
+	async function logout() {
+		await supabase.auth.signOut();
 		goto('/auth');
 	}
 

@@ -1,9 +1,7 @@
-<!-- LaufplanerPro - Neural Triathlon Training System -->
-
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { ClientAuth } from '$lib/client-auth';
+	import { supabase } from '$lib/supabase';
 
 	let mounted = false;
 	let glowIntensity = 0;
@@ -22,9 +20,13 @@
 			particlesVisible = true;
 		}, 1000);
 
-		// Check if user is already authenticated
-		if (ClientAuth.isAuthenticated()) {
-			goto('/dashboard');
+		// Check if user is already authenticated (browser only)
+		if (typeof window !== 'undefined') {
+			supabase.auth.getUser().then(({ data: { user } }: { data: { user: any } }) => {
+				if (user) {
+					goto('/dashboard');
+				}
+			});
 		}
 
 		return () => clearInterval(interval);

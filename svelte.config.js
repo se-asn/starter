@@ -15,6 +15,9 @@ const config = {
 				include: ['/api/*']
 			}
 		}),
+		prerender: {
+			handleHttpError: 'ignore'
+		},
 		paths: {
 			base: process.env.NODE_ENV === 'production' ? '' : ''
 		}
