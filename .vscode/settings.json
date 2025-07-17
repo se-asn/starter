@@ -1,0 +1,13 @@
+{
+  "github.copilot.chat.autoSubmit": true,
+  "github.copilot.conversation.allowAutoExecution": true,
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "svelte.enable-ts-plugin": true,
+  "editor.formatOnSave": true,
+  "terminal.integrated.confirmOnExit": "never",
+  "terminal.integrated.confirmOnKill": "never",
+  "workbench.terminal.autoConfirm": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  }
+}
