@@ -1,1519 +1,2347 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/supabase';
-
+	import { browser } from '$app/environment';
 	import Navigation from '$lib/components/Navigation.svelte';
-	// User state
+
+	// Basic state
 	let user: any = null;
 	let mounted = false;
-	let glowIntensity = 0;
-	let authToken = '';
 
-	// Pro Triathlon Analytics Data
-	let performanceMetrics = {
-		weeklyVolume: {
-			swim: { hours: 4.5, distance: '12.8km', trend: '+8%' },
-			bike: { hours: 12.2, distance: '387km', trend: '+12%' },
-			run: { hours: 6.8, distance: '68.5km', trend: '+5%' }
+	// Enhanced athlete data with comprehensive metrics
+	let athleteProfile = {
+		name: 'Alex Mueller',
+		age: 32,
+		location: 'Frankfurt, Germany',
+		discipline: 'Triathlon',
+		experience: '8 Jahre',
+		currentWeight: 72.5, // kg
+		targetWeight: 71.0, // kg
+		bodyFat: 8.2, // %
+		// Performance metrics
+		restingHR: 38,
+		maxHR: 195,
+		ltHR: 175, // Lactate Threshold HR
+		ftp: 285, // watts
+		vo2Max: 68.5,
+		// Swimming metrics
+		swimCSS: '1:25', // Critical Swim Speed per 100m
+		swimT100: '1:18', // Best 100m time
+		// Running metrics
+		runningFTP: '3:45', // per km at threshold
+		vVO2max: '3:25', // per km at VO2max
+		// Current form
+		ctlFitness: 95, // Chronic Training Load
+		atlFatigue: 45, // Acute Training Load
+		tsbForm: 50, // Training Stress Balance
+		// Season stats
+		totalDistance: 2847, // km this year
+		totalTime: '387:42:15', // this year
+		totalTSS: 12450 // this year
+	};
+
+	// Enhanced training zones with power and pace
+	let trainingZones = {
+		hr: {
+			z1: { min: 38, max: 155, label: 'Recovery', color: '#4CAF50', percentage: '65-75%' },
+			z2: { min: 156, max: 165, label: 'Aerobic', color: '#8BC34A', percentage: '75-85%' },
+			z3: { min: 166, max: 175, label: 'Tempo', color: '#FFC107', percentage: '85-90%' },
+			z4: { min: 176, max: 185, label: 'Threshold', color: '#FF9800', percentage: '90-95%' },
+			z5: { min: 186, max: 195, label: 'VO2Max', color: '#F44336', percentage: '95-100%' }
 		},
-		currentForm: {
-			fitness: 95,
-			fatigue: 42,
-			form: 53,
-			rampRate: 8.2
+		power: {
+			z1: { min: 0, max: 171, label: 'Recovery', color: '#4CAF50', percentage: '0-55%' },
+			z2: { min: 172, max: 228, label: 'Endurance', color: '#8BC34A', percentage: '56-75%' },
+			z3: { min: 229, max: 256, label: 'Tempo', color: '#FFC107', percentage: '76-90%' },
+			z4: { min: 257, max: 285, label: 'Threshold', color: '#FF9800', percentage: '91-105%' },
+			z5: { min: 286, max: 342, label: 'VO2Max', color: '#F44336', percentage: '106-120%' }
 		},
-		nextRace: {
-			name: 'Ironman Frankfurt',
-			date: '2025-07-06',
-			daysLeft: 26,
-			priority: 'A'
+		pace: {
+			z1: { min: '5:30', max: '6:30', label: 'Easy', color: '#4CAF50', kmh: '9.2-10.9' },
+			z2: { min: '4:45', max: '5:29', label: 'Aerobic', color: '#8BC34A', kmh: '11.0-12.6' },
+			z3: { min: '4:15', max: '4:44', label: 'Tempo', color: '#FFC107', kmh: '12.7-14.1' },
+			z4: { min: '3:45', max: '4:14', label: 'Threshold', color: '#FF9800', kmh: '14.2-16.0' },
+			z5: { min: '3:25', max: '3:44', label: 'VO2Max', color: '#F44336', kmh: '16.1-17.5' }
 		},
-		zones: {
-			hr: { z1: 155, z2: 165, z3: 175, z4: 185, z5: 195 },
-			power: { ftp: 285, z1: 171, z2: 228, z3: 256, z4: 285, z5: 342 },
-			pace: { threshold: '4:15', z1: '5:30', z2: '4:45', z3: '4:25', z4: '4:15', z5: '3:55' }
+		swim: {
+			z1: { min: '1:50', max: '2:10', label: 'Easy', color: '#4CAF50', pace100: '/100m' },
+			z2: { min: '1:35', max: '1:49', label: 'Aerobic', color: '#8BC34A', pace100: '/100m' },
+			z3: { min: '1:28', max: '1:34', label: 'Tempo', color: '#FFC107', pace100: '/100m' },
+			z4: { min: '1:22', max: '1:27', label: 'Threshold', color: '#FF9800', pace100: '/100m' },
+			z5: { min: '1:18', max: '1:21', label: 'VO2Max', color: '#F44336', pace100: '/100m' }
 		}
 	};
 
+	// Enhanced recent activities with comprehensive data
 	let recentActivities = [
-		{ id: 1, sport: 'swim', duration: '01:15:30', distance: '3.2km', tss: 68, date: '2025-06-09' },
-		{ id: 2, sport: 'bike', duration: '02:45:15', distance: '95km', tss: 142, date: '2025-06-08' },
-		{ id: 3, sport: 'run', duration: '01:35:20', distance: '18km', tss: 89, date: '2025-06-07' },
-		{ id: 4, sport: 'swim', duration: '00:58:45', distance: '2.8km', tss: 55, date: '2025-06-06' }
+		{
+			id: 1,
+			sport: 'swim',
+			type: 'Schwellwert-Training',
+			duration: '01:15:30',
+			distance: '3.2km',
+			tss: 68,
+			date: '2025-07-12',
+			avgPace: '1:34/100m',
+			strokeRate: 42,
+			swolf: 38,
+			pool: '50m',
+			calories: 420,
+			equipment: 'Paddles, Pull-Buoy',
+			feeling: 'Sehr gut',
+			effort: 8,
+			notes: 'Perfekte Technik, neue PR auf 200m'
+		},
+		{
+			id: 2,
+			sport: 'bike',
+			type: 'FTP Test + Ausdauer',
+			duration: '02:45:15',
+			distance: '95km',
+			tss: 142,
+			date: '2025-07-11',
+			avgPower: 285,
+			maxPower: 415,
+			avgSpeed: '34.5km/h',
+			maxSpeed: '68.2km/h',
+			elevation: 850,
+			normalizedPower: 295,
+			intensityFactor: 0.89,
+			cadence: 92,
+			temperature: '24°C',
+			equipment: 'Zeitfahrrad, PowerMeter',
+			feeling: 'Stark',
+			effort: 9,
+			notes: 'Neue FTP: 315W! Perfekte Aerodynamik'
+		},
+		{
+			id: 3,
+			sport: 'run',
+			type: 'Tempo-Lauf + Cool-Down',
+			duration: '01:35:20',
+			distance: '18km',
+			tss: 89,
+			date: '2025-07-10',
+			avgPace: '4:15/km',
+			avgHR: 168,
+			maxHR: 182,
+			cadence: 185,
+			verticalRatio: 8.2,
+			groundContactTime: 215,
+			elevation: 125,
+			calories: 950,
+			splits: ['4:18', '4:12', '4:15', '4:08'],
+			weather: 'Bewölkt, 18°C',
+			equipment: 'Carbon-Laufschuhe',
+			feeling: 'Perfekt',
+			effort: 7,
+			notes: 'Gleichmäßige Splits, perfekte Ausführung'
+		},
+		{
+			id: 4,
+			sport: 'bike',
+			type: 'Regeneration',
+			duration: '01:20:00',
+			distance: '35km',
+			tss: 28,
+			date: '2025-07-09',
+			avgPower: 165,
+			avgSpeed: '26.2km/h',
+			avgHR: 142,
+			feeling: 'Entspannt',
+			effort: 3,
+			notes: 'Lockere Regenerationsfahrt'
+		},
+		{
+			id: 5,
+			sport: 'swim',
+			type: 'Technik + Ausdauer',
+			duration: '01:05:00',
+			distance: '2.8km',
+			tss: 45,
+			date: '2025-07-08',
+			avgPace: '1:38/100m',
+			strokeRate: 38,
+			drills: 'Einarmig, Wasserfassen',
+			feeling: 'Gut',
+			effort: 5,
+			notes: 'Fokus auf Technikverbesserung'
+		}
 	];
 
+	// Enhanced upcoming workouts with detailed structure
 	let upcomingWorkouts = [
-		{ id: 1, sport: 'bike', type: 'FTP Test', duration: '01:30:00', scheduled: '2025-06-11 06:00' },
-		{ id: 2, sport: 'run', type: 'Tempo Run', duration: '01:15:00', scheduled: '2025-06-11 18:00' },
+		{
+			id: 1,
+			sport: 'bike',
+			type: 'VO2Max Intervalle',
+			duration: '02:15:00',
+			scheduled: '2025-07-13 06:00',
+			tssPlanned: 125,
+			coach: 'TrainerAI',
+			description: '5x5min @ 120% FTP',
+			warmup: '20min Easy spinning',
+			mainSet: '5 x (5min @ 350W / 2min @ 150W)',
+			cooldown: '15min Easy',
+			targetPower: '340-360W',
+			targetHR: '185-195bpm',
+			equipment: 'Zeitfahrrad, PowerMeter',
+			nutrition: 'Isotonic drink, 1 gel',
+			weather: 'Sonnig, 22°C',
+			location: 'Outdoor-Strecke A5',
+			priority: 'high'
+		},
+		{
+			id: 2,
+			sport: 'run',
+			type: 'Langer Lauf',
+			duration: '02:45:00',
+			scheduled: '2025-07-13 18:00',
+			tssPlanned: 156,
+			coach: 'TrainerAI',
+			description: '32km aerobic base',
+			warmup: '10min @ 5:30/km',
+			mainSet: '30km @ 4:45-5:00/km',
+			cooldown: '2km @ 5:30/km',
+			targetPace: '4:45-5:00/km',
+			targetHR: '155-165bpm',
+			elevation: '+245m',
+			route: 'Main-Ufer Rundkurs',
+			nutrition: '3 gels, Electrolytes',
+			hydration: '750ml/hour',
+			equipment: 'Ausdauer-Laufschuhe',
+			priority: 'high'
+		},
 		{
 			id: 3,
 			sport: 'swim',
-			type: 'Threshold Set',
+			type: 'Wettkampftempo',
+			duration: '01:30:00',
+			scheduled: '2025-07-14 06:30',
+			tssPlanned: 85,
+			coach: 'TrainerAI',
+			description: 'Race pace simulation',
+			warmup: '600m Easy + 4x50m build',
+			mainSet: '3 x (400m @ 1:25/100m + 100m Easy)',
+			cooldown: '400m Easy',
+			targetPace: '1:22-1:28/100m',
+			targetHR: '175-185bpm',
+			strokeRate: '40-42/min',
+			pool: '50m Outdoor',
+			equipment: 'Neopren optional',
+			technique: 'Bilaterale Atmung',
+			priority: 'medium'
+		},
+		{
+			id: 4,
+			sport: 'bike',
+			type: 'Regeneration',
 			duration: '01:00:00',
-			scheduled: '2025-06-12 06:30'
+			scheduled: '2025-07-14 17:00',
+			tssPlanned: 25,
+			coach: 'TrainerAI',
+			description: 'Active recovery',
+			targetPower: '120-150W',
+			targetHR: '135-145bpm',
+			route: 'Stadtpark flach',
+			priority: 'low'
 		}
 	];
+
+	// Weekly and monthly statistics
+	let weeklyStats = {
+		totalTime: '12:45:30',
+		totalDistance: 127.5,
+		totalTSS: 548,
+		activities: 7,
+		avgDailyTSS: 78,
+		breakdown: {
+			swim: { time: '3:15:00', distance: 12.5, percentage: 25 },
+			bike: { time: '6:30:00', distance: 285, percentage: 51 },
+			run: { time: '3:00:30', distance: 47.5, percentage: 24 }
+		}
+	};
+
+	let monthlyStats = {
+		totalTime: '52:20:15',
+		totalDistance: 542.8,
+		totalTSS: 2156,
+		activities: 28,
+		avgWeeklyTSS: 539,
+		breakdown: {
+			swim: { time: '12:45:00', distance: 48.2, percentage: 24 },
+			bike: { time: '28:10:00', distance: 1125, percentage: 54 },
+			run: { time: '11:25:15', distance: 195.5, percentage: 22 }
+		}
+	};
+
+	// Performance trends and analysis
+	let performanceTrends = {
+		fitness: { current: 95, trend: '+8', change: 'improving' },
+		fatigue: { current: 45, trend: '-5', change: 'decreasing' },
+		form: { current: 50, trend: '+13', change: 'peaking' },
+		vo2max: { current: 68.5, trend: '+1.2', change: 'improving' },
+		ftp: { current: 285, trend: '+15', change: 'improving' },
+		runningThreshold: { current: '3:45', trend: '-8sec', change: 'improving' },
+		swimCSS: { current: '1:25', trend: '-2sec', change: 'improving' }
+	};
+
+	// Upcoming races and goals
+	let upcomingRaces = [
+		{
+			id: 1,
+			name: 'Frankfurt Ironman 70.3',
+			date: '2025-08-24',
+			distance: '70.3',
+			type: 'Half Ironman',
+			location: 'Frankfurt am Main',
+			daysLeft: 42,
+			goalTime: '4:15:00',
+			currentForm: 'On Track',
+			preparation: 85,
+			priority: 'A-Race'
+		},
+		{
+			id: 2,
+			name: 'München Marathon',
+			date: '2025-10-12',
+			distance: '42.2km',
+			type: 'Marathon',
+			location: 'München',
+			daysLeft: 91,
+			goalTime: '2:45:00',
+			currentForm: 'Early Prep',
+			preparation: 35,
+			priority: 'B-Race'
+		}
+	];
+
+	// Training readiness factors with detailed breakdown
+	let readinessFactors = {
+		overall: 85,
+		status: 'High intensity OK',
+		sleep: { score: 95, hours: 8.2, quality: 'Excellent', deepSleep: '2:15' },
+		hrv: { score: 88, value: 42, trend: 'stable', rmssd: '52ms' },
+		recovery: { score: 98, status: 'Fully Recovered', muscleOxygen: 95 },
+		stress: { score: 82, level: 'Low', mentalFatigue: 'Low' },
+		nutrition: { score: 90, hydration: 'Good', energyBalance: '+150kcal' },
+		motivation: { score: 95, mentalReadiness: 'High', focus: 'Excellent' }
+	};
+
+	// Zone selection for training zones display
+	let selectedZoneType: 'hr' | 'power' | 'pace' | 'swim' = 'hr';
+
+	// Button action functions
+	function updateZones() {
+		// Simulate zone update with new FTP test values
+		showNotification('Zonen werden aktualisiert basierend auf letzten Testdaten...');
+		// Here you would normally call an API to recalculate zones
+	}
+
+	function planTest() {
+		// Navigate to test planning
+		showNotification('Weiterleitung zu Trainingsplanung...');
+		setTimeout(() => goto('/training-plans?focus=test'), 500);
+	}
+
+	function analyzePerformance() {
+		// Navigate to detailed analytics
+		showNotification('Öffne detaillierte Leistungsanalyse...');
+		setTimeout(() => goto('/analytics'), 500);
+	}
+
+	function addActivity() {
+		// Navigate to activity entry
+		showNotification('Neue Aktivität hinzufügen...');
+		setTimeout(() => goto('/activities?action=add'), 500);
+	}
+
+	function viewAllActivities() {
+		// Navigate to all activities
+		showNotification('Alle Aktivitäten anzeigen...');
+		setTimeout(() => goto('/activities'), 500);
+	}
+
+	function addWorkout() {
+		// Navigate to workout planner
+		showNotification('Neues Workout planen...');
+		setTimeout(() => goto('/training-plans?action=add'), 500);
+	}
+
+	function openCalendar() {
+		// Navigate to training calendar
+		showNotification('Trainingskalender öffnen...');
+		setTimeout(() => goto('/calendar'), 500);
+	}
+
+	function viewMonthlyStats() {
+		// Navigate to monthly view
+		showNotification('Monatsstatistiken laden...');
+		setTimeout(() => goto('/analytics?view=monthly'), 500);
+	}
+
+	function addRace() {
+		// Navigate to race planning
+		showNotification('Neuen Wettkampf hinzufügen...');
+		setTimeout(() => goto('/races?action=add'), 500);
+	}
+
+	function viewRecoveryDetails() {
+		// Navigate to recovery analytics
+		showNotification('Recovery-Details laden...');
+		setTimeout(() => goto('/recovery'), 500);
+	}
+
+	function viewYearlyStats() {
+		// Navigate to yearly overview
+		showNotification('Jahresübersicht laden...');
+		setTimeout(() => goto('/analytics?view=yearly'), 500);
+	}
+
+	// Show notifications for successful actions
+	function showNotification(message: string) {
+		if (!browser) return;
+
+		// Simple notification system
+		const notification = document.createElement('div');
+		notification.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: rgba(102, 126, 234, 0.9);
+			color: white;
+			padding: 1rem 2rem;
+			border-radius: 8px;
+			z-index: 1000;
+			backdrop-filter: blur(10px);
+			animation: slideInNotification 0.3s ease-out;
+		`;
+		notification.textContent = message;
+
+		// Add CSS animation if not already added
+		if (!document.getElementById('notification-styles')) {
+			const style = document.createElement('style');
+			style.id = 'notification-styles';
+			style.textContent = `
+				@keyframes slideInNotification {
+					from {
+						transform: translateX(100%);
+						opacity: 0;
+					}
+					to {
+						transform: translateX(0);
+						opacity: 1;
+					}
+				}
+			`;
+			document.head.appendChild(style);
+		}
+
+		document.body.appendChild(notification);
+
+		setTimeout(() => {
+			notification.style.animation = 'slideInNotification 0.3s ease-out reverse';
+			setTimeout(() => {
+				notification.remove();
+			}, 300);
+		}, 3000);
+	}
+
+	// Function to switch zone types
+	function switchZoneType(type: 'hr' | 'power' | 'pace' | 'swim') {
+		selectedZoneType = type;
+	}
+
+	// Function to get current zone based on HR/Power
+	function getCurrentZone(metric: number, type: 'hr' | 'power'): string {
+		const zones = trainingZones[type];
+		for (const [zone, data] of Object.entries(zones)) {
+			if (metric >= data.min && metric <= data.max) {
+				return `${zone.toUpperCase()} - ${data.label}`;
+			}
+		}
+		return 'Unknown';
+	}
+
+	// Function to format time duration
+	function formatDuration(seconds: number): string {
+		const hours = Math.floor(seconds / 3600);
+		const minutes = Math.floor((seconds % 3600) / 60);
+		const secs = seconds % 60;
+		return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+	}
+
+	// Function to get effort color
+	function getEffortColor(effort: number): string {
+		if (effort <= 3) return '#4CAF50';
+		if (effort <= 5) return '#8BC34A';
+		if (effort <= 7) return '#FFC107';
+		if (effort <= 8) return '#FF9800';
+		return '#F44336';
+	}
+
+	// Function to get priority color
+	function getPriorityColor(priority: string): string {
+		switch (priority) {
+			case 'high':
+				return '#F44336';
+			case 'medium':
+				return '#FF9800';
+			case 'low':
+				return '#4CAF50';
+			default:
+				return '#757575';
+		}
+	}
+
+	// Auth check
+	onMount(async () => {
+		if (browser) {
+			try {
+				// Check for demo mode first
+				const demoMode = localStorage.getItem('demoMode');
+				const storedUser = localStorage.getItem('user');
+
+				if (demoMode === 'true' && storedUser) {
+					// Demo mode - use stored user data
+					user = JSON.parse(storedUser);
+					mounted = true;
+					startAnimations();
+					return;
+				}
+
+				// Regular Supabase auth check
+				const {
+					data: { user: currentUser }
+				} = await supabase.auth.getUser();
+
+				if (!currentUser) {
+					goto('/auth');
+					return;
+				}
+
+				user = currentUser;
+				mounted = true;
+				startAnimations();
+			} catch (error) {
+				console.error('Error loading dashboard:', error);
+				goto('/auth');
+			}
+		}
+	});
+
+	// Utility functions
 	function getSportIcon(sport: string): string {
-		const icons: { [key: string]: string } = { swim: 'swim', bike: 'bike', run: 'run' };
-		return icons[sport] || 'fitness';
+		const icons: { [key: string]: string } = {
+			swim: '🏊‍♂️',
+			bike: '🚴‍♂️',
+			run: '🏃‍♂️'
+		};
+		return icons[sport] || '💪';
 	}
 
 	function getSportColor(sport: string): string {
-		const colors: { [key: string]: string } = { swim: '#00D4FF', bike: '#FF6B35', run: '#4CAF50' };
-		return colors[sport] || '#666';
+		const colors: { [key: string]: string } = {
+			swim: '#00BCD4',
+			bike: '#FF9800',
+			run: '#4CAF50'
+		};
+		return colors[sport] || '#757575';
 	}
 
-	function formatDuration(duration: string): string {
-		return duration.replace(/^00:/, '').replace(/^0/, '');
+	// Animation variables like homepage
+	let glowIntensity = 0;
+	let particlesVisible = false;
+
+	// Start animations after mount
+	function startAnimations() {
+		// Animate glow effect like homepage
+		const interval = setInterval(() => {
+			glowIntensity = Math.sin(Date.now() * 0.001) * 0.5 + 0.5;
+		}, 16);
+
+		// Show particles after delay
+		setTimeout(() => {
+			particlesVisible = true;
+		}, 500);
 	}
-
-	// Database connection status (simulated for GitHub Pages)
-	let databaseStatus = {
-		connected: true,
-		loading: false,
-		tables: ['athletes', 'activities', 'training_plans', 'api_connections'],
-		recordCounts: {
-			athletes: 156,
-			activities: 2847,
-			training_plans: 42,
-			api_connections: 89
-		},
-		error: null
-	};
-	// API Integrations
-	let integrations = [
-		{
-			id: 'strava',
-			name: 'Strava',
-			description: 'Sync activities, segments and performance data',
-			icon: 'strava',
-			connected: false,
-			lastSync: '',
-			activities: 0
-		},
-		{
-			id: 'garmin',
-			name: 'Garmin Connect',
-			description: 'Import workouts and health metrics',
-			icon: 'garmin',
-			connected: false,
-			lastSync: '',
-			activities: 0
-		},
-		{
-			id: 'polar',
-			name: 'Polar Flow',
-			description: 'Training data and recovery metrics',
-			icon: 'polar',
-			connected: false,
-			lastSync: '',
-			activities: 0
-		},
-		{
-			id: 'wahoo',
-			name: 'Wahoo',
-			description: 'Bike computer and trainer data',
-			icon: 'wahoo',
-			connected: false,
-			lastSync: '',
-			activities: 0
-		}
-	];
-
-	let statusMessage = '';
-	let statusType: 'success' | 'error' | '' = '';
-	onMount(async () => {
-		// Check authentication using Supabase (browser only)
-		console.log('🎯 Dashboard: Checking authentication...');
-
-		if (typeof window !== 'undefined') {
-			const {
-				data: { user: currentUser }
-			} = await supabase.auth.getUser();
-			if (!currentUser) {
-				console.log('🎯 Dashboard: User not authenticated, redirecting to /auth');
-				goto('/auth');
-				return;
-			}
-
-			console.log('🎯 Dashboard: User is authenticated!');
-			user = currentUser;
-			authToken = localStorage.getItem('authToken') || '';
-			console.log('🎯 Dashboard: Current user:', user);
-			console.log('🎯 Dashboard: Auth token present:', !!authToken);
-		}
-
-		// Simulate some connected integrations for demo    integrations[0].connected = true; // Strava
-		integrations[0].lastSync = new Date().toISOString();
-		integrations[0].activities = 127;
-
-		integrations[1].connected = true; // Garmin
-		integrations[1].lastSync = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(); // 2 hours ago
-		integrations[1].activities = 89;
-
-		// Check URL params for OAuth callbacks
-		const urlParams = new URLSearchParams($page.url.search);
-		const success = urlParams.get('success');
-		const error = urlParams.get('error');
-
-		if (success === 'strava_connected') {
-			statusMessage = 'Strava successfully connected! 🎉';
-			statusType = 'success';
-			// Update Strava connection status
-			const strava = integrations.find((i) => i.id === 'strava');
-			if (strava) strava.connected = true;
-		}
-
-		if (error) {
-			statusMessage = getErrorMessage(error);
-			statusType = 'error';
-		}
-
-		// Clear URL params after 3 seconds
-		if (success || error) {
-			setTimeout(() => {
-				const url = new URL(window.location.href);
-				url.search = '';
-				window.history.replaceState({}, '', url.toString());
-				statusMessage = '';
-			}, 3000);
-		}
-	});
-
-	function getErrorMessage(error: string): string {
-		switch (error) {
-			case 'strava_auth_denied':
-				return 'Strava connection was denied. Please try again.';
-			case 'strava_auth_failed':
-				return 'Failed to connect to Strava. Please try again.';
-			default:
-				return 'An error occurred. Please try again.';
-		}
-	}
-
-	function connectIntegration(id: string) {
-		switch (id) {
-			case 'strava':
-				window.location.href = '/api/integrations/strava?action=auth';
-				break;
-			case 'garmin':
-				// TODO: Implement Garmin OAuth
-				alert('Garmin integration coming soon!');
-				break;
-			case 'polar':
-				// TODO: Implement Polar OAuth
-				alert('Polar integration coming soon!');
-				break;
-			case 'wahoo':
-				// TODO: Implement Wahoo OAuth
-				alert('Wahoo integration coming soon!');
-				break;
-		}
-	}
-	function syncIntegration(id: string) {
-		// Trigger manual sync
-		fetch(`/api/integrations/${id}?action=sync`, { method: 'GET' })
-			.then((response) => response.json())
-			.then((data) => {
-				statusMessage = `${id} sync started!`;
-				statusType = 'success';
-			})
-			.catch((error) => {
-				statusMessage = `Failed to sync ${id}`;
-				statusType = 'error';
-			});
-	}
-
-	function disconnectIntegration(id: string) {
-		if (confirm(`Are you sure you want to disconnect ${id}?`)) {
-			// TODO: Implement disconnect
-			const integration = integrations.find((i) => i.id === id);
-			if (integration) {
-				integration.connected = false;
-				integration.lastSync = '';
-				integration.activities = 0;
-			}
-		}
-	}
-	async function logout() {
-		await supabase.auth.signOut();
-		goto('/auth');
-	}
-
-	// Test database connection
-	async function testDatabaseConnection() {
-		databaseStatus.loading = true;
-		try {
-			const response = await fetch('/api/test/database');
-			const data: any = await response.json();
-
-			if (data.success) {
-				databaseStatus = {
-					connected: true,
-					loading: false,
-					tables: data.database.tables || [],
-					recordCounts: data.database.recordCounts || {
-						athletes: 0,
-						activities: 0,
-						training_plans: 0,
-						api_connections: 0
-					},
-					error: null
-				};
-			} else {
-				databaseStatus = {
-					connected: false,
-					loading: false,
-					tables: [],
-					recordCounts: {
-						athletes: 0,
-						activities: 0,
-						training_plans: 0,
-						api_connections: 0
-					},
-					error: data.error || 'Unknown error'
-				};
-			}
-		} catch (error: any) {
-			databaseStatus = {
-				connected: false,
-				loading: false,
-				tables: [],
-				recordCounts: {
-					athletes: 0,
-					activities: 0,
-					training_plans: 0,
-					api_connections: 0
-				},
-				error: error.message
-			};
-		}
-	}
-
-	onMount(async () => {
-		// Test database on page load
-		await testDatabaseConnection();
-	});
 </script>
 
 <svelte:head>
-	<title>Smart Triathlete - Neural Dashboard</title>
-	<meta
-		name="description"
-		content="Neural triathlon training dashboard with quantum performance analytics"
-	/>
+	<title>Neural Dashboard - Smart Triathlete</title>
+	<meta name="description" content="Your intelligent triathlon training command center" />
 </svelte:head>
 
-<Navigation />
+<div class="quantum-page dashboard">
+	<Navigation />
 
-<!-- Professional Mobile-First Dashboard -->
-<div class="dashboard-container">
-	<section class="performance-overview">
-		<div class="metric-cards">
-			<!-- Current Form Card -->
-			<div class="metric-card primary">
-				<div class="metric-header">
-					<h3>Current Form</h3>
-					<span class="metric-trend positive">+{performanceMetrics.currentForm.rampRate}</span>
+	<!-- Neural Dashboard Header -->
+	<header class="neural-dashboard-header" class:mounted>
+		<div class="neural-container">
+			<div class="dashboard-title-section">
+				<div class="neural-logo-small">
+					<div class="logo-pulse" style="--glow: {glowIntensity}"></div>
+					<span class="dashboard-title">Neural Command Center</span>
 				</div>
-				<div class="form-gauge">
-					<div class="gauge-value">{performanceMetrics.currentForm.form}</div>
-					<div class="gauge-label">Form Score</div>
-				</div>
-				<div class="form-breakdown">
-					<div class="form-item">
-						<span>Fitness</span>
-						<div class="form-bar">
-							<div class="form-fill" style="width: {performanceMetrics.currentForm.fitness}%"></div>
-						</div>
-						<span>{performanceMetrics.currentForm.fitness}</span>
-					</div>
-					<div class="form-item">
-						<span>Fatigue</span>
-						<div class="form-bar fatigue">
-							<div class="form-fill" style="width: {performanceMetrics.currentForm.fatigue}%"></div>
-						</div>
-						<span>{performanceMetrics.currentForm.fatigue}</span>
-					</div>
+				<div class="athlete-status">
+					<div class="athlete-name">{athleteProfile.name}</div>
+					<div class="athlete-location">{athleteProfile.location}</div>
 				</div>
 			</div>
 
-			<!-- Weekly Volume Card -->
-			<div class="metric-card">
-				<h3>This Week</h3>
-				<div class="volume-sports">
-					{#each Object.entries(performanceMetrics.weeklyVolume) as [sport, data]}
-						<div class="sport-volume" style="border-left: 4px solid {getSportColor(sport)}">
-							<div class="sport-header">
-								<div class="icon-{sport}"></div>
-								<span class="sport-name">{sport.toUpperCase()}</span>
-								<span class="sport-trend positive">{data.trend}</span>
-							</div>
-							<div class="volume-stats">
-								<div class="volume-stat">
-									<strong>{data.hours}h</strong>
-									<span>Time</span>
-								</div>
-								<div class="volume-stat">
-									<strong>{data.distance}</strong>
-									<span>Distance</span>
-								</div>
-							</div>
-						</div>
+			{#if particlesVisible}
+				<div class="neural-particles">
+					{#each Array(10) as _, i}
+						<div
+							class="particle"
+							style="--delay: {i * 0.2}s; --x: {Math.random() * 100}%; --y: {Math.random() * 100}%"
+						></div>
 					{/each}
 				</div>
-			</div>
-
-			<!-- Next Race Card -->
-			<div class="metric-card race-card">
-				<div class="race-header">
-					<h3>Next Race</h3>
-					<span class="race-priority priority-{performanceMetrics.nextRace.priority.toLowerCase()}">
-						Priority {performanceMetrics.nextRace.priority}
-					</span>
-				</div>
-				<div class="race-info">
-					<h4>{performanceMetrics.nextRace.name}</h4>
-					<div class="race-countdown">
-						<span class="countdown-number">{performanceMetrics.nextRace.daysLeft}</span>
-						<span class="countdown-label">days to go</span>
-					</div>
-					<div class="race-date">{performanceMetrics.nextRace.date}</div>
-				</div>
-			</div>
+			{/if}
 		</div>
-	</section>
-
-	<!-- Recent Activities -->
-	<section class="recent-activities">
-		<div class="section-header">
-			<h2>Recent Activities</h2>
-			<a href="/activities" class="view-all">View All →</a>
-		</div>
-		<div class="activity-list">
-			{#each recentActivities as activity}
-				<div class="activity-item">
-					<div class="activity-sport" style="background: {getSportColor(activity.sport)}">
-						<div class="icon-{activity.sport}"></div>
-					</div>
-					<div class="activity-details">
-						<div class="activity-main">
-							<span class="activity-distance">{activity.distance}</span>
-							<span class="activity-duration">{formatDuration(activity.duration)}</span>
-						</div>
-						<div class="activity-meta">
-							<span class="activity-tss">TSS: {activity.tss}</span>
-							<span class="activity-date">{activity.date}</span>
+	</header>
+	<div class="neural-dashboard-content">
+		<!-- Perfect Symmetrical Dashboard Grid - 3x3 Layout -->
+		<div class="neural-dashboard-grid-symmetrical">
+			<!-- Row 1: Core Performance Metrics -->
+			<div class="grid-row row-performance">
+				<div class="neural-card performance-card">
+					<div class="neural-card-header">
+						<div class="card-icon">⚡</div>
+						<h3 class="card-title">Leistungsmetriken</h3>
+						<div class="card-actions">
+							<button class="action-btn" title="Zonen aktualisieren" on:click={updateZones}
+								>🔄</button
+							>
+							<button class="action-btn" title="Test planen" on:click={planTest}>📊</button>
 						</div>
 					</div>
-				</div>
-			{/each}
-		</div>
-	</section>
-
-	<!-- Upcoming Workouts -->
-	<section class="upcoming-workouts">
-		<div class="section-header">
-			<h2>Upcoming Workouts</h2>
-			<a href="/training-plans" class="view-all">View Plan →</a>
-		</div>
-		<div class="workout-list">
-			{#each upcomingWorkouts as workout}
-				<div class="workout-item">
-					<div class="workout-sport" style="background: {getSportColor(workout.sport)}">
-						<div class="icon-{workout.sport}"></div>
-					</div>
-					<div class="workout-details">
-						<div class="workout-main">
-							<h4>{workout.type}</h4>
-							<span class="workout-duration">{formatDuration(workout.duration)}</span>
-						</div>
-						<div class="workout-schedule">{workout.scheduled}</div>
-					</div>
-					<button class="workout-action">Start</button>
-				</div>
-			{/each}
-		</div>
-	</section>
-
-	<!-- Device Integrations -->
-	<section class="device-integrations">
-		<div class="section-header">
-			<h2>Device Connections</h2>
-			<span class="connection-count"
-				>{integrations.filter((i) => i.connected).length}/{integrations.length} connected</span
-			>
-		</div>
-		<div class="device-grid">
-			{#each integrations as integration}
-				<div class="device-card" class:connected={integration.connected}>
-					<div class="device-header">
-						<div class="icon-{integration.icon}"></div>
-						<div class="device-info">
-							<h4>{integration.name}</h4>
-							<p>{integration.description}</p>
-						</div>
-						<div class="connection-indicator" class:connected={integration.connected}>
-							{#if integration.connected}
-								<span class="status-dot connected"></span>
-							{:else}
-								<span class="status-dot"></span>
-							{/if}
-						</div>
-					</div>
-
-					{#if integration.connected}
-						<div class="device-stats">
-							<div class="stat-item">
-								<span class="stat-number">{integration.activities}</span>
-								<span class="stat-label">Activities</span>
-							</div>
-							<div class="stat-item">
-								<span class="stat-number">
-									{integration.lastSync
-										? new Date(integration.lastSync).toLocaleDateString()
-										: 'Never'}
-								</span>
-								<span class="stat-label">Last Sync</span>
+					<div class="neural-metrics-grid enhanced">
+						<div class="neural-metric-item">
+							<div class="metric-icon">💓</div>
+							<div class="metric-content">
+								<span class="neural-metric-label">Ruhe-HF</span>
+								<span class="neural-metric-value"
+									>{athleteProfile.restingHR} <span class="metric-unit">bpm</span></span
+								>
+								<span class="metric-trend positive">-2 bpm</span>
 							</div>
 						</div>
-						<div class="device-actions">
-							<button class="btn-sync" on:click={() => syncIntegration(integration.id)}>
-								<div class="icon-sync"></div>
-								Sync Now
-							</button>
-							<button class="btn-disconnect" on:click={() => disconnectIntegration(integration.id)}>
-								Disconnect
-							</button>
+						<div class="neural-metric-item">
+							<div class="metric-icon">🔥</div>
+							<div class="metric-content">
+								<span class="neural-metric-label">Max HF</span>
+								<span class="neural-metric-value"
+									>{athleteProfile.maxHR} <span class="metric-unit">bpm</span></span
+								>
+								<span class="metric-trend stable">stabil</span>
+							</div>
 						</div>
-					{:else}
-						<div class="device-connect">
-							<button class="btn-connect" on:click={() => connectIntegration(integration.id)}>
-								Connect {integration.name}
-							</button>
+						<div class="neural-metric-item">
+							<div class="metric-icon">⚡</div>
+							<div class="metric-content">
+								<span class="neural-metric-label">FTP</span>
+								<span class="neural-metric-value"
+									>{athleteProfile.ftp}<span class="metric-unit">W</span></span
+								>
+								<span class="metric-trend positive">+15W</span>
+							</div>
 						</div>
-					{/if}
+						<div class="neural-metric-item">
+							<div class="metric-icon">🫁</div>
+							<div class="metric-content">
+								<span class="neural-metric-label">VO2 Max</span>
+								<span class="neural-metric-value"
+									>{athleteProfile.vo2Max}<span class="metric-unit">ml/kg/min</span></span
+								>
+								<span class="metric-trend positive">+1.2</span>
+							</div>
+						</div>
+						<div class="neural-metric-item">
+							<div class="metric-icon">🏃‍♂️</div>
+							<div class="metric-content">
+								<span class="neural-metric-label">Lauf-Schwelle</span>
+								<span class="neural-metric-value"
+									>{athleteProfile.runningFTP}<span class="metric-unit">/km</span></span
+								>
+								<span class="metric-trend positive">-8s</span>
+							</div>
+						</div>
+						<div class="neural-metric-item">
+							<div class="metric-icon">🏊‍♂️</div>
+							<div class="metric-content">
+								<span class="neural-metric-label">Schwimm-CSS</span>
+								<span class="neural-metric-value"
+									>{athleteProfile.swimCSS}<span class="metric-unit">/100m</span></span
+								>
+								<span class="metric-trend positive">-2s</span>
+							</div>
+						</div>
+					</div>
 				</div>
-			{/each}
-		</div>
-	</section>
-	{#if statusMessage}
-		<div class="status-banner {statusType}">
-			<div class="status-icon">
-				{#if statusType === 'success'}
-					<div class="icon-check"></div>
-				{:else}
-					<div class="icon-error"></div>
-				{/if}
+
+				<div class="neural-card zones-card">
+					<div class="neural-card-header">
+						<div class="card-icon">🎯</div>
+						<h3 class="card-title">Trainingszonen</h3>
+						<div class="zone-switcher">
+							<button
+								class="zone-btn"
+								class:active={selectedZoneType === 'hr'}
+								on:click={() => switchZoneType('hr')}>HF</button
+							>
+							<button
+								class="zone-btn"
+								class:active={selectedZoneType === 'power'}
+								on:click={() => switchZoneType('power')}>Power</button
+							>
+							<button
+								class="zone-btn"
+								class:active={selectedZoneType === 'pace'}
+								on:click={() => switchZoneType('pace')}>Pace</button
+							>
+							<button
+								class="zone-btn"
+								class:active={selectedZoneType === 'swim'}
+								on:click={() => switchZoneType('swim')}>Swim</button
+							>
+						</div>
+					</div>
+					<div class="neural-zones-list">
+						{#each Object.entries(trainingZones[selectedZoneType]) as [zone, data]}
+							<div class="neural-zone-item" style="--zone-color: {data.color}">
+								<div class="zone-indicator"></div>
+								<div class="zone-content">
+									<div class="zone-header">
+										<span class="neural-zone-name">{zone.toUpperCase()}</span>
+										<span class="neural-zone-label">{data.label}</span>
+									</div>
+									<div class="neural-zone-range">
+										{data.min} - {data.max}
+										{#if selectedZoneType === 'hr'}bpm{:else if selectedZoneType === 'power'}W{:else if selectedZoneType === 'pace'}/km{:else if selectedZoneType === 'swim'}/100m{/if}
+										{#if 'percentage' in data && data.percentage}
+											<span class="zone-percentage">({data.percentage})</span>
+										{/if}
+									</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+
+				<div class="neural-card trends-card">
+					<div class="neural-card-header">
+						<div class="card-icon">📈</div>
+						<h3 class="card-title">Leistungstrends</h3>
+						<div class="card-actions">
+							<button class="action-btn" title="Detailanalyse" on:click={analyzePerformance}
+								>🔬</button
+							>
+						</div>
+					</div>
+					<div class="trends-grid">
+						{#each Object.entries(performanceTrends) as [metric, data]}
+							<div
+								class="trend-item"
+								class:improving={data.change === 'improving'}
+								class:declining={data.change === 'declining'}
+							>
+								<div class="trend-metric">
+									<span class="trend-label"
+										>{metric === 'fitness'
+											? 'Fitness'
+											: metric === 'fatigue'
+												? 'Ermüdung'
+												: metric === 'form'
+													? 'Form'
+													: metric === 'vo2max'
+														? 'VO2 Max'
+														: metric === 'ftp'
+															? 'FTP'
+															: metric === 'runningThreshold'
+																? 'Laufschwelle'
+																: 'Schwimm-CSS'}</span
+									>
+									<span class="trend-value"
+										>{data.current}{metric === 'vo2max'
+											? ' ml/kg/min'
+											: metric === 'ftp'
+												? 'W'
+												: metric === 'runningThreshold' || metric === 'swimCSS'
+													? '/km'
+													: ''}</span
+									>
+								</div>
+								<div
+									class="trend-change"
+									class:positive={data.change === 'improving'}
+									class:negative={data.change === 'declining'}
+								>
+									{data.trend}
+									{data.change === 'improving' ? '📈' : data.change === 'declining' ? '📉' : '➡️'}
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
 			</div>
-			<span class="status-text">{statusMessage}</span>
+
+			<!-- Row 2: Activity & Training -->
+			<div class="grid-row row-training">
+				<div class="neural-card activities-card">
+					<div class="neural-card-header">
+						<div class="card-icon">📋</div>
+						<h3 class="card-title">Letzte Aktivitäten</h3>
+						<div class="card-actions">
+							<button class="action-btn" title="Aktivität hinzufügen" on:click={addActivity}
+								>➕</button
+							>
+							<button class="action-btn" title="Alle anzeigen" on:click={viewAllActivities}
+								>📊</button
+							>
+						</div>
+					</div>
+					<div class="neural-activities-list">
+						{#each recentActivities.slice(0, 4) as activity}
+							<div class="neural-activity-item enhanced">
+								<div
+									class="activity-sport-icon"
+									style="--sport-color: {getSportColor(activity.sport)}"
+								>
+									{getSportIcon(activity.sport)}
+								</div>
+								<div class="activity-content">
+									<div class="activity-main">
+										<span class="neural-activity-type">{activity.type}</span>
+										<span class="neural-activity-date">{activity.date}</span>
+										{#if activity.effort}
+											<span
+												class="effort-badge"
+												style="--effort-color: {getEffortColor(activity.effort)}"
+												>{activity.effort}/10</span
+											>
+										{/if}
+									</div>
+									<div class="neural-activity-metrics">
+										<span class="metric-chip duration">{activity.duration}</span>
+										<span class="metric-chip distance">{activity.distance}</span>
+										<span class="metric-chip tss">TSS: {activity.tss}</span>
+										{#if activity.avgPace}
+											<span class="metric-chip pace">⚡ {activity.avgPace}</span>
+										{/if}
+										{#if activity.avgPower}
+											<span class="metric-chip power">⚡ {activity.avgPower}W</span>
+										{/if}
+										{#if activity.calories}
+											<span class="metric-chip calories">🔥 {activity.calories}kcal</span>
+										{/if}
+									</div>
+									{#if activity.feeling}
+										<div class="activity-feeling">Gefühl: {activity.feeling}</div>
+									{/if}
+									{#if activity.notes}
+										<div class="neural-activity-notes">{activity.notes}</div>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+
+				<div class="neural-card workouts-card">
+					<div class="neural-card-header">
+						<div class="card-icon">📅</div>
+						<h3 class="card-title">Geplante Workouts</h3>
+						<div class="card-actions">
+							<button class="action-btn" title="Workout hinzufügen" on:click={addWorkout}>➕</button
+							>
+							<button class="action-btn" title="Kalender öffnen" on:click={openCalendar}>📅</button>
+						</div>
+					</div>
+					<div class="neural-workouts-list">
+						{#each upcomingWorkouts.slice(0, 4) as workout}
+							<div
+								class="neural-workout-item enhanced"
+								class:high-priority={workout.priority === 'high'}
+							>
+								<div
+									class="workout-sport-icon"
+									style="--sport-color: {getSportColor(workout.sport)}"
+								>
+									{getSportIcon(workout.sport)}
+								</div>
+								<div class="workout-content">
+									<div class="workout-main">
+										<span class="neural-workout-type">{workout.type}</span>
+										<span class="neural-workout-time"
+											>{new Date(workout.scheduled).toLocaleDateString('de-DE')} um {new Date(
+												workout.scheduled
+											).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span
+										>
+										<span
+											class="priority-badge"
+											style="--priority-color: {getPriorityColor(workout.priority)}"
+											>{workout.priority}</span
+										>
+									</div>
+									<div class="neural-workout-metrics">
+										<span class="metric-chip duration">{workout.duration}</span>
+										<span class="metric-chip tss">TSS: {workout.tssPlanned}</span>
+										{#if workout.targetPower}
+											<span class="metric-chip power">🎯 {workout.targetPower}</span>
+										{/if}
+										{#if workout.targetPace}
+											<span class="metric-chip pace">🎯 {workout.targetPace}</span>
+										{/if}
+										{#if workout.targetHR}
+											<span class="metric-chip hr">💓 {workout.targetHR}</span>
+										{/if}
+									</div>
+									<div class="neural-workout-description">{workout.description}</div>
+									{#if workout.warmup || workout.mainSet || workout.cooldown}
+										<div class="workout-structure">
+											{#if workout.warmup}<div class="structure-item warmup">
+													Warm-up: {workout.warmup}
+												</div>{/if}
+											{#if workout.mainSet}<div class="structure-item main">
+													Main: {workout.mainSet}
+												</div>{/if}
+											{#if workout.cooldown}<div class="structure-item cooldown">
+													Cool-down: {workout.cooldown}
+												</div>{/if}
+										</div>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+
+				<div class="neural-card stats-card">
+					<div class="neural-card-header">
+						<div class="card-icon">📊</div>
+						<h3 class="card-title">Wochenstatistik</h3>
+						<div class="card-actions">
+							<button class="action-btn" title="Monatsansicht" on:click={viewMonthlyStats}
+								>📈</button
+							>
+						</div>
+					</div>
+					<div class="stats-overview">
+						<div class="stats-summary">
+							<div class="summary-item">
+								<span class="summary-value">{weeklyStats.totalTime}</span>
+								<span class="summary-label">Trainingszeit</span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-value">{weeklyStats.totalDistance}km</span>
+								<span class="summary-label">Distanz</span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-value">{weeklyStats.totalTSS}</span>
+								<span class="summary-label">TSS</span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-value">{weeklyStats.activities}</span>
+								<span class="summary-label">Einheiten</span>
+							</div>
+						</div>
+						<div class="sport-breakdown">
+							{#each Object.entries(weeklyStats.breakdown) as [sport, data]}
+								<div class="breakdown-item">
+									<div class="breakdown-header">
+										<span class="sport-icon">{getSportIcon(sport)}</span>
+										<span class="sport-name">{sport.charAt(0).toUpperCase() + sport.slice(1)}</span>
+										<span class="percentage">{data.percentage}%</span>
+									</div>
+									<div class="breakdown-metrics">
+										<span class="time-metric">{data.time}</span>
+										<span class="distance-metric">{data.distance}km</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Row 3: Goals & Analysis -->
+			<div class="grid-row row-goals">
+				<div class="neural-card races-card">
+					<div class="neural-card-header">
+						<div class="card-icon">🏆</div>
+						<h3 class="card-title">Wettkämpfe & Ziele</h3>
+						<div class="card-actions">
+							<button class="action-btn" title="Wettkampf hinzufügen" on:click={addRace}>➕</button>
+						</div>
+					</div>
+					<div class="races-list">
+						{#each upcomingRaces.slice(0, 2) as race}
+							<div class="race-item" class:a-race={race.priority === 'A-Race'}>
+								<div class="race-header">
+									<div class="race-title">
+										<span class="race-name">{race.name}</span>
+										<span class="race-priority" class:a-priority={race.priority === 'A-Race'}
+											>{race.priority}</span
+										>
+									</div>
+									<div class="race-countdown">
+										<span class="days-left">{race.daysLeft}</span>
+										<span class="days-label">Tage</span>
+									</div>
+								</div>
+								<div class="race-details">
+									<div class="race-info">
+										<span class="race-date">{race.date}</span>
+										<span class="race-location">{race.location}</span>
+										<span class="race-distance">{race.distance} - {race.type}</span>
+									</div>
+									<div class="race-goals">
+										<span class="goal-time">Zielzeit: {race.goalTime}</span>
+										<span class="current-form">Form: {race.currentForm}</span>
+									</div>
+								</div>
+								<div class="preparation-progress">
+									<div class="progress-label">Vorbereitung: {race.preparation}%</div>
+									<div class="progress-bar">
+										<div class="progress-fill" style="width: {race.preparation}%"></div>
+									</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+
+				<!-- New Recovery & Readiness Card -->
+				<div class="neural-card recovery-card">
+					<div class="neural-card-header">
+						<div class="card-icon">🧘‍♂️</div>
+						<h3 class="card-title">Regeneration & Bereitschaft</h3>
+						<div class="card-actions">
+							<button class="action-btn" title="Details" on:click={viewRecoveryDetails}>📊</button>
+						</div>
+					</div>
+					<div class="recovery-overview">
+						<div class="readiness-score">
+							<div
+								class="score-circle"
+								style="--score: {Math.round(
+									(readinessFactors.sleep.score +
+										readinessFactors.hrv.score +
+										readinessFactors.stress.score) /
+										3
+								)}"
+							>
+								<span class="score-value"
+									>{Math.round(
+										(readinessFactors.sleep.score +
+											readinessFactors.hrv.score +
+											readinessFactors.stress.score) /
+											3
+									)}</span
+								>
+								<span class="score-label">Bereitschaft</span>
+							</div>
+						</div>
+						<div class="readiness-factors">
+							<div class="factor-item">
+								<div class="factor-icon">😴</div>
+								<div class="factor-content">
+									<span class="factor-label">Schlaf</span>
+									<span class="factor-value"
+										>{readinessFactors.sleep.hours}h / {readinessFactors.sleep.quality}</span
+									>
+								</div>
+								<div
+									class="factor-score score-{readinessFactors.sleep.score >= 80
+										? 'good'
+										: readinessFactors.sleep.score >= 60
+											? 'ok'
+											: 'poor'}"
+								>
+									{readinessFactors.sleep.score}
+								</div>
+							</div>
+							<div class="factor-item">
+								<div class="factor-icon">💓</div>
+								<div class="factor-content">
+									<span class="factor-label">HRV</span>
+									<span class="factor-value">{readinessFactors.hrv.rmssd}</span>
+								</div>
+								<div
+									class="factor-score score-{readinessFactors.hrv.score >= 80
+										? 'good'
+										: readinessFactors.hrv.score >= 60
+											? 'ok'
+											: 'poor'}"
+								>
+									{readinessFactors.hrv.score}
+								</div>
+							</div>
+							<div class="factor-item">
+								<div class="factor-icon">🧠</div>
+								<div class="factor-content">
+									<span class="factor-label">Stress</span>
+									<span class="factor-value">{readinessFactors.stress.level}</span>
+								</div>
+								<div
+									class="factor-score score-{readinessFactors.stress.score >= 80
+										? 'good'
+										: readinessFactors.stress.score >= 60
+											? 'ok'
+											: 'poor'}"
+								>
+									{readinessFactors.stress.score}
+								</div>
+							</div>
+							<div class="factor-item">
+								<div class="factor-icon">🍎</div>
+								<div class="factor-content">
+									<span class="factor-label">Ernährung</span>
+									<span class="factor-value">{readinessFactors.nutrition.hydration}</span>
+								</div>
+								<div
+									class="factor-score score-{readinessFactors.nutrition.score >= 80
+										? 'good'
+										: readinessFactors.nutrition.score >= 60
+											? 'ok'
+											: 'poor'}"
+								>
+									{readinessFactors.nutrition.score}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- New Monthly Overview Card -->
+				<div class="neural-card monthly-card">
+					<div class="neural-card-header">
+						<div class="card-icon">📅</div>
+						<h3 class="card-title">Monatsübersicht</h3>
+						<div class="card-actions">
+							<button class="action-btn" title="Jahresansicht" on:click={viewYearlyStats}>📆</button
+							>
+						</div>
+					</div>
+					<div class="monthly-overview">
+						<div class="monthly-summary">
+							<div class="summary-item">
+								<span class="summary-value">{monthlyStats.totalTime}</span>
+								<span class="summary-label">Gesamtzeit</span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-value">{monthlyStats.totalDistance}km</span>
+								<span class="summary-label">Distanz</span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-value">{monthlyStats.totalTSS}</span>
+								<span class="summary-label">TSS</span>
+							</div>
+							<div class="summary-item">
+								<span class="summary-value">{monthlyStats.activities}</span>
+								<span class="summary-label">Einheiten</span>
+							</div>
+						</div>
+						<div class="monthly-targets">
+							<div class="target-item">
+								<span class="target-label">Monatsziel</span>
+								<div class="target-progress">
+									<div class="progress-bar">
+										<div
+											class="progress-fill"
+											style="width: {(monthlyStats.totalDistance / 450) * 100}%"
+										></div>
+									</div>
+									<span class="progress-text">{monthlyStats.totalDistance}/450km</span>
+								</div>
+							</div>
+							<div class="target-item">
+								<span class="target-label">TSS Ziel</span>
+								<div class="target-progress">
+									<div class="progress-bar">
+										<div
+											class="progress-fill"
+											style="width: {(monthlyStats.totalTSS / 1500) * 100}%"
+										></div>
+									</div>
+									<span class="progress-text">{monthlyStats.totalTSS}/1500</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-	{/if}
+		<!-- End neural-dashboard-grid-symmetrical -->
+	</div>
+	<!-- End neural-dashboard-content -->
 </div>
 
+<!-- Closing quantum-page dashboard -->
+
 <style>
-	/* Neural/Quantum Dashboard Design */
-	* {
-		box-sizing: border-box;
-	}
+	/* Neural Dashboard Styles - Clean & Modern */
 
-	.dashboard-container {
+	/* Neural Dashboard Styles - Step 1 */
+	.quantum-page.dashboard {
 		min-height: 100vh;
-		background: var(--neural-bg);
-		color: var(--neural-text);
-		font-family: var(--font-neural);
-		padding: 0;
-		margin: 0;
-		font-weight: 300;
-		letter-spacing: 0.01em;
+		background: radial-gradient(circle at 20% 20%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+			radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+			radial-gradient(circle at 40% 60%, rgba(120, 219, 255, 0.1) 0%, transparent 50%),
+			linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+		color: #e2e8f0;
 	}
 
-	/* Neural Logo and Icons */
-	.logo {
+	.neural-dashboard-header {
+		padding: 2rem 0;
+		margin-bottom: 2rem;
+		position: relative;
+		overflow: hidden;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.neural-dashboard-header.mounted {
+		animation: slideInFromTop 0.8s ease-out;
+	}
+
+	.dashboard-title-section {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		position: relative;
+		z-index: 2;
+	}
+
+	.neural-logo-small {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 1rem;
 	}
 
-	.logo-text {
+	.logo-pulse {
+		width: 40px;
+		height: 40px;
+		background: radial-gradient(circle, #667eea 0%, #764ba2 50%, #f093fb 100%);
+		border-radius: 50%;
+		opacity: calc(0.7 + var(--glow) * 0.3);
+		box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+		animation: pulse 2s ease-in-out infinite;
+	}
+
+	.dashboard-title {
 		font-size: 1.5rem;
-		font-weight: 300;
-		letter-spacing: 0.05em;
-		background: var(--neural-gradient);
-		background-clip: text;
+		font-weight: 700;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
-	}
-	.icon-neural,
-	.icon-profile,
-	.icon-dashboard,
-	.icon-activities,
-	.icon-training,
-	.icon-integrations,
-	.icon-user,
-	.icon-chevron,
-	.icon-swim,
-	.icon-bike,
-	.icon-run,
-	.icon-strava,
-	.icon-garmin,
-	.icon-polar,
-	.icon-wahoo,
-	.icon-sync,
-	.icon-check,
-	.icon-error {
-		width: 24px;
-		height: 24px;
-		border-radius: 6px;
-		position: relative;
-		flex-shrink: 0;
+		background-clip: text;
 	}
 
-	.icon-neural {
-		background: radial-gradient(circle at center, var(--neural-accent) 30%, transparent 70%);
-		border: 1px solid var(--neural-accent);
-		animation: neuralPulse 2s ease-in-out infinite;
+	.athlete-status {
+		text-align: right;
 	}
 
-	.icon-neural:before {
-		content: '';
+	.athlete-name {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #e2e8f0;
+		margin-bottom: 0.25rem;
+	}
+
+	.athlete-location {
+		font-size: 0.875rem;
+		color: #94a3b8;
+	}
+
+	.neural-particles {
 		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 8px;
-		height: 8px;
-		background: var(--neural-accent);
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	.particle {
+		position: absolute;
+		width: 2px;
+		height: 2px;
+		background: #667eea;
 		border-radius: 50%;
-		transform: translate(-50%, -50%);
-		animation: pulse 1.5s ease-in-out infinite;
+		opacity: 0;
+		left: var(--x);
+		top: var(--y);
+		animation: floatParticle 4s ease-in-out infinite;
+		animation-delay: var(--delay);
 	}
 
-	.icon-profile {
-		background: linear-gradient(135deg, var(--neural-secondary), var(--neural-accent));
-		border-radius: 50%;
-	}
-
-	/* Navigation Icons */
-	.icon-dashboard {
-		background: linear-gradient(135deg, #667eea, #764ba2);
-		border-radius: 8px;
-		position: relative;
-	}
-
-	.icon-dashboard:before {
-		content: '';
-		position: absolute;
-		top: 6px;
-		left: 6px;
-		right: 6px;
-		bottom: 6px;
-		border: 2px solid white;
-		border-radius: 4px;
-		border-bottom: none;
-		border-right: none;
-	}
-
-	.icon-activities {
-		background: linear-gradient(135deg, #4caf50, #45a049);
-		border-radius: 50%;
-		position: relative;
-	}
-
-	.icon-activities:before {
-		content: '';
-		position: absolute;
-		top: 8px;
-		left: 8px;
-		right: 8px;
-		bottom: 8px;
-		border: 2px solid white;
-		border-radius: 50%;
-	}
-
-	.icon-training {
-		background: linear-gradient(135deg, #ff9800, #f57c00);
-		border-radius: 6px;
-		position: relative;
-	}
-
-	.icon-training:before {
-		content: '';
-		position: absolute;
-		top: 6px;
-		left: 6px;
-		right: 6px;
-		bottom: 6px;
-		background: white;
-		clip-path: polygon(50% 20%, 80% 80%, 20% 80%);
-	}
-
-	.icon-integrations {
-		background: linear-gradient(135deg, #9c27b0, #7b1fa2);
-		border-radius: 6px;
-		position: relative;
-	}
-
-	.icon-integrations:before,
-	.icon-integrations:after {
-		content: '';
-		position: absolute;
-		width: 8px;
-		height: 8px;
-		background: white;
-		border-radius: 50%;
-	}
-
-	.icon-integrations:before {
-		top: 4px;
-		left: 8px;
-	}
-
-	.icon-integrations:after {
-		bottom: 4px;
-		right: 8px;
-	}
-
-	.icon-user {
-		background: linear-gradient(135deg, var(--neural-accent), #4a90e2);
-		border-radius: 50%;
-		position: relative;
-	}
-
-	.icon-user:before {
-		content: '';
-		position: absolute;
-		top: 6px;
-		left: 8px;
-		right: 8px;
-		height: 6px;
-		background: white;
-		border-radius: 50%;
-	}
-
-	.icon-user:after {
-		content: '';
-		position: absolute;
-		bottom: 4px;
-		left: 6px;
-		right: 6px;
-		height: 8px;
-		background: white;
-		border-radius: 8px 8px 0 0;
-	}
-
-	.icon-chevron {
-		width: 16px;
-		height: 16px;
-		background: transparent;
-		border: none;
-		position: relative;
-	}
-
-	.icon-chevron:before {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 6px;
-		height: 6px;
-		border-right: 2px solid var(--neural-text);
-		border-bottom: 2px solid var(--neural-text);
-		transform: translate(-50%, -50%) rotate(45deg);
-		opacity: 0.7;
-	}
-
-	@keyframes neuralPulse {
-		0%,
-		100% {
-			box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7);
+	@keyframes slideInFromTop {
+		from {
+			opacity: 0;
+			transform: translateY(-30px);
 		}
-		50% {
-			box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+		to {
+			opacity: 1;
+			transform: translateY(0);
 		}
 	}
 
 	@keyframes pulse {
 		0%,
 		100% {
-			opacity: 1;
-			transform: translate(-50%, -50%) scale(1);
+			transform: scale(1);
 		}
 		50% {
-			opacity: 0.5;
-			transform: translate(-50%, -50%) scale(1.2);
+			transform: scale(1.05);
 		}
 	}
 
-	@keyframes rotate {
-		from {
-			transform: rotate(0deg);
+	@keyframes floatParticle {
+		0%,
+		100% {
+			opacity: 0;
+			transform: translateY(0) scale(0);
 		}
-		to {
-			transform: rotate(360deg);
+		50% {
+			opacity: 1;
+			transform: translateY(-20px) scale(1);
 		}
-	}
-	/* Performance Overview */
-	.performance-overview {
-		padding: 2rem 1.5rem;
 	}
 
-	.metric-cards {
+	/* Neural Container */
+	.neural-container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 2rem;
+		position: relative;
+	}
+
+	/* Perfect Symmetrical Neural Dashboard Grid - 3x3 Layout */
+	.neural-dashboard-grid-symmetrical {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		margin-bottom: 2rem;
+		padding: 0 2rem;
+	}
+
+	.grid-row {
 		display: grid;
-		gap: 1.5rem;
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 2rem;
+		width: 100%;
 	}
 
-	.metric-card {
-		background: var(--neural-glass);
-		backdrop-filter: blur(20px);
-		border: 1px solid var(--neural-border);
+	/* Ensure all cards in a row have equal height */
+	.grid-row .neural-card {
+		display: flex;
+		flex-direction: column;
+		min-height: 400px; /* Consistent minimum height */
+	}
+
+	/* Make card content flexible to fill available space */
+	.neural-card > *:last-child {
+		flex: 1;
+	}
+
+	/* Neural Cards */
+	.neural-card {
+		background: rgba(255, 255, 255, 0.05);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 16px;
-		padding: 2rem;
+		padding: 1.5rem;
 		position: relative;
 		overflow: hidden;
-		transition: all var(--neural-transition);
+		transition: all 0.3s ease;
+		animation: slideInFromBottom 0.6s ease-out;
 	}
 
-	.metric-card:hover {
-		transform: translateY(-4px);
-		box-shadow: var(--neural-shadow);
-		border-color: var(--neural-accent);
+	.neural-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 20px 40px rgba(102, 126, 234, 0.1);
+		border-color: rgba(102, 126, 234, 0.3);
 	}
 
-	.metric-card.primary {
+	.neural-card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 1px;
 		background: linear-gradient(
-			135deg,
-			rgba(0, 212, 255, 0.1),
-			rgba(255, 107, 53, 0.1),
-			rgba(76, 175, 80, 0.1)
+			90deg,
+			transparent 0%,
+			rgba(102, 126, 234, 0.5) 50%,
+			transparent 100%
 		);
-		border: 1px solid var(--neural-accent);
 	}
 
-	.metric-header {
+	/* Neural Card Header */
+	.neural-card-header {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		gap: 0.75rem;
 		margin-bottom: 1.5rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
-	.metric-header h3 {
+	.card-icon {
+		font-size: 1.5rem;
+		filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
+	}
+
+	.card-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: #e2e8f0;
 		margin: 0;
-		font-size: 1.1rem;
-		font-weight: 300;
-		letter-spacing: 0.02em;
-		opacity: 0.9;
+	}
+
+	/* Card Actions */
+	.card-actions {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.action-btn {
+		width: 32px;
+		height: 32px;
+		border: none;
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		color: #e2e8f0;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 0.875rem;
+	}
+
+	.action-btn:hover {
+		background: rgba(102, 126, 234, 0.2);
+		transform: scale(1.1);
+	}
+
+	.action-btn:active {
+		transform: scale(0.95);
+	}
+
+	/* Zone Selection Buttons */
+	.zone-btn {
+		padding: 0.5rem 1rem;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: rgba(255, 255, 255, 0.05);
+		color: #e2e8f0;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		font-size: 0.875rem;
+		font-weight: 500;
+	}
+
+	.zone-btn:hover {
+		background: rgba(102, 126, 234, 0.2);
+		border-color: rgba(102, 126, 234, 0.4);
+		transform: translateY(-1px);
+	}
+
+	.zone-btn.active {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		border-color: #667eea;
+		color: white;
+		box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+	}
+
+	.zone-btn:active {
+		transform: translateY(0);
+	}
+
+	/* Neural Metrics Grid */
+	.neural-metrics-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
+	}
+
+	.neural-metrics-grid.enhanced {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.neural-metric-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		transition: all 0.3s ease;
+	}
+
+	.neural-metric-item:hover {
+		background: rgba(102, 126, 234, 0.1);
+		border-color: rgba(102, 126, 234, 0.3);
+	}
+
+	.metric-icon {
+		font-size: 1.25rem;
+		filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.3));
+	}
+
+	.metric-content {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.neural-metric-label {
+		font-size: 0.75rem;
+		color: #94a3b8;
+		margin-bottom: 0.25rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.neural-metric-value {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: #e2e8f0;
+	}
+
+	.metric-unit {
+		font-size: 0.875rem;
+		color: #64748b;
+		font-weight: 400;
 	}
 
 	.metric-trend {
-		font-size: 0.85rem;
-		padding: 0.4rem 0.8rem;
-		border-radius: 12px;
-		font-weight: 300;
-		letter-spacing: 0.01em;
+		font-size: 0.75rem;
+		font-weight: 600;
+		margin-top: 0.25rem;
 	}
 
 	.metric-trend.positive {
-		background: rgba(76, 175, 80, 0.2);
 		color: #4caf50;
-		border: 1px solid rgba(76, 175, 80, 0.3);
 	}
 
-	/* Form Gauge */
-	.form-gauge {
-		text-align: center;
-		margin: 2rem 0;
+	.metric-trend.stable {
+		color: #94a3b8;
 	}
 
-	.gauge-value {
-		font-size: 3.5rem;
-		font-weight: 200;
-		color: var(--neural-accent);
-		line-height: 1;
-		letter-spacing: -0.02em;
-	}
-
-	.gauge-label {
-		font-size: 0.9rem;
-		opacity: 0.7;
-		margin-top: 0.5rem;
-		font-weight: 300;
-		letter-spacing: 0.02em;
-	}
-
-	.form-breakdown {
+	/* Neural Zones */
+	.neural-zones-list {
 		display: flex;
 		flex-direction: column;
-		gap: 1.25rem;
+		gap: 0.75rem;
 	}
 
-	.form-item {
+	.neural-zone-item {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		font-size: 0.9rem;
-		font-weight: 300;
+		padding: 0.75rem;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		transition: all 0.3s ease;
 	}
 
-	.form-item span:first-child {
-		min-width: 60px;
-		opacity: 0.8;
-		letter-spacing: 0.01em;
+	.neural-zone-item:hover {
+		background: rgba(255, 255, 255, 0.05);
+		transform: translateX(5px);
 	}
 
-	.form-item span:last-child {
-		min-width: 30px;
-		font-weight: 300;
-		text-align: right;
-		letter-spacing: 0.01em;
+	.zone-indicator {
+		width: 4px;
+		height: 30px;
+		background: var(--zone-color);
+		border-radius: 2px;
+		box-shadow: 0 0 10px var(--zone-color);
 	}
 
-	.form-bar {
+	.zone-content {
 		flex: 1;
-		height: 8px;
-		background: var(--neural-glass);
-		border-radius: 4px;
+	}
+
+	.zone-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.25rem;
+	}
+
+	.neural-zone-name {
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--zone-color);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.neural-zone-label {
+		font-size: 0.875rem;
+		color: #94a3b8;
+	}
+
+	.neural-zone-range {
+		font-size: 0.875rem;
+		color: #e2e8f0;
+		font-weight: 500;
+	}
+
+	/* Enhanced Activities */
+	.neural-activity-item.enhanced {
+		position: relative;
 		overflow: hidden;
-		border: 1px solid var(--neural-border);
 	}
 
-	.form-fill {
-		height: 100%;
-		background: var(--neural-gradient);
-		border-radius: 4px;
-		transition: width var(--neural-transition);
+	.neural-activity-item.enhanced::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		width: 3px;
+		background: var(--sport-color);
+		opacity: 0.7;
 	}
 
-	.form-bar.fatigue .form-fill {
-		background: linear-gradient(90deg, #ff6b35, #ff4444);
+	.effort-badge {
+		background: var(--effort-color);
+		color: white;
+		padding: 0.2rem 0.5rem;
+		border-radius: 12px;
+		font-size: 0.75rem;
+		font-weight: 600;
 	}
 
-	/* Volume Sports */
-	.volume-sports {
+	.activity-feeling {
+		font-size: 0.875rem;
+		color: #94a3b8;
+		font-style: italic;
+		margin-top: 0.5rem;
+	}
+
+	.metric-chip {
+		font-size: 0.75rem;
+		padding: 0.25rem 0.5rem;
+		border-radius: 6px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.metric-chip.duration {
+		background: rgba(102, 126, 234, 0.1);
+		border-color: rgba(102, 126, 234, 0.3);
+	}
+
+	.metric-chip.distance {
+		background: rgba(76, 175, 80, 0.1);
+		border-color: rgba(76, 175, 80, 0.3);
+	}
+
+	.metric-chip.pace,
+	.metric-chip.power {
+		background: rgba(255, 193, 7, 0.1);
+		border-color: rgba(255, 193, 7, 0.3);
+	}
+
+	.metric-chip.calories {
+		background: rgba(244, 67, 54, 0.1);
+		border-color: rgba(244, 67, 54, 0.3);
+	}
+
+	.metric-chip.hr {
+		background: rgba(233, 30, 99, 0.1);
+		border-color: rgba(233, 30, 99, 0.3);
+	}
+
+	/* Enhanced Workouts */
+	.neural-workout-item.enhanced {
+		position: relative;
+		border-left: 3px solid var(--sport-color);
+	}
+
+	.neural-workout-item.high-priority {
+		box-shadow: 0 0 15px rgba(244, 67, 54, 0.2);
+		border-color: #f44336;
+	}
+
+	.priority-badge {
+		background: var(--priority-color);
+		color: white;
+		padding: 0.2rem 0.5rem;
+		border-radius: 12px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+	}
+
+	.workout-structure {
+		margin-top: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.structure-item {
+		font-size: 0.875rem;
+		padding: 0.5rem;
+		border-radius: 6px;
+		border-left: 3px solid;
+	}
+
+	.structure-item.warmup {
+		background: rgba(76, 175, 80, 0.1);
+		border-color: #4caf50;
+	}
+
+	.structure-item.main {
+		background: rgba(255, 193, 7, 0.1);
+		border-color: #ffc107;
+	}
+
+	.structure-item.cooldown {
+		background: rgba(102, 126, 234, 0.1);
+		border-color: #667eea;
+	}
+
+	/* Weekly Statistics */
+	.stats-overview {
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
 	}
 
-	.sport-volume {
-		padding: 1.5rem;
-		background: var(--neural-glass);
-		border-radius: 12px;
-		border: 1px solid var(--neural-border);
-		transition: all var(--neural-transition);
+	.stats-summary {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
 	}
 
-	.sport-volume:hover {
-		background: var(--neural-hover);
-		transform: translateY(-2px);
+	.summary-item {
+		text-align: center;
+		padding: 1rem;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
-	.sport-header {
+	.summary-value {
+		display: block;
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #667eea;
+		margin-bottom: 0.25rem;
+	}
+
+	.summary-label {
+		font-size: 0.875rem;
+		color: #94a3b8;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.sport-breakdown {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.breakdown-item {
+		padding: 0.75rem;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+	}
+
+	.breakdown-header {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
-		margin-bottom: 1.25rem;
+		gap: 0.75rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.sport-icon {
+		font-size: 1.25rem;
 	}
 
 	.sport-name {
-		font-weight: 300;
 		flex: 1;
-		letter-spacing: 0.05em;
-		font-size: 0.9rem;
+		font-weight: 600;
+		color: #e2e8f0;
+		text-transform: capitalize;
 	}
 
-	.sport-trend {
-		font-size: 0.8rem;
-		padding: 0.3rem 0.6rem;
-		border-radius: 8px;
-		font-weight: 300;
+	.percentage {
+		font-weight: 600;
+		color: #667eea;
 	}
 
-	.volume-stats {
+	.breakdown-metrics {
 		display: flex;
-		gap: 2rem;
+		gap: 1rem;
+		font-size: 0.875rem;
+		color: #94a3b8;
 	}
 
-	.volume-stat {
+	/* Upcoming Races */
+	.races-list {
 		display: flex;
 		flex-direction: column;
-		gap: 0.25rem;
+		gap: 1rem;
 	}
 
-	.volume-stat strong {
-		font-size: 1.1rem;
-		color: var(--neural-text);
-		font-weight: 300;
-		letter-spacing: 0.01em;
+	.race-item {
+		padding: 1.5rem;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		transition: all 0.3s ease;
 	}
 
-	.volume-stat span {
-		font-size: 0.8rem;
-		opacity: 0.7;
-		font-weight: 300;
-		letter-spacing: 0.02em;
-	}
-
-	/* Race Card */
-	.race-card {
-		background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(76, 175, 80, 0.15));
-		border: 1px solid rgba(255, 107, 53, 0.3);
+	.race-item.a-race {
+		background: rgba(244, 67, 54, 0.05);
+		border-color: rgba(244, 67, 54, 0.2);
+		box-shadow: 0 0 20px rgba(244, 67, 54, 0.1);
 	}
 
 	.race-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1.5rem;
+		align-items: flex-start;
+		margin-bottom: 1rem;
+	}
+
+	.race-title {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.race-name {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: #e2e8f0;
 	}
 
 	.race-priority {
-		padding: 0.3rem 0.8rem;
+		padding: 0.25rem 0.75rem;
 		border-radius: 12px;
-		font-size: 0.8rem;
-		font-weight: 300;
-		letter-spacing: 0.02em;
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		background: rgba(255, 255, 255, 0.1);
+		color: #94a3b8;
+		align-self: flex-start;
 	}
 
-	.race-priority.priority-a {
-		background: rgba(255, 68, 68, 0.2);
-		color: #ff4444;
-		border: 1px solid rgba(255, 68, 68, 0.3);
-	}
-
-	.race-info h4 {
-		margin: 0 0 1.5rem 0;
-		font-size: 1.2rem;
-		font-weight: 300;
-		letter-spacing: 0.02em;
+	.race-priority.a-priority {
+		background: rgba(244, 67, 54, 0.2);
+		color: #f44336;
 	}
 
 	.race-countdown {
-		display: flex;
-		align-items: baseline;
-		gap: 0.75rem;
-		margin-bottom: 0.75rem;
+		text-align: right;
 	}
 
-	.countdown-number {
-		font-size: 2.5rem;
-		font-weight: 200;
-		color: #ff6b35;
-		line-height: 1;
-		letter-spacing: -0.02em;
+	.days-left {
+		display: block;
+		font-size: 2rem;
+		font-weight: 700;
+		color: #667eea;
 	}
 
-	.countdown-label {
-		font-size: 0.9rem;
-		opacity: 0.8;
-		font-weight: 300;
-		letter-spacing: 0.01em;
+	.days-label {
+		font-size: 0.875rem;
+		color: #94a3b8;
 	}
 
-	.race-date {
-		font-size: 0.9rem;
-		opacity: 0.7;
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	/* Sections */
-	.recent-activities,
-	.upcoming-workouts,
-	.device-integrations {
-		padding: 2rem 1.5rem;
-		border-top: 1px solid var(--neural-border);
-	}
-
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 2rem;
-	}
-
-	.section-header h2 {
-		margin: 0;
-		font-size: 1.3rem;
-		font-weight: 300;
-		letter-spacing: 0.02em;
-	}
-
-	.view-all {
-		color: var(--neural-accent);
-		text-decoration: none;
-		font-size: 0.9rem;
-		font-weight: 300;
-		letter-spacing: 0.01em;
-		transition: all var(--neural-transition);
-	}
-
-	.view-all:hover {
-		color: var(--neural-text);
-		transform: translateX(4px);
-	}
-
-	/* Activity List */
-	.activity-list {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.activity-item {
-		display: flex;
-		align-items: center;
-		gap: 1.25rem;
-		padding: 1.5rem;
-		background: var(--neural-glass);
-		border-radius: 12px;
-		border: 1px solid var(--neural-border);
-		transition: all var(--neural-transition);
-	}
-
-	.activity-item:hover {
-		background: var(--neural-hover);
-		transform: translateY(-2px);
-		box-shadow: var(--neural-shadow);
-	}
-
-	.activity-sport {
-		width: 50px;
-		height: 50px;
-		border-radius: 12px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		border: 1px solid var(--neural-border);
-	}
-
-	.activity-details {
-		flex: 1;
-	}
-
-	.activity-main {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 0.75rem;
-	}
-
-	.activity-distance {
-		font-weight: 300;
-		font-size: 1.1rem;
-		letter-spacing: 0.01em;
-	}
-
-	.activity-duration {
-		color: var(--neural-accent);
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	.activity-meta {
-		display: flex;
-		justify-content: space-between;
-		font-size: 0.8rem;
-		opacity: 0.7;
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	/* Workout List */
-	.workout-list {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.workout-item {
-		display: flex;
-		align-items: center;
-		gap: 1.25rem;
-		padding: 1.5rem;
-		background: var(--neural-glass);
-		border-radius: 12px;
-		border: 1px solid var(--neural-border);
-		transition: all var(--neural-transition);
-	}
-
-	.workout-item:hover {
-		background: var(--neural-hover);
-		transform: translateY(-2px);
-	}
-
-	.workout-sport {
-		width: 50px;
-		height: 50px;
-		border-radius: 12px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		border: 1px solid var(--neural-border);
-	}
-
-	.workout-details {
-		flex: 1;
-	}
-
-	.workout-main {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 0.75rem;
-	}
-
-	.workout-main h4 {
-		margin: 0;
-		font-size: 1rem;
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	.workout-duration {
-		color: #4caf50;
-		font-weight: 300;
-		font-size: 0.9rem;
-		letter-spacing: 0.01em;
-	}
-
-	.workout-schedule {
-		font-size: 0.8rem;
-		opacity: 0.7;
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	.workout-action {
-		background: var(--neural-gradient);
-		border: none;
-		padding: 0.75rem 1.5rem;
-		border-radius: 8px;
-		color: white;
-		font-weight: 300;
-		letter-spacing: 0.02em;
-		cursor: pointer;
-		transition: all var(--neural-transition);
-	}
-
-	.workout-action:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-	}
-
-	/* Device Integrations */
-	.connection-count {
-		font-size: 0.9rem;
-		color: var(--neural-accent);
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	.device-grid {
+	.race-details {
 		display: grid;
-		gap: 1.5rem;
-		grid-template-columns: 1fr;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin-bottom: 1rem;
 	}
 
-	.device-card {
-		background: var(--neural-glass);
-		border: 1px solid var(--neural-border);
-		border-radius: 16px;
-		padding: 2rem;
-		transition: all var(--neural-transition);
-	}
-
-	.device-card:hover {
-		background: var(--neural-hover);
-		transform: translateY(-4px);
-		box-shadow: var(--neural-shadow);
-	}
-
-	.device-card.connected {
-		border: 1px solid rgba(76, 175, 80, 0.4);
-		background: var(--neural-glass);
-	}
-
-	.device-header {
+	.race-info,
+	.race-goals {
 		display: flex;
-		align-items: flex-start;
-		gap: 1.25rem;
-		margin-bottom: 2rem;
+		flex-direction: column;
+		gap: 0.25rem;
+		font-size: 0.875rem;
 	}
 
-	.device-info {
-		flex: 1;
+	.race-date,
+	.race-location,
+	.race-distance,
+	.goal-time,
+	.current-form {
+		color: #94a3b8;
 	}
 
-	.device-info h4 {
-		margin: 0 0 0.75rem 0;
-		font-size: 1.1rem;
-		font-weight: 300;
-		letter-spacing: 0.01em;
+	.preparation-progress {
+		margin-top: 1rem;
 	}
 
-	.device-info p {
-		margin: 0;
-		font-size: 0.9rem;
-		opacity: 0.8;
-		line-height: 1.5;
-		font-weight: 300;
-		letter-spacing: 0.01em;
+	.progress-label {
+		font-size: 0.875rem;
+		color: #e2e8f0;
+		margin-bottom: 0.5rem;
 	}
 
-	.connection-indicator {
+	.progress-bar {
+		height: 6px;
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 3px;
+		overflow: hidden;
+	}
+
+	.progress-fill {
+		height: 100%;
+		background: linear-gradient(90deg, #4caf50 0%, #667eea 100%);
+		transition: width 0.3s ease;
+	}
+
+	/* Performance Trends */
+	.trends-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.75rem;
+	}
+
+	.trend-item {
+		padding: 1rem;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		transition: all 0.3s ease;
+	}
+
+	.trend-item.improving {
+		border-color: rgba(76, 175, 80, 0.3);
+		background: rgba(76, 175, 80, 0.05);
+	}
+
+	.trend-item.declining {
+		border-color: rgba(244, 67, 54, 0.3);
+		background: rgba(244, 67, 54, 0.05);
+	}
+
+	.trend-metric {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.trend-label {
+		font-size: 0.75rem;
+		color: #94a3b8;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.trend-value {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #e2e8f0;
+	}
+
+	.trend-change {
+		font-size: 0.875rem;
+		font-weight: 600;
+	}
+
+	.trend-change.positive {
+		color: #4caf50;
+	}
+
+	.trend-change.negative {
+		color: #f44336;
+	}
+
+	/* Recovery & Readiness Card */
+	.recovery-overview {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.readiness-score {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 1rem;
+	}
+
+	.score-circle {
+		width: 120px;
+		height: 120px;
+		border-radius: 50%;
+		background: conic-gradient(
+			from 0deg,
+			#4caf50 0deg,
+			#4caf50 calc(var(--score) * 3.6deg),
+			rgba(255, 255, 255, 0.1) calc(var(--score) * 3.6deg),
+			rgba(255, 255, 255, 0.1) 360deg
+		);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+	}
+
+	.score-circle::before {
+		content: '';
+		position: absolute;
+		width: 90px;
+		height: 90px;
+		border-radius: 50%;
+		background: rgba(30, 41, 59, 0.95);
+	}
+
+	.score-value {
+		font-size: 2rem;
+		font-weight: 700;
+		color: #4caf50;
+		z-index: 1;
+	}
+
+	.score-label {
+		font-size: 0.75rem;
+		color: #94a3b8;
+		z-index: 1;
+	}
+
+	.readiness-factors {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.factor-item {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.8rem;
-		opacity: 0.7;
-		font-weight: 300;
+		gap: 1rem;
+		padding: 0.75rem;
+		background: rgba(255, 255, 255, 0.03);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
-	.status-dot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.3);
+	.factor-icon {
+		font-size: 1.25rem;
+		width: 24px;
+		text-align: center;
 	}
 
-	.status-dot.connected {
-		background: #4caf50;
-		box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-		animation: pulse 2s ease-in-out infinite;
-	}
-
-	.device-stats {
+	.factor-content {
+		flex: 1;
 		display: flex;
-		gap: 2rem;
-		margin-bottom: 2rem;
-		padding: 1.5rem;
-		background: var(--neural-glass);
-		border-radius: 12px;
-		border: 1px solid var(--neural-border);
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 
-	.stat-item {
+	.factor-label {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: #e2e8f0;
+	}
+
+	.factor-value {
+		font-size: 0.75rem;
+		color: #94a3b8;
+	}
+
+	.factor-score {
+		padding: 0.25rem 0.5rem;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		min-width: 30px;
+		text-align: center;
+	}
+
+	.factor-score.score-good {
+		background: rgba(76, 175, 80, 0.2);
+		color: #4caf50;
+	}
+
+	.factor-score.score-ok {
+		background: rgba(255, 193, 7, 0.2);
+		color: #ffc107;
+	}
+
+	.factor-score.score-poor {
+		background: rgba(244, 67, 54, 0.2);
+		color: #f44336;
+	}
+
+	/* Monthly Overview Card */
+	.monthly-overview {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.monthly-summary {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
+	}
+
+	.monthly-targets {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.target-item {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
 	}
 
-	.stat-number {
-		font-size: 1.2rem;
-		font-weight: 300;
-		color: var(--neural-text);
-		letter-spacing: 0.01em;
+	.target-label {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: #e2e8f0;
 	}
 
-	.stat-label {
-		font-size: 0.8rem;
-		opacity: 0.7;
-		font-weight: 300;
-		letter-spacing: 0.02em;
-	}
-
-	.device-actions,
-	.device-connect {
+	.target-progress {
 		display: flex;
-		gap: 1rem;
-		flex-wrap: wrap;
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 
-	/* Buttons */
-	.btn-connect {
-		background: var(--neural-gradient);
-		border: none;
-		padding: 1rem 2rem;
-		border-radius: 12px;
-		color: white;
-		font-weight: 300;
-		letter-spacing: 0.02em;
-		cursor: pointer;
-		transition: all var(--neural-transition);
-		flex: 1;
-		min-width: 160px;
+	.progress-text {
+		font-size: 0.75rem;
+		color: #94a3b8;
+		text-align: right;
 	}
 
-	.btn-connect:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
-	}
-
-	.btn-sync {
-		background: var(--neural-glass);
-		border: 1px solid var(--neural-border);
-		padding: 0.75rem 1.25rem;
-		border-radius: 8px;
-		color: var(--neural-text);
-		font-weight: 300;
-		letter-spacing: 0.01em;
-		cursor: pointer;
-		transition: all var(--neural-transition);
-		font-size: 0.9rem;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.btn-sync:hover {
-		background: var(--neural-hover);
-		transform: translateY(-2px);
-	}
-
-	.btn-disconnect {
-		background: rgba(255, 107, 53, 0.2);
-		border: 1px solid rgba(255, 107, 53, 0.3);
-		padding: 0.75rem 1.25rem;
-		border-radius: 8px;
-		color: #ff6b35;
-		font-weight: 300;
-		letter-spacing: 0.01em;
-		cursor: pointer;
-		transition: all var(--neural-transition);
-		font-size: 0.9rem;
-	}
-
-	.btn-disconnect:hover {
-		background: rgba(255, 107, 53, 0.3);
-		transform: translateY(-2px);
-	}
-
-	/* Status Banner */
-	.status-banner {
-		position: fixed;
-		top: 80px;
-		left: 50%;
-		transform: translateX(-50%);
-		z-index: 1000;
-		padding: 1.25rem 2rem;
-		border-radius: 12px;
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		backdrop-filter: blur(20px);
-		box-shadow: var(--neural-shadow);
-		animation: slideDown 0.3s ease;
-		font-weight: 300;
-		letter-spacing: 0.01em;
-	}
-
-	.status-banner.success {
-		background: rgba(76, 175, 80, 0.9);
-		border: 1px solid rgba(76, 175, 80, 0.5);
-	}
-
-	.status-banner.error {
-		background: rgba(255, 68, 68, 0.9);
-		border: 1px solid rgba(255, 68, 68, 0.5);
-	}
-
-	@keyframes slideDown {
-		from {
-			opacity: 0;
-			transform: translateX(-50%) translateY(-20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateX(-50%) translateY(0);
-		}
-	}
-
-	/* Responsive Design */
-	@media (min-width: 768px) {
-		.metric-cards {
-			grid-template-columns: 1fr 1fr;
-		}
-
-		.device-grid {
-			grid-template-columns: 1fr 1fr;
-		}
-
-		.volume-stats {
-			gap: 3rem;
-		}
-
-		.device-actions {
-			flex-wrap: nowrap;
-		}
-	}
-
-	@media (min-width: 1024px) {
-		.metric-cards {
-			grid-template-columns: 2fr 1fr 1fr;
-		}
-
-		.device-grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
-
-		.dashboard-container {
-			padding: 0;
-		}
-
-		.performance-overview,
-		.recent-activities,
-		.upcoming-workouts,
-		.device-integrations {
-			padding: 2.5rem 3rem;
-		}
-
-		.top-nav {
-			padding: 1rem 3rem;
-		}
-	}
-
-	/* Mobile Responsive Design */
+	/* Mobile Responsiveness - Step 4 */
 	@media (max-width: 768px) {
-		.top-nav {
-			padding: 1rem;
-			flex-wrap: wrap;
+		/* Neural Container */
+		.neural-container {
+			padding: 0 1rem;
+		}
+
+		/* Dashboard Header */
+		.neural-dashboard-header {
+			padding: 1rem 0;
+		}
+
+		.dashboard-title-section {
+			flex-direction: column;
+			align-items: flex-start;
 			gap: 1rem;
 		}
 
-		.nav-menu {
-			order: 3;
+		.neural-logo-small {
+			align-self: center;
+		}
+
+		.athlete-status {
+			text-align: center;
 			width: 100%;
-			justify-content: flex-start;
-			overflow-x: auto;
-			padding: 0.5rem 0;
+		}
+
+		.dashboard-title {
+			font-size: 1.25rem;
+		}
+
+		/* Dashboard Content */
+		.neural-dashboard-content {
+			padding: 1rem;
+		}
+
+		/* Dashboard Grid - Symmetrical */
+		.neural-dashboard-grid-symmetrical {
+			padding: 0 1rem;
+		}
+
+		.grid-row {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+
+		.grid-row .neural-card {
+			min-height: 350px;
+		}
+
+		/* Neural Cards */
+		.neural-card {
+			padding: 1.25rem;
+			border-radius: 12px;
+		}
+
+		.neural-card-header {
+			margin-bottom: 1.25rem;
+			padding-bottom: 0.75rem;
+		}
+
+		.card-title {
+			font-size: 1rem;
+		}
+
+		/* Metrics Grid */
+		.neural-metrics-grid {
+			grid-template-columns: 1fr;
+			gap: 0.75rem;
+		}
+
+		.neural-metric-item {
+			padding: 0.75rem;
+		}
+
+		.neural-metric-value {
+			font-size: 1rem;
+		}
+
+		/* Zones */
+		.neural-zones-list {
+			gap: 0.5rem;
+		}
+
+		.neural-zone-item {
+			padding: 0.5rem;
+			gap: 0.75rem;
+		}
+
+		.zone-indicator {
+			width: 3px;
+			height: 25px;
+		}
+
+		.zone-header {
+			flex-direction: column;
+			align-items: flex-start;
 			gap: 0.25rem;
 		}
 
-		.nav-link {
-			flex-shrink: 0;
-			padding: 0.5rem 0.75rem;
-			white-space: nowrap;
+		/* Activities & Workouts */
+		.neural-activities-list,
+		.neural-workouts-list {
+			gap: 0.75rem;
 		}
 
-		.nav-link span {
-			font-size: 0.9rem;
-		}
-
-		.action-cards {
-			grid-template-columns: 1fr;
-			gap: 1rem;
-		}
-
-		.action-card {
-			padding: 1rem;
-		}
-
-		.action-icon {
+		.neural-activity-item,
+		.neural-workout-item {
 			padding: 0.75rem;
+			gap: 0.75rem;
+		}
+
+		.activity-sport-icon,
+		.workout-sport-icon {
+			width: 32px;
+			height: 32px;
+			font-size: 1rem;
+		}
+
+		.activity-main,
+		.workout-main {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.25rem;
+		}
+
+		.neural-activity-metrics,
+		.neural-workout-metrics {
+			flex-wrap: wrap;
+			gap: 0.25rem;
+		}
+
+		.metric-chip {
+			font-size: 0.7rem;
+			padding: 0.2rem 0.4rem;
+		}
+
+		/* Buttons - No live training functionality */
+	}
+
+	/* Tablet Responsiveness */
+	@media (max-width: 1024px) and (min-width: 769px) {
+		.grid-row {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 1.5rem;
+		}
+
+		.grid-row .neural-card {
+			min-height: 380px;
 		}
 	}
 
-	@media (max-width: 480px) {
-		.nav-link span {
-			display: none;
+	/* Large Desktop */
+	@media (min-width: 1400px) {
+		.neural-container {
+			max-width: 1400px;
 		}
-		.nav-link {
+
+		.grid-row {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		.grid-row .neural-card {
+			min-height: 420px;
+		}
+	}
+
+	/* Landscape Phone */
+	@media (max-width: 768px) and (orientation: landscape) {
+		.neural-dashboard-header {
+			padding: 0.75rem 0;
+		}
+
+		.dashboard-title-section {
+			flex-direction: row;
+			align-items: center;
+		}
+	}
+
+	/* Extra Small Phones */
+	@media (max-width: 480px) {
+		.neural-container {
+			padding: 0 0.75rem;
+		}
+
+		.neural-dashboard-content {
 			padding: 0.75rem;
+		}
+
+		.neural-card {
+			padding: 1rem;
+		}
+
+		.dashboard-title {
+			font-size: 1.125rem;
+		}
+
+		.factor-item {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.5rem;
+		}
+
+		.factor-text {
+			order: 1;
+		}
+
+		.factor-score {
+			order: 2;
+			align-self: flex-start;
+		}
+
+		.factor-icon {
+			order: 0;
+			align-self: center;
 		}
 	}
 </style>

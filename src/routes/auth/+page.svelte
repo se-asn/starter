@@ -22,8 +22,8 @@
 		// Check URL parameters for demo mode
 		const urlParams = new URLSearchParams(window.location.search);
 		if (urlParams.get('mode') === 'demo') {
-			email = 'demo@example.com';
-			password = 'demo123';
+			email = 'demo@laufplanerpro.de';
+			password = 'Demo123!';
 		}
 
 		// Redirect if already authenticated (browser only)
@@ -42,6 +42,50 @@
 		success = '';
 	}
 
+	function fillDemoCredentials() {
+		email = 'demo@laufplanerpro.de';
+		password = 'Demo123!';
+		error = '';
+		success = 'Demo credentials loaded! Click "Neural Login" to proceed.';
+	}
+
+	async function handleDemoLogin() {
+		loading = true;
+		error = '';
+		success = '';
+
+		try {
+			// For demo purposes, create a mock session
+			const demoUser = {
+				id: 'demo-user-123',
+				email: 'demo@laufplanerpro.de',
+				user_metadata: { name: 'Demo User' },
+				created_at: new Date().toISOString()
+			};
+
+			const demoSession = {
+				access_token: 'demo-token-123',
+				user: demoUser
+			};
+
+			// Store demo session
+			localStorage.setItem('authToken', demoSession.access_token);
+			localStorage.setItem('user', JSON.stringify(demoUser));
+			localStorage.setItem('demoMode', 'true');
+
+			success = 'Demo session established! Accessing dashboard...';
+
+			setTimeout(() => {
+				goto('/dashboard');
+			}, 1500);
+		} catch (error) {
+			console.error('Demo login error:', error);
+			error = 'Demo login failed. Please try again.';
+		} finally {
+			loading = false;
+		}
+	}
+
 	async function handleSubmit() {
 		if (loading) return;
 
@@ -51,11 +95,59 @@
 		try {
 			if (isLogin) {
 				console.log('🔐 Attempting login with:', email);
-				const { data, error: authError } = await supabase.auth.signInWithPassword({
-					email,
-					password
-				});
-				console.log('🔐 Login result:', { data, error: authError });
+
+				let data: any;
+				let authError: any;
+
+				// Special handling for demo user
+				if (email === 'demo@laufplanerpro.de' && password === 'Demo123!') {
+					console.log('🔐 Demo login detected, ensuring demo user exists...');
+
+					// First try to sign in
+					const loginResult = await supabase.auth.signInWithPassword({
+						email,
+						password
+					});
+					data = loginResult.data;
+					authError = loginResult.error;
+
+					// If login fails, try to create the demo user
+					if (authError && authError.message.includes('Invalid login credentials')) {
+						console.log('🔐 Demo user not found, creating...');
+						const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+							email,
+							password,
+							options: {
+								data: { name: 'Demo User' }
+							}
+						});
+
+						if (signUpData.user && !signUpError) {
+							console.log('🔐 Demo user created, attempting login...');
+							// Try to sign in again
+							const secondLoginResult = await supabase.auth.signInWithPassword({
+								email,
+								password
+							});
+							data = secondLoginResult.data;
+							authError = secondLoginResult.error;
+						} else {
+							error = signUpError?.message || 'Failed to create demo user';
+							loading = false;
+							return;
+						}
+					}
+
+					console.log('🔐 Demo login result:', { data, error: authError });
+				} else {
+					// Regular login for non-demo users
+					const loginResult = await supabase.auth.signInWithPassword({
+						email,
+						password
+					});
+					data = loginResult.data;
+					authError = loginResult.error;
+				}
 
 				if (data.user && !authError) {
 					// Store user session data
@@ -110,12 +202,6 @@
 		}
 
 		loading = false;
-	}
-
-	function handleDemoLogin() {
-		email = 'demo@example.com';
-		password = 'demo123';
-		handleSubmit();
 	}
 </script>
 

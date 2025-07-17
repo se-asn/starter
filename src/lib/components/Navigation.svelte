@@ -10,6 +10,16 @@
 	// Initialize user data only on client side
 	onMount(async () => {
 		if (browser) {
+			// Check for demo mode first
+			const demoMode = localStorage.getItem('demoMode');
+			const storedUser = localStorage.getItem('user');
+
+			if (demoMode === 'true' && storedUser) {
+				user = JSON.parse(storedUser);
+				return;
+			}
+
+			// Regular Supabase auth
 			const {
 				data: { user: currentUser }
 			} = await supabase.auth.getUser();
@@ -18,7 +28,14 @@
 	});
 
 	async function logout() {
-		await supabase.auth.signOut();
+		// Check if demo mode
+		if (localStorage.getItem('demoMode') === 'true') {
+			localStorage.removeItem('demoMode');
+			localStorage.removeItem('user');
+			localStorage.removeItem('authToken');
+		} else {
+			await supabase.auth.signOut();
+		}
 		goto('/auth');
 	}
 

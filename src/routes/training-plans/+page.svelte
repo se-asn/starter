@@ -2,11 +2,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import Navigation from '$lib/components/Navigation.svelte';
 
 	let user = null;
+	let action = '';
+	let focus = '';
 
 	onMount(() => {
+		// Check URL params
+		action = $page.url.searchParams.get('action') || '';
+		focus = $page.url.searchParams.get('focus') || '';
+
 		// Check authentication
 		const token = localStorage.getItem('authToken');
 		if (!token) {
@@ -18,7 +25,24 @@
 		if (userData) {
 			user = JSON.parse(userData);
 		}
+
+		// Handle auto-actions
+		if (action === 'add') {
+			setTimeout(() => addNewWorkout(), 100);
+		} else if (focus === 'test') {
+			setTimeout(() => planTest(), 100);
+		}
 	});
+
+	function addNewWorkout() {
+		alert('Neues Workout erstellen...');
+		// Here would be workout creation logic
+	}
+
+	function planTest() {
+		alert('FTP/Zone-Test planen...');
+		// Here would be test planning logic
+	}
 </script>
 
 <svelte:head>

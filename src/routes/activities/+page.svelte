@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { supabase } from '$lib/supabase';
 
 	import Navigation from '$lib/components/Navigation.svelte';
 
 	// Authentication
 	let user = null;
+	let action = '';
 
 	// Sample Activities Data
 	let activities = [
@@ -115,6 +117,9 @@
 	$: totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
 
 	onMount(async () => {
+		// Check URL params for action
+		action = $page.url.searchParams.get('action') || '';
+
 		if (typeof window !== 'undefined') {
 			const {
 				data: { user: currentUser }
@@ -161,6 +166,16 @@
 		if (currentPage > 0) {
 			currentPage--;
 		}
+	}
+
+	function addNewActivity() {
+		alert('Neue Aktivität erstellen...');
+		// Here would be activity creation logic
+	}
+
+	// Auto-add mode
+	if (action === 'add') {
+		setTimeout(() => addNewActivity(), 100);
 	}
 </script>
 
