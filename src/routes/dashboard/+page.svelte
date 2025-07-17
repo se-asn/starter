@@ -4,6 +4,7 @@
 	import { supabase } from '$lib/supabase';
 	import { browser } from '$app/environment';
 	import Navigation from '$lib/components/Navigation.svelte';
+	import { t, lang } from '$lib/i18n';
 
 	// Basic state
 	let user: any = null;
@@ -15,7 +16,7 @@
 		age: 32,
 		location: 'Frankfurt, Germany',
 		discipline: 'Triathlon',
-		experience: '8 Jahre',
+		experience: '8 Years',
 		currentWeight: 72.5, // kg
 		targetWeight: 71.0, // kg
 		bodyFat: 8.2, // %
@@ -78,7 +79,7 @@
 		{
 			id: 1,
 			sport: 'swim',
-			type: 'Schwellwert-Training',
+			type: 'Threshold Training',
 			duration: '01:15:30',
 			distance: '3.2km',
 			tss: 68,
@@ -89,14 +90,14 @@
 			pool: '50m',
 			calories: 420,
 			equipment: 'Paddles, Pull-Buoy',
-			feeling: 'Sehr gut',
+			feeling: 'Excellent',
 			effort: 8,
-			notes: 'Perfekte Technik, neue PR auf 200m'
+			notes: 'Perfect technique, new PR on 200m'
 		},
 		{
 			id: 2,
 			sport: 'bike',
-			type: 'FTP Test + Ausdauer',
+			type: 'FTP Test + Endurance',
 			duration: '02:45:15',
 			distance: '95km',
 			tss: 142,
@@ -110,15 +111,15 @@
 			intensityFactor: 0.89,
 			cadence: 92,
 			temperature: '24°C',
-			equipment: 'Zeitfahrrad, PowerMeter',
-			feeling: 'Stark',
+			equipment: 'Time Trial Bike, PowerMeter',
+			feeling: 'Strong',
 			effort: 9,
-			notes: 'Neue FTP: 315W! Perfekte Aerodynamik'
+			notes: 'New FTP: 315W! Perfect aerodynamics'
 		},
 		{
 			id: 3,
 			sport: 'run',
-			type: 'Tempo-Lauf + Cool-Down',
+			type: 'Tempo Run + Cool-Down',
 			duration: '01:35:20',
 			distance: '18km',
 			tss: 89,
@@ -136,12 +137,12 @@
 			equipment: 'Carbon-Laufschuhe',
 			feeling: 'Perfekt',
 			effort: 7,
-			notes: 'Gleichmäßige Splits, perfekte Ausführung'
+			notes: 'Even splits, perfect execution'
 		},
 		{
 			id: 4,
 			sport: 'bike',
-			type: 'Regeneration',
+			type: 'Recovery',
 			duration: '01:20:00',
 			distance: '35km',
 			tss: 28,
@@ -151,12 +152,12 @@
 			avgHR: 142,
 			feeling: 'Entspannt',
 			effort: 3,
-			notes: 'Lockere Regenerationsfahrt'
+			notes: 'Easy recovery ride'
 		},
 		{
 			id: 5,
 			sport: 'swim',
-			type: 'Technik + Ausdauer',
+			type: 'Technique + Endurance',
 			duration: '01:05:00',
 			distance: '2.8km',
 			tss: 45,
@@ -164,9 +165,9 @@
 			avgPace: '1:38/100m',
 			strokeRate: 38,
 			drills: 'Einarmig, Wasserfassen',
-			feeling: 'Gut',
+			feeling: 'Good',
 			effort: 5,
-			notes: 'Fokus auf Technikverbesserung'
+			notes: 'Focus on technique improvement'
 		}
 	];
 
@@ -210,13 +211,13 @@
 			route: 'Main-Ufer Rundkurs',
 			nutrition: '3 gels, Electrolytes',
 			hydration: '750ml/hour',
-			equipment: 'Ausdauer-Laufschuhe',
+			equipment: 'Endurance Running Shoes',
 			priority: 'high'
 		},
 		{
 			id: 3,
 			sport: 'swim',
-			type: 'Wettkampftempo',
+			type: 'Race Pace',
 			duration: '01:30:00',
 			scheduled: '2025-07-14 06:30',
 			tssPlanned: 85,
@@ -236,7 +237,7 @@
 		{
 			id: 4,
 			sport: 'bike',
-			type: 'Regeneration',
+			type: 'Recovery',
 			duration: '01:00:00',
 			scheduled: '2025-07-14 17:00',
 			tssPlanned: 25,
@@ -335,25 +336,25 @@
 	// Button action functions
 	function updateZones() {
 		// Simulate zone update with new FTP test values
-		showNotification('Zonen werden aktualisiert basierend auf letzten Testdaten...');
+		showNotification('Updating zones based on latest test data...');
 		// Here you would normally call an API to recalculate zones
 	}
 
 	function planTest() {
 		// Navigate to test planning
-		showNotification('Weiterleitung zu Trainingsplanung...');
+		showNotification('Redirecting to training planning...');
 		setTimeout(() => goto('/training-plans?focus=test'), 500);
 	}
 
 	function analyzePerformance() {
 		// Navigate to detailed analytics
-		showNotification('Öffne detaillierte Leistungsanalyse...');
+		showNotification('Opening detailed performance analysis...');
 		setTimeout(() => goto('/analytics'), 500);
 	}
 
 	function addActivity() {
 		// Navigate to activity entry
-		showNotification('Neue Aktivität hinzufügen...');
+		showNotification('Adding new activity...');
 		setTimeout(() => goto('/activities?action=add'), 500);
 	}
 
@@ -365,25 +366,25 @@
 
 	function addWorkout() {
 		// Navigate to workout planner
-		showNotification('Neues Workout planen...');
+		showNotification('Planning new workout...');
 		setTimeout(() => goto('/training-plans?action=add'), 500);
 	}
 
 	function openCalendar() {
 		// Navigate to training calendar
-		showNotification('Trainingskalender öffnen...');
+		showNotification('Opening training calendar...');
 		setTimeout(() => goto('/calendar'), 500);
 	}
 
 	function viewMonthlyStats() {
 		// Navigate to monthly view
-		showNotification('Monatsstatistiken laden...');
+		showNotification('Loading monthly statistics...');
 		setTimeout(() => goto('/analytics?view=monthly'), 500);
 	}
 
 	function addRace() {
 		// Navigate to race planning
-		showNotification('Neuen Wettkampf hinzufügen...');
+		showNotification('Adding new race...');
 		setTimeout(() => goto('/races?action=add'), 500);
 	}
 
@@ -395,7 +396,7 @@
 
 	function viewYearlyStats() {
 		// Navigate to yearly overview
-		showNotification('Jahresübersicht laden...');
+		showNotification('Loading yearly overview...');
 		setTimeout(() => goto('/analytics?view=yearly'), 500);
 	}
 
@@ -522,6 +523,10 @@
 				}
 
 				user = currentUser;
+
+				// Check admin status
+				await checkAdminStatus();
+
 				mounted = true;
 				startAnimations();
 			} catch (error) {
@@ -530,6 +535,30 @@
 			}
 		}
 	});
+
+	// Check if user is admin
+	let isAdmin = false;
+
+	async function checkAdminStatus() {
+		try {
+			const {
+				data: { session }
+			} = await supabase.auth.getSession();
+			if (!session) return;
+
+			const response = await fetch('/api/admin', {
+				headers: {
+					Authorization: `Bearer ${session.access_token}`
+				}
+			});
+
+			const result = await response.json();
+			isAdmin = result.isAdmin || false;
+		} catch (error) {
+			console.error('Admin check error:', error);
+			isAdmin = false;
+		}
+	}
 
 	// Utility functions
 	function getSportIcon(sport: string): string {
@@ -590,6 +619,13 @@
 				</div>
 			</div>
 
+			<!-- Admin Access Button -->
+			{#if isAdmin}
+				<div class="admin-section">
+					<button class="admin-btn" on:click={() => goto('/admin')}> 🔧 Admin Dashboard </button>
+				</div>
+			{/if}
+
 			{#if particlesVisible}
 				<div class="neural-particles">
 					{#each Array(10) as _, i}
@@ -610,19 +646,19 @@
 				<div class="neural-card performance-card">
 					<div class="neural-card-header">
 						<div class="card-icon">⚡</div>
-						<h3 class="card-title">Leistungsmetriken</h3>
+						<h3 class="card-title">Performance Metrics</h3>
 						<div class="card-actions">
-							<button class="action-btn" title="Zonen aktualisieren" on:click={updateZones}
+							<button class="action-btn" title="Update Zones" on:click={updateZones}
 								>🔄</button
 							>
-							<button class="action-btn" title="Test planen" on:click={planTest}>📊</button>
+							<button class="action-btn" title="Plan Test" on:click={planTest}>📊</button>
 						</div>
 					</div>
 					<div class="neural-metrics-grid enhanced">
 						<div class="neural-metric-item">
 							<div class="metric-icon">💓</div>
 							<div class="metric-content">
-								<span class="neural-metric-label">Ruhe-HF</span>
+								<span class="neural-metric-label">Resting HR</span>
 								<span class="neural-metric-value"
 									>{athleteProfile.restingHR} <span class="metric-unit">bpm</span></span
 								>
@@ -632,7 +668,7 @@
 						<div class="neural-metric-item">
 							<div class="metric-icon">🔥</div>
 							<div class="metric-content">
-								<span class="neural-metric-label">Max HF</span>
+								<span class="neural-metric-label">Max HR</span>
 								<span class="neural-metric-value"
 									>{athleteProfile.maxHR} <span class="metric-unit">bpm</span></span
 								>
@@ -662,7 +698,7 @@
 						<div class="neural-metric-item">
 							<div class="metric-icon">🏃‍♂️</div>
 							<div class="metric-content">
-								<span class="neural-metric-label">Lauf-Schwelle</span>
+								<span class="neural-metric-label">Run Threshold</span>
 								<span class="neural-metric-value"
 									>{athleteProfile.runningFTP}<span class="metric-unit">/km</span></span
 								>
@@ -672,7 +708,7 @@
 						<div class="neural-metric-item">
 							<div class="metric-icon">🏊‍♂️</div>
 							<div class="metric-content">
-								<span class="neural-metric-label">Schwimm-CSS</span>
+								<span class="neural-metric-label">Swim CSS</span>
 								<span class="neural-metric-value"
 									>{athleteProfile.swimCSS}<span class="metric-unit">/100m</span></span
 								>
@@ -685,12 +721,12 @@
 				<div class="neural-card zones-card">
 					<div class="neural-card-header">
 						<div class="card-icon">🎯</div>
-						<h3 class="card-title">Trainingszonen</h3>
+						<h3 class="card-title">Training Zones</h3>
 						<div class="zone-switcher">
 							<button
 								class="zone-btn"
 								class:active={selectedZoneType === 'hr'}
-								on:click={() => switchZoneType('hr')}>HF</button
+								on:click={() => switchZoneType('hr')}>HR</button
 							>
 							<button
 								class="zone-btn"
@@ -734,9 +770,9 @@
 				<div class="neural-card trends-card">
 					<div class="neural-card-header">
 						<div class="card-icon">📈</div>
-						<h3 class="card-title">Leistungstrends</h3>
+						<h3 class="card-title">Performance Trends</h3>
 						<div class="card-actions">
-							<button class="action-btn" title="Detailanalyse" on:click={analyzePerformance}
+							<button class="action-btn" title="Detailed Analysis" on:click={analyzePerformance}
 								>🔬</button
 							>
 						</div>
@@ -793,12 +829,12 @@
 				<div class="neural-card activities-card">
 					<div class="neural-card-header">
 						<div class="card-icon">📋</div>
-						<h3 class="card-title">Letzte Aktivitäten</h3>
+						<h3 class="card-title">Recent Activities</h3>
 						<div class="card-actions">
-							<button class="action-btn" title="Aktivität hinzufügen" on:click={addActivity}
+							<button class="action-btn" title="Add Activity" on:click={addActivity}
 								>➕</button
 							>
-							<button class="action-btn" title="Alle anzeigen" on:click={viewAllActivities}
+							<button class="action-btn" title="View All" on:click={viewAllActivities}
 								>📊</button
 							>
 						</div>
@@ -853,9 +889,9 @@
 				<div class="neural-card workouts-card">
 					<div class="neural-card-header">
 						<div class="card-icon">📅</div>
-						<h3 class="card-title">Geplante Workouts</h3>
+						<h3 class="card-title">Planned Workouts</h3>
 						<div class="card-actions">
-							<button class="action-btn" title="Workout hinzufügen" on:click={addWorkout}>➕</button
+							<button class="action-btn" title="Add Workout" on:click={addWorkout}>➕</button
 							>
 							<button class="action-btn" title="Kalender öffnen" on:click={openCalendar}>📅</button>
 						</div>
@@ -876,9 +912,9 @@
 									<div class="workout-main">
 										<span class="neural-workout-type">{workout.type}</span>
 										<span class="neural-workout-time"
-											>{new Date(workout.scheduled).toLocaleDateString('de-DE')} um {new Date(
+											>{new Date(workout.scheduled).toLocaleDateString('en-US')} at {new Date(
 												workout.scheduled
-											).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span
+											).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span
 										>
 										<span
 											class="priority-badge"
@@ -922,7 +958,7 @@
 				<div class="neural-card stats-card">
 					<div class="neural-card-header">
 						<div class="card-icon">📊</div>
-						<h3 class="card-title">Wochenstatistik</h3>
+						<h3 class="card-title">Weekly Statistics</h3>
 						<div class="card-actions">
 							<button class="action-btn" title="Monatsansicht" on:click={viewMonthlyStats}
 								>📈</button
@@ -933,11 +969,11 @@
 						<div class="stats-summary">
 							<div class="summary-item">
 								<span class="summary-value">{weeklyStats.totalTime}</span>
-								<span class="summary-label">Trainingszeit</span>
+								<span class="summary-label">Training Time</span>
 							</div>
 							<div class="summary-item">
 								<span class="summary-value">{weeklyStats.totalDistance}km</span>
-								<span class="summary-label">Distanz</span>
+								<span class="summary-label">Distance</span>
 							</div>
 							<div class="summary-item">
 								<span class="summary-value">{weeklyStats.totalTSS}</span>
@@ -945,7 +981,7 @@
 							</div>
 							<div class="summary-item">
 								<span class="summary-value">{weeklyStats.activities}</span>
-								<span class="summary-label">Einheiten</span>
+								<span class="summary-label">Sessions</span>
 							</div>
 						</div>
 						<div class="sport-breakdown">
@@ -972,9 +1008,9 @@
 				<div class="neural-card races-card">
 					<div class="neural-card-header">
 						<div class="card-icon">🏆</div>
-						<h3 class="card-title">Wettkämpfe & Ziele</h3>
+						<h3 class="card-title">Races & Goals</h3>
 						<div class="card-actions">
-							<button class="action-btn" title="Wettkampf hinzufügen" on:click={addRace}>➕</button>
+							<button class="action-btn" title="Add Race" on:click={addRace}>➕</button>
 						</div>
 					</div>
 					<div class="races-list">
@@ -1018,7 +1054,7 @@
 				<div class="neural-card recovery-card">
 					<div class="neural-card-header">
 						<div class="card-icon">🧘‍♂️</div>
-						<h3 class="card-title">Regeneration & Bereitschaft</h3>
+						<h3 class="card-title">Recovery & Readiness</h3>
 						<div class="card-actions">
 							<button class="action-btn" title="Details" on:click={viewRecoveryDetails}>📊</button>
 						</div>
@@ -1042,7 +1078,7 @@
 											3
 									)}</span
 								>
-								<span class="score-label">Bereitschaft</span>
+								<span class="score-label">Readiness</span>
 							</div>
 						</div>
 						<div class="readiness-factors">
@@ -1120,9 +1156,9 @@
 				<div class="neural-card monthly-card">
 					<div class="neural-card-header">
 						<div class="card-icon">📅</div>
-						<h3 class="card-title">Monatsübersicht</h3>
+						<h3 class="card-title">Monthly Overview</h3>
 						<div class="card-actions">
-							<button class="action-btn" title="Jahresansicht" on:click={viewYearlyStats}>📆</button
+							<button class="action-btn" title="Yearly View" on:click={viewYearlyStats}>📆</button
 							>
 						</div>
 					</div>
@@ -1130,11 +1166,11 @@
 						<div class="monthly-summary">
 							<div class="summary-item">
 								<span class="summary-value">{monthlyStats.totalTime}</span>
-								<span class="summary-label">Gesamtzeit</span>
+								<span class="summary-label">Total Time</span>
 							</div>
 							<div class="summary-item">
 								<span class="summary-value">{monthlyStats.totalDistance}km</span>
-								<span class="summary-label">Distanz</span>
+								<span class="summary-label">Distance</span>
 							</div>
 							<div class="summary-item">
 								<span class="summary-value">{monthlyStats.totalTSS}</span>
@@ -1142,12 +1178,12 @@
 							</div>
 							<div class="summary-item">
 								<span class="summary-value">{monthlyStats.activities}</span>
-								<span class="summary-label">Einheiten</span>
+								<span class="summary-label">Sessions</span>
 							</div>
 						</div>
 						<div class="monthly-targets">
 							<div class="target-item">
-								<span class="target-label">Monatsziel</span>
+								<span class="target-label">Monthly Goal</span>
 								<div class="target-progress">
 									<div class="progress-bar">
 										<div
@@ -1213,6 +1249,36 @@
 		align-items: center;
 		position: relative;
 		z-index: 2;
+	}
+
+	.admin-section {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		position: relative;
+		z-index: 3;
+	}
+
+	.admin-btn {
+		background: var(--neural-gradient);
+		border: none;
+		color: white;
+		padding: 0.75rem 1.5rem;
+		border-radius: 12px;
+		cursor: pointer;
+		font-size: 0.9rem;
+		font-weight: 300;
+		letter-spacing: 0.02em;
+		transition: all var(--neural-transition);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+	}
+
+	.admin-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 24px rgba(0, 212, 255, 0.4);
 	}
 
 	.neural-logo-small {

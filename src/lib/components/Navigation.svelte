@@ -28,14 +28,16 @@
 	});
 
 	async function logout() {
-		// Check if demo mode
-		if (localStorage.getItem('demoMode') === 'true') {
-			localStorage.removeItem('demoMode');
-			localStorage.removeItem('user');
-			localStorage.removeItem('authToken');
-		} else {
+		// Clean up localStorage for both demo and real users
+		localStorage.removeItem('demoMode');
+		localStorage.removeItem('user');
+		localStorage.removeItem('authToken');
+		
+		// Also sign out from Supabase if not demo mode
+		if (localStorage.getItem('demoMode') !== 'true') {
 			await supabase.auth.signOut();
 		}
+		
 		goto('/auth');
 	}
 

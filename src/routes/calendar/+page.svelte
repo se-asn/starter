@@ -30,7 +30,7 @@
 
 <svelte:head>
 	<title>Calendar - LaufplanerPro</title>
-	<meta name="description" content="Trainingskalender und Terminplanung" />
+	<meta name="description" content="Training calendar and schedule planning" />
 </svelte:head>
 
 {#if mounted}
@@ -39,8 +39,8 @@
 	<div class="calendar-page">
 		<div class="container">
 			<header class="page-header">
-				<h1>📅 Trainingskalender</h1>
-				<p>Planen und verwalten Sie Ihre Trainings und Wettkämpfe</p>
+				<h1>📅 Training Calendar</h1>
+				<p>Plan and manage your training sessions and races</p>
 			</header>
 
 			<div class="calendar-container">
@@ -110,8 +110,8 @@
 					<div class="quick-actions">
 						<h3>⚡ Quick Actions</h3>
 						<button class="action-button">+ Workout hinzufügen</button>
-						<button class="action-button">+ Wettkampf planen</button>
-						<button class="action-button">📊 Trainingsanalyse</button>
+						<button class="action-button">+ Plan Race</button>
+						<button class="action-button">📊 Training Analysis</button>
 					</div>
 				</div>
 			</div>

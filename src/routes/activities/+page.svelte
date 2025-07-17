@@ -121,6 +121,17 @@
 		action = $page.url.searchParams.get('action') || '';
 
 		if (typeof window !== 'undefined') {
+			// Check for demo mode first
+			if (localStorage.getItem('demoMode') === 'true') {
+				user = { 
+					id: '00000000-0000-0000-0000-000000000123',
+					email: 'demo@laufplanerpro.de', 
+					name: 'Alex Mueller' 
+				};
+				return;
+			}
+
+			// Regular Supabase auth
 			const {
 				data: { user: currentUser }
 			} = await supabase.auth.getUser();

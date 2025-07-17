@@ -133,6 +133,14 @@
 
 	onMount(async () => {
 		if (typeof window !== 'undefined') {
+			// Check for demo mode first
+			if (localStorage.getItem('demoMode') === 'true') {
+				user = { email: 'demo@laufplanerpro.de', name: 'Demo User' };
+				console.log('✅ API Integrations page loaded for demo user:', user);
+				return;
+			}
+
+			// Regular Supabase auth
 			const {
 				data: { user: currentUser }
 			} = await supabase.auth.getUser();

@@ -97,25 +97,25 @@
 			]
 		},
 		{
-			category: 'Aktive Erholung',
+			category: 'Active Recovery',
 			icon: '🧘',
-			title: 'Regenerative Maßnahmen',
+			title: 'Regenerative Measures',
 			tips: [
-				'Yoga oder Stretching',
-				'Leichte Schwimmeinheiten',
-				'Spaziergänge in der Natur',
-				'Atemübungen praktizieren'
+				'Yoga or stretching',
+				'Light swimming sessions',
+				'Nature walks',
+				'Practice breathing exercises'
 			]
 		},
 		{
-			category: 'Therapie',
+			category: 'Therapy',
 			icon: '💆',
-			title: 'Professionelle Unterstützung',
+			title: 'Professional Support',
 			tips: [
-				'Regelmäßige Massage',
-				'Physiotherapie bei Bedarf',
-				'Kältetherapie/Eisbad',
-				'Kompressionskleidung nutzen'
+				'Regular massage',
+				'Physiotherapy when needed',
+				'Cold therapy/ice bath',
+				'Use compression wear'
 			]
 		}
 	];

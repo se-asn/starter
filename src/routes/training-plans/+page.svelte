@@ -14,16 +14,25 @@
 		action = $page.url.searchParams.get('action') || '';
 		focus = $page.url.searchParams.get('focus') || '';
 
-		// Check authentication
-		const token = localStorage.getItem('authToken');
-		if (!token) {
-			goto('/auth');
-			return;
-		}
+		// Check authentication - support both demo and real users
+		if (localStorage.getItem('demoMode') === 'true') {
+			// Demo mode
+			const userData = localStorage.getItem('user');
+			if (userData) {
+				user = JSON.parse(userData);
+			}
+		} else {
+			// Check for authToken (real users)
+			const token = localStorage.getItem('authToken');
+			if (!token) {
+				goto('/auth');
+				return;
+			}
 
-		const userData = localStorage.getItem('user');
-		if (userData) {
-			user = JSON.parse(userData);
+			const userData = localStorage.getItem('user');
+			if (userData) {
+				user = JSON.parse(userData);
+			}
 		}
 
 		// Handle auto-actions
@@ -35,12 +44,12 @@
 	});
 
 	function addNewWorkout() {
-		alert('Neues Workout erstellen...');
+		alert('Creating new workout...');
 		// Here would be workout creation logic
 	}
 
 	function planTest() {
-		alert('FTP/Zone-Test planen...');
+		alert('Planning FTP/Zone test...');
 		// Here would be test planning logic
 	}
 </script>

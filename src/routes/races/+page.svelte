@@ -61,21 +61,34 @@
 	onMount(async () => {
 		// Check URL params for action
 		action = $page.url.searchParams.get('action') || '';
+		
+		// Check authentication - support both demo and real users
+		if (localStorage.getItem('demoMode') === 'true') {
+			// Demo mode - user is set from localStorage in dashboard
+		} else {
+			// Check for authToken (real users)
+			const token = localStorage.getItem('authToken');
+			if (!token) {
+				goto('/auth');
+				return;
+			}
+		}
+		
 		mounted = true;
 	});
 
 	function addNewRace() {
-		alert('Wettkampf-Formular wird geöffnet...');
+		alert('Opening race form...');
 		// Here would be race creation logic
 	}
 
 	function editRace(raceId: number) {
-		alert(`Wettkampf ${raceId} bearbeiten...`);
+		alert(`Editing race ${raceId}...`);
 		// Here would be race editing logic
 	}
 
 	function deleteRace(raceId: number) {
-		if (confirm('Wettkampf wirklich löschen?')) {
+		if (confirm('Really delete this race?')) {
 			races = races.filter((race) => race.id !== raceId);
 		}
 	}
@@ -116,8 +129,8 @@
 
 <main class="races-page">
 	<div class="page-header">
-		<h1>🏆 Wettkampfplanung</h1>
-		<button class="add-btn" on:click={addNewRace}> ➕ Neuer Wettkampf </button>
+		<h1>🏆 Race Planning</h1>
+		<button class="add-btn" on:click={addNewRace}> ➕ New Race </button>
 	</div>
 
 	<div class="races-grid">

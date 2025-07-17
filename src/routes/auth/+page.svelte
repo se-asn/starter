@@ -1,20 +1,148 @@
-<!-- Smart Triathlete Neural Authentication -->
+<!-- LaufplanerPro - Professional Athlete Application System -->
 
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { supabase } from '$lib/supabase';
+	import { en } from '$lib/i18n/en';
 
-	let isLogin = true;
+	// Use English language pack
+	const t = en;
+
+	let currentStep = 'login'; // 'login', 'apply', 'submitted'
 	let email = '';
 	let password = '';
-	let confirmPassword = '';
-	let name = '';
 	let loading = false;
 	let error = '';
 	let success = '';
 	let mounted = false;
+
+	// Application form data
+	interface ApplicationData {
+		[key: string]: string | string[];
+		// Personal Info
+		firstName: string;
+		lastName: string;
+		email: string;
+		phone: string;
+		birthDate: string;
+		gender: string;
+		location: string;
+
+		// Athletic Background
+		experience: string; // years
+		primaryDiscipline: string; // triathlon, running, cycling, swimming
+		currentLevel: string; // beginner, amateur, competitive, elite
+		weeklyTrainingHours: string;
+
+		// Performance Data
+		bestMarathonTime: string;
+		bestHalfMarathonTime: string;
+		best10kTime: string;
+		best5kTime: string;
+		bestIronmanTime: string;
+		bestOlympicTriTime: string;
+		bestSprintTriTime: string;
+
+		// Physiological Data
+		restingHR: string;
+		maxHR: string;
+		ftp: string; // watts
+		ltHR: string; // lactate threshold HR
+		vo2Max: string;
+		weight: string;
+		height: string;
+		bodyFat: string;
+
+		// Swimming Data
+		best50mFree: string;
+		best100mFree: string;
+		best1500mFree: string;
+		swimCSS: string; // Critical Swim Speed
+
+		// Goals & Motivation
+		goals2025: string;
+		targetRaces: string;
+		motivation: string;
+		expectations: string;
+
+		// Equipment & Technology
+		devices: string[]; // garmin, wahoo, polar, strava, etc.
+		trainingApps: string[];
+		equipment: string; // bike type, wetsuit, etc.
+
+		// Additional Info
+		injuries: string;
+		medications: string;
+		coach: string;
+		teamClub: string;
+		socialMedia: string;
+		referralSource: string;
+		additionalInfo: string;
+	}
+
+	let applicationData: ApplicationData = {
+		// Personal Info
+		firstName: '',
+		lastName: '',
+		email: '',
+		phone: '',
+		birthDate: '',
+		gender: '',
+		location: '',
+
+		// Athletic Background
+		experience: '', // years
+		primaryDiscipline: '', // triathlon, running, cycling, swimming
+		currentLevel: '', // beginner, amateur, competitive, elite
+		weeklyTrainingHours: '',
+
+		// Performance Data
+		bestMarathonTime: '',
+		bestHalfMarathonTime: '',
+		best10kTime: '',
+		best5kTime: '',
+		bestIronmanTime: '',
+		bestOlympicTriTime: '',
+		bestSprintTriTime: '',
+
+		// Physiological Data
+		restingHR: '',
+		maxHR: '',
+		ftp: '', // watts
+		ltHR: '', // lactate threshold HR
+		vo2Max: '',
+		weight: '',
+		height: '',
+		bodyFat: '',
+
+		// Swimming Data
+		best50mFree: '',
+		best100mFree: '',
+		best1500mFree: '',
+		swimCSS: '', // Critical Swim Speed
+
+		// Goals & Motivation
+		goals2025: '',
+		targetRaces: '',
+		motivation: '',
+		expectations: '',
+
+		// Equipment & Technology
+		devices: [], // garmin, wahoo, polar, strava, etc.
+		trainingApps: [],
+		equipment: '', // bike type, wetsuit, etc.
+
+		// Additional Info
+		injuries: '',
+		medications: '',
+		coach: '',
+		teamClub: '',
+		socialMedia: '',
+		referralSource: '',
+		additionalInfo: ''
+	};
 
 	onMount(() => {
 		mounted = true;
@@ -36,8 +164,14 @@
 		}
 	});
 
-	function toggleMode() {
-		isLogin = !isLogin;
+	function showApplicationForm() {
+		currentStep = 'apply';
+		error = '';
+		success = '';
+	}
+
+	function backToLogin() {
+		currentStep = 'login';
 		error = '';
 		success = '';
 	}
@@ -49,165 +183,162 @@
 		success = 'Demo credentials loaded! Click "Neural Login" to proceed.';
 	}
 
-	async function handleDemoLogin() {
+	async function handleLogin() {
 		loading = true;
 		error = '';
 		success = '';
 
 		try {
-			// For demo purposes, create a mock session
-			const demoUser = {
-				id: 'demo-user-123',
-				email: 'demo@laufplanerpro.de',
-				user_metadata: { name: 'Demo User' },
-				created_at: new Date().toISOString()
-			};
+			// Check for demo credentials
+			if (email === 'demo@laufplanerpro.de' && password === 'Demo123!') {
+				// Handle demo login - use real Supabase auth
+				const { data, error: demoError } = await supabase.auth.signInWithPassword({
+					email: 'demo@laufplanerpro.de',
+					password: 'Demo123!'
+				});
 
-			const demoSession = {
-				access_token: 'demo-token-123',
-				user: demoUser
-			};
+				if (demoError) {
+					error = 'Demo login failed: ' + demoError.message;
+					return;
+				}
 
-			// Store demo session
-			localStorage.setItem('authToken', demoSession.access_token);
-			localStorage.setItem('user', JSON.stringify(demoUser));
-			localStorage.setItem('demoMode', 'true');
+				if (data.user) {
+					// Set localStorage for compatibility with other pages
+					localStorage.setItem('authToken', data.session?.access_token || 'supabase_session');
+					localStorage.setItem('user', JSON.stringify({
+						email: data.user.email,
+						name: data.user.user_metadata?.name || 'Alex Mueller',
+						id: data.user.id
+					}));
+					localStorage.setItem('demoMode', 'true');
 
-			success = 'Demo session established! Accessing dashboard...';
+					success = 'Demo access granted! Loading dashboard...';
 
-			setTimeout(() => {
-				goto('/dashboard');
-			}, 1500);
-		} catch (error) {
-			console.error('Demo login error:', error);
-			error = 'Demo login failed. Please try again.';
+					setTimeout(() => {
+						goto('/dashboard');
+					}, 1500);
+				}
+				
+				loading = false;
+				return;
+			}
+
+			// Regular Supabase login for real users
+			const { data, error: loginError } = await supabase.auth.signInWithPassword({
+				email: email,
+				password: password
+			});
+
+			if (loginError) {
+				error = loginError.message;
+				return;
+			}
+
+			if (data.user) {
+				// Set localStorage for compatibility with other pages
+				localStorage.setItem('authToken', data.session?.access_token || 'supabase_session');
+				localStorage.setItem('user', JSON.stringify({
+					email: data.user.email,
+					name: data.user.user_metadata?.name || data.user.email,
+					id: data.user.id
+				}));
+				
+				success = 'Login successful! Redirecting...';
+				setTimeout(() => {
+					goto('/dashboard');
+				}, 1000);
+			}
+		} catch (e) {
+			console.error('Login error:', e);
+			error = 'An unexpected error occurred.';
 		} finally {
 			loading = false;
 		}
 	}
 
-	async function handleSubmit() {
-		if (loading) return;
-
+	async function submitApplication() {
 		loading = true;
 		error = '';
 		success = '';
-		try {
-			if (isLogin) {
-				console.log('🔐 Attempting login with:', email);
 
-				let data: any;
-				let authError: any;
+		// Validate required fields
+		const requiredFields = [
+			'firstName',
+			'lastName',
+			'email',
+			'phone',
+			'birthDate',
+			'experience',
+			'primaryDiscipline',
+			'currentLevel',
+			'goals2025',
+			'motivation'
+		];
 
-				// Special handling for demo user
-				if (email === 'demo@laufplanerpro.de' && password === 'Demo123!') {
-					console.log('🔐 Demo login detected, ensuring demo user exists...');
-
-					// First try to sign in
-					const loginResult = await supabase.auth.signInWithPassword({
-						email,
-						password
-					});
-					data = loginResult.data;
-					authError = loginResult.error;
-
-					// If login fails, try to create the demo user
-					if (authError && authError.message.includes('Invalid login credentials')) {
-						console.log('🔐 Demo user not found, creating...');
-						const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-							email,
-							password,
-							options: {
-								data: { name: 'Demo User' }
-							}
-						});
-
-						if (signUpData.user && !signUpError) {
-							console.log('🔐 Demo user created, attempting login...');
-							// Try to sign in again
-							const secondLoginResult = await supabase.auth.signInWithPassword({
-								email,
-								password
-							});
-							data = secondLoginResult.data;
-							authError = secondLoginResult.error;
-						} else {
-							error = signUpError?.message || 'Failed to create demo user';
-							loading = false;
-							return;
-						}
-					}
-
-					console.log('🔐 Demo login result:', { data, error: authError });
-				} else {
-					// Regular login for non-demo users
-					const loginResult = await supabase.auth.signInWithPassword({
-						email,
-						password
-					});
-					data = loginResult.data;
-					authError = loginResult.error;
-				}
-
-				if (data.user && !authError) {
-					// Store user session data
-					if (data.session?.access_token) {
-						localStorage.setItem('authToken', data.session.access_token);
-						console.log('🔐 Token stored:', data.session.access_token);
-					}
-					if (data.user) {
-						localStorage.setItem('user', JSON.stringify(data.user));
-						console.log('🔐 User stored:', data.user);
-					}
-					success = 'Neural connection established! Accessing dashboard...';
-					console.log('🔐 Redirecting to dashboard in 1500ms...');
-					setTimeout(() => {
-						console.log('🔐 Executing redirect to /dashboard');
-						goto('/dashboard');
-					}, 1500);
-				} else {
-					error = authError?.message || 'Authentication failed. Please verify your credentials.';
-				}
-			} else {
-				if (password !== confirmPassword) {
-					error = 'Password confirmation does not match.';
-					loading = false;
-					return;
-				}
-				const { data, error: regError } = await supabase.auth.signUp({
-					email,
-					password,
-					options: {
-						data: { name: name || 'Neural Athlete' }
-					}
-				});
-				if (data.user && !regError) {
-					// Store token and user data
-					if (data.session?.access_token) {
-						localStorage.setItem('authToken', data.session.access_token);
-					}
-					if (data.user) {
-						localStorage.setItem('user', JSON.stringify(data.user));
-					}
-					success = 'Account created successfully! Neural profile initialized.';
-					setTimeout(() => {
-						goto('/dashboard');
-					}, 2000);
-				} else {
-					error = regError?.message || 'Registration failed. Please try again.';
-				}
+		for (const field of requiredFields) {
+			if (!applicationData[field]) {
+				error = 'Bitte alle Pflichtfelder ausfüllen.';
+				loading = false;
+				return;
 			}
-		} catch (err) {
-			error = 'Network error. Please check your connection and try again.';
 		}
 
-		loading = false;
+		try {
+			// Submit application to API
+			const response = await fetch('/api/applications', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(applicationData)
+			});
+
+			const result = await response.json();
+
+			if (!response.ok) {
+				error = result.error || 'Error submitting application.';
+				return;
+			}
+
+			if (result.success) {
+				currentStep = 'submitted';
+				success = 'Application submitted successfully!';
+
+				// Store application ID for reference
+				localStorage.setItem('applicationId', result.applicationId);
+			} else {
+				error = result.error || 'Unknown error occurred.';
+			}
+		} catch (e) {
+			console.error('Application submission error:', e);
+			error = 'Network error. Please check your internet connection.';
+		} finally {
+			loading = false;
+		}
+	}
+
+	// Handle device selection
+	function toggleDevice(device: string) {
+		if (applicationData.devices.includes(device)) {
+			applicationData.devices = applicationData.devices.filter((d) => d !== device);
+		} else {
+			applicationData.devices = [...applicationData.devices, device];
+		}
+	}
+
+	// Handle training app selection
+	function toggleApp(app: string) {
+		if (applicationData.trainingApps.includes(app)) {
+			applicationData.trainingApps = applicationData.trainingApps.filter((a) => a !== app);
+		} else {
+			applicationData.trainingApps = [...applicationData.trainingApps, app];
+		}
 	}
 </script>
 
 <svelte:head>
-	<title>Smart Triathlete - Neural Authentication</title>
-	<meta name="description" content="Access your neural triathlon training system" />
+	<title>LaufplanerPro - Elite Athlete Application</title>
+	<meta name="description" content="Professional triathlon training platform application" />
 </svelte:head>
 
 <div class="auth-container">
@@ -218,125 +349,484 @@
 	<header class="auth-header">
 		<div class="logo">
 			<div class="icon-neural"></div>
-			<span class="logo-text">Smart Triathlete</span>
+			<span class="logo-text">LaufplanerPro</span>
 		</div>
-		<p class="subtitle">Neural Training System</p>
+		<p class="subtitle">Elite Training Platform</p>
 	</header>
 
-	<!-- Main Auth Card -->
+	<!-- Main Content -->
 	<main class="auth-main">
+		{#if currentStep === 'login'}		<!-- Login Form -->
 		<div class="auth-card">
 			<div class="auth-form-header">
-				<h1>{isLogin ? 'Neural Access' : 'Initialize Profile'}</h1>
-				<p class="form-subtitle">
-					{isLogin
-						? 'Connect to your training neural network'
-						: 'Create your quantum athlete profile'}
-				</p>
+				<h1>Member Login</h1>
+				<p class="form-subtitle">Access for approved athletes</p>
 			</div>
 
 			{#if error}
 				<div class="alert error">
-					<div class="icon-error"></div>
-					<span>{error}</span>
+					<span class="alert-icon">⚠️</span>
+					{error}
 				</div>
 			{/if}
 
 			{#if success}
 				<div class="alert success">
-					<div class="icon-check"></div>
-					<span>{success}</span>
+					<span class="alert-icon">✅</span>
+					{success}
 				</div>
 			{/if}
 
-			<form on:submit|preventDefault={handleSubmit} class="auth-form">
+			<form on:submit|preventDefault={handleLogin} class="auth-form">
 				<div class="form-group">
-					<label for="email">Neural ID (Email)</label>
+					<label for="email">Email</label>
 					<input
-						type="email"
 						id="email"
+						type="email"
 						bind:value={email}
-						placeholder="athlete@neural.training"
+						placeholder="your.email@domain.com"
 						required
 						disabled={loading}
 					/>
 				</div>
 
 				<div class="form-group">
-					<label for="password">Quantum Key (Password)</label>
+					<label for="password">Password</label>
 					<input
-						type="password"
 						id="password"
+						type="password"
 						bind:value={password}
-						placeholder="Enter your quantum key"
+						placeholder="••••••••"
 						required
 						disabled={loading}
 					/>
 				</div>
-				{#if !isLogin}
-					<div class="form-group">
-						<label for="name">Neural Identity (Name)</label>
-						<input
-							type="text"
-							id="name"
-							bind:value={name}
-							placeholder="Enter your neural identity"
-							required
-							disabled={loading}
-						/>
-					</div>
-					<div class="form-group">
-						<label for="confirmPassword">Confirm Quantum Key</label>
-						<input
-							type="password"
-							id="confirmPassword"
-							bind:value={confirmPassword}
-							placeholder="Confirm your quantum key"
-							required
-							disabled={loading}
-						/>
-					</div>
-				{/if}
 
-				<button type="submit" class="auth-submit" disabled={loading}>
-					{#if loading}
-						<div class="icon-sync loading"></div>
-						{isLogin ? 'Connecting...' : 'Initializing...'}
-					{:else}
-						{isLogin ? 'Establish Connection' : 'Initialize Profile'}
-					{/if}
+				<button type="submit" class="btn-primary" disabled={loading}>
+					{loading ? 'Signing in...' : 'Sign In'}
 				</button>
 			</form>
 
-			<div class="auth-actions">
-				<button type="button" class="toggle-mode" on:click={toggleMode}>
-					{isLogin ? 'Need to create a profile?' : 'Already have a profile?'}
-					<span class="toggle-text">
-						{isLogin ? 'Initialize new account' : 'Access existing account'}
-					</span>
-				</button>
+			<div class="auth-divider">
+				<span>or</span>
+			</div>
 
-				{#if isLogin}
-					<button type="button" class="demo-access" on:click={handleDemoLogin}>
-						<div class="icon-quantum"></div>
-						Demo Neural Access
-					</button>
-				{/if}
+			<button on:click={fillDemoCredentials} class="btn-demo" disabled={loading}>
+				🚀 Demo Neural Access
+			</button>
+
+			<div class="auth-footer">
+				<p>Not a member yet?</p>
+				<button on:click={showApplicationForm} class="btn-link">
+					Apply for access now →
+				</button>
 			</div>
 		</div>
-	</main>
+		{:else if currentStep === 'apply'}		<!-- Application Form -->
+		<div class="application-card">
+			<div class="application-header">
+				<button on:click={backToLogin} class="back-btn">← Back</button>
+				<div>
+					<h1>LaufplanerPro Application</h1>
+					<p class="form-subtitle">Elite Triathlon Training Platform</p>
+				</div>
+			</div>
 
-	<!-- Footer -->
-	<footer class="auth-footer">
-		<p>© 2025 Smart Triathlete - Neural Training System</p>
-		<div class="footer-links">
-			<a href="/">Home</a>
-			<span>•</span>
-			<span class="disabled">About</span>
-			<span>•</span>
-			<span class="disabled">Privacy</span>
-		</div>
-	</footer>
+			{#if error}
+				<div class="alert error">
+					<span class="alert-icon">⚠️</span>
+					{error}
+				</div>
+			{/if}
+
+			<form on:submit|preventDefault={submitApplication} class="application-form">
+				<!-- Personal Information -->
+				<section class="form-section">
+					<h2>👤 Personal Information</h2>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="firstName">First Name *</label>
+							<input id="firstName" type="text" bind:value={applicationData.firstName} required />
+						</div>
+						<div class="form-group">
+							<label for="lastName">Last Name *</label>
+							<input id="lastName" type="text" bind:value={applicationData.lastName} required />
+						</div>
+						</div>
+						<div class="form-row">						<div class="form-group">
+							<label for="email">Email *</label>
+							<input id="email" type="email" bind:value={applicationData.email} required />
+						</div>
+						<div class="form-group">
+							<label for="phone">Phone</label>
+							<input id="phone" type="tel" bind:value={applicationData.phone} />
+						</div>
+						</div>
+						<div class="form-row">						<div class="form-group">
+							<label for="birthDate">Date of Birth *</label>
+							<input id="birthDate" type="date" bind:value={applicationData.birthDate} required />
+						</div>
+						<div class="form-group">
+							<label for="gender">Gender</label>
+							<select id="gender" bind:value={applicationData.gender}>
+								<option value="">Please select</option>
+								<option value="m">Male</option>
+								<option value="w">Female</option>
+								<option value="d">Other</option>
+							</select>
+						</div>
+						</div>					<div class="form-group">
+						<label for="location">Location</label>
+						<input
+							id="location"
+							type="text"
+							bind:value={applicationData.location}
+							placeholder="City, Country"
+						/>
+					</div>
+				</section>
+
+				<!-- Athletic Background -->
+				<section class="form-section">
+					<h2>🏃‍♂️ Athletic Background</h2>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="experience">Training Experience (Years) *</label>
+								<input
+									id="experience"
+									type="number"
+									bind:value={applicationData.experience}
+									min="0"
+									max="50"
+									required
+								/>
+							</div>
+							<div class="form-group">
+								<label for="primaryDiscipline">Primary Discipline *</label>
+								<select
+									id="primaryDiscipline"
+									bind:value={applicationData.primaryDiscipline}
+									required
+								>
+									<option value="">Please select</option>
+									<option value="triathlon">Triathlon</option>
+									<option value="running">Running</option>
+									<option value="cycling">Cycling</option>
+									<option value="swimming">Swimming</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="currentLevel">Current Level *</label>
+								<select id="currentLevel" bind:value={applicationData.currentLevel} required>
+									<option value="">Please select</option>
+									<option value="beginner">Beginner</option>
+									<option value="amateur">Amateur</option>
+									<option value="competitive">Competitive</option>
+									<option value="elite">Elite/Professional</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="weeklyTrainingHours">Weekly Training Hours</label>
+								<input
+									id="weeklyTrainingHours"
+									type="number"
+									bind:value={applicationData.weeklyTrainingHours}
+									min="1"
+									max="40"
+								/>
+							</div>
+						</div>
+					</section>
+
+					<!-- Performance Data -->
+					<section class="form-section">
+						<h2>📊 Leistungsdaten</h2>
+						<h3>🏃‍♂️ Laufen</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="best5k">Beste 5km Zeit</label>
+								<input
+									id="best5k"
+									type="text"
+									bind:value={applicationData.best5kTime}
+									placeholder="z.B. 20:15"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="best10k">Beste 10km Zeit</label>
+								<input
+									id="best10k"
+									type="text"
+									bind:value={applicationData.best10kTime}
+									placeholder="z.B. 42:30"
+								/>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="bestHalf">Beste Halbmarathon Zeit</label>
+								<input
+									id="bestHalf"
+									type="text"
+									bind:value={applicationData.bestHalfMarathonTime}
+									placeholder="z.B. 1:35:20"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="bestMarathon">Beste Marathon Zeit</label>
+								<input
+									id="bestMarathon"
+									type="text"
+									bind:value={applicationData.bestMarathonTime}
+									placeholder="z.B. 3:20:45"
+								/>
+							</div>
+						</div>
+
+						<h3>🏊‍♂️ Schwimmen</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="best50free">Beste 50m Freistil</label>
+								<input
+									id="best50free"
+									type="text"
+									bind:value={applicationData.best50mFree}
+									placeholder="z.B. 0:35"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="best100free">Beste 100m Freistil</label>
+								<input
+									id="best100free"
+									type="text"
+									bind:value={applicationData.best100mFree}
+									placeholder="z.B. 1:15"
+								/>
+							</div>
+						</div>
+
+						<h3>🚴‍♂️ Triathlon</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="bestSprint">Beste Sprint-Triathlon Zeit</label>
+								<input
+									id="bestSprint"
+									type="text"
+									bind:value={applicationData.bestSprintTriTime}
+									placeholder="z.B. 1:05:30"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="bestOlympic">Beste Olympic-Triathlon Zeit</label>
+								<input
+									id="bestOlympic"
+									type="text"
+									bind:value={applicationData.bestOlympicTriTime}
+									placeholder="z.B. 2:15:45"
+								/>
+							</div>
+						</div>
+					</section>
+
+					<!-- Physiological Data -->
+					<section class="form-section">
+						<h2>📈 Physiologische Daten</h2>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="restingHR">Ruhepuls (bpm)</label>
+								<input
+									id="restingHR"
+									type="number"
+									bind:value={applicationData.restingHR}
+									min="30"
+									max="100"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="maxHR">Maximalpuls (bpm)</label>
+								<input
+									id="maxHR"
+									type="number"
+									bind:value={applicationData.maxHR}
+									min="120"
+									max="220"
+								/>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="ftp">FTP - Functional Threshold Power (Watt)</label>
+								<input
+									id="ftp"
+									type="number"
+									bind:value={applicationData.ftp}
+									min="100"
+									max="500"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="vo2max">VO2Max (ml/kg/min)</label>
+								<input
+									id="vo2max"
+									type="number"
+									bind:value={applicationData.vo2Max}
+									min="30"
+									max="90"
+								/>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="weight">Gewicht (kg)</label>
+								<input
+									id="weight"
+									type="number"
+									bind:value={applicationData.weight}
+									min="40"
+									max="150"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="height">Größe (cm)</label>
+								<input
+									id="height"
+									type="number"
+									bind:value={applicationData.height}
+									min="140"
+									max="220"
+								/>
+							</div>
+						</div>
+					</section>
+
+					<!-- Goals & Motivation -->
+					<section class="form-section">
+						<h2>🎯 Ziele & Motivation</h2>
+						<div class="form-group">
+							<label for="goals2025">Ihre Ziele für 2025 *</label>
+							<textarea
+								id="goals2025"
+								bind:value={applicationData.goals2025}
+								placeholder="Beschreiben Sie Ihre sportlichen Ziele für 2025..."
+								rows="3"
+								required
+							></textarea>
+						</div>
+						<div class="form-group">
+							<label for="targetRaces">Planned Races 2025</label>
+							<textarea
+								id="targetRaces"
+								bind:value={applicationData.targetRaces}
+								placeholder="Which races do you plan to participate in?"
+								rows="3"
+							></textarea>
+						</div>
+						<div class="form-group">
+							<label for="motivation">Why do you want to use LaufplanerPro? *</label>
+							<textarea
+								id="motivation"
+								bind:value={applicationData.motivation}
+								placeholder="What motivates you and how can we help you achieve your goals?"
+								rows="4"
+								required
+							></textarea>
+						</div>
+					</section>
+
+					<!-- Technology & Equipment -->
+					<section class="form-section">
+						<h2>📱 Technology & Equipment</h2>
+						<div class="form-group">
+							<fieldset>
+								<legend>Training Devices/Apps Used</legend>
+								<div class="checkbox-grid">
+									{#each ['Garmin', 'Wahoo', 'Polar', 'Suunto', 'Apple Watch', 'Strava', 'TrainingPeaks', 'Zwift'] as device}
+										<label class="checkbox-item">
+											<input
+												type="checkbox"
+												checked={applicationData.devices.includes(device)}
+												on:change={() => toggleDevice(device)}
+											/>
+											{device}
+										</label>
+									{/each}
+								</div>
+							</fieldset>
+						</div>
+					</section>
+
+					<!-- Additional Information -->
+					<section class="form-section">
+						<h2>ℹ️ Zusätzliche Informationen</h2>
+						<div class="form-group">
+							<label for="coach">Trainer/Coach</label>
+							<input
+								id="coach"
+								type="text"
+								bind:value={applicationData.coach}
+								placeholder="Name des Trainers (falls vorhanden)"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="teamClub">Verein/Team</label>
+							<input
+								id="teamClub"
+								type="text"
+								bind:value={applicationData.teamClub}
+								placeholder="Vereinszugehörigkeit"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="referralSource">Wie haben Sie von uns erfahren?</label>
+							<select id="referralSource" bind:value={applicationData.referralSource}>
+								<option value="">Bitte wählen</option>
+								<option value="google">Google Suche</option>
+								<option value="social">Social Media</option>
+								<option value="friend">Freunde/Bekannte</option>
+								<option value="coach">Trainer-Empfehlung</option>
+								<option value="other">Sonstiges</option>
+							</select>
+						</div>
+					</section>
+
+					<div class="form-actions">
+						<button type="button" on:click={backToLogin} class="btn-secondary"> Abbrechen </button>
+						<button type="submit" class="btn-primary" disabled={loading}>
+							{loading ? 'Submitting application...' : 'Submit Application'}
+						</button>
+					</div>
+				</form>
+			</div>
+		{:else if currentStep === 'submitted'}
+			<!-- Success Message -->
+			<div class="success-card">
+				<div class="success-icon">✅</div>
+				<h1>Application Submitted!</h1>
+				<div class="success-content">
+					<p><strong>Thank you for your application!</strong></p>
+					<p>Your application has been successfully submitted and will be reviewed by our team.</p>
+
+					<div class="next-steps">
+						<h3>What happens next?</h3>
+						<ol>
+							<li><strong>Review:</strong> Our team will review your application within 48 hours</li>
+							<li><strong>Notification:</strong> You will receive an email with our decision</li>
+							<li><strong>Access:</strong> If accepted, you will receive your login credentials</li>
+						</ol>
+					</div>
+
+					<div class="contact-info">
+						<p><strong>Questions?</strong> Contact us at:</p>
+						<p>📧 info@laufplanerpro.de</p>
+					</div>
+				</div>
+
+				<button on:click={backToLogin} class="btn-primary"> Back to Login </button>
+			</div>
+		{/if}
+	</main>
 </div>
 
 <style>
@@ -353,7 +843,7 @@
 		color: var(--neural-text);
 		font-family: var(--font-neural);
 		position: relative;
-		overflow: hidden;
+		overflow-x: hidden;
 		font-weight: 300;
 	}
 
@@ -378,23 +868,30 @@
 		}
 	}
 
-	/* Neural Icons */
-	.icon-neural,
-	.icon-quantum,
-	.icon-sync,
-	.icon-check,
-	.icon-error {
-		width: 24px;
-		height: 24px;
-		border-radius: 6px;
+	/* Header */
+	.auth-header {
+		text-align: center;
+		padding: 3rem 2rem 2rem;
 		position: relative;
-		flex-shrink: 0;
+		z-index: 2;
+	}
+
+	.logo {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		margin-bottom: 1rem;
 	}
 
 	.icon-neural {
+		width: 40px;
+		height: 40px;
+		border-radius: 10px;
 		background: radial-gradient(circle at center, var(--neural-accent) 30%, transparent 70%);
 		border: 1px solid var(--neural-accent);
 		animation: neuralPulse 2s ease-in-out infinite;
+		position: relative;
 	}
 
 	.icon-neural:before {
@@ -402,78 +899,12 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		width: 8px;
-		height: 8px;
+		width: 12px;
+		height: 12px;
 		background: var(--neural-accent);
 		border-radius: 50%;
 		transform: translate(-50%, -50%);
 		animation: pulse 1.5s ease-in-out infinite;
-	}
-
-	.icon-quantum {
-		background: linear-gradient(45deg, var(--neural-accent), var(--neural-secondary));
-		border-radius: 50%;
-		position: relative;
-		margin-right: 0.5rem;
-	}
-
-	.icon-quantum:before {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 6px;
-		height: 6px;
-		background: var(--neural-bg);
-		border-radius: 50%;
-		transform: translate(-50%, -50%);
-		animation: quantumSpin 3s linear infinite;
-	}
-
-	.icon-sync {
-		background: var(--neural-accent);
-		border-radius: 50%;
-		margin-right: 0.5rem;
-	}
-
-	.icon-sync.loading {
-		animation: rotate 1s linear infinite;
-	}
-
-	.icon-check {
-		background: #4caf50;
-		border-radius: 50%;
-		position: relative;
-		margin-right: 0.5rem;
-	}
-
-	.icon-check:before {
-		content: '✓';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		color: white;
-		font-size: 12px;
-		font-weight: bold;
-	}
-
-	.icon-error {
-		background: #ff4444;
-		border-radius: 50%;
-		position: relative;
-		margin-right: 0.5rem;
-	}
-
-	.icon-error:before {
-		content: '!';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		color: white;
-		font-size: 12px;
-		font-weight: bold;
 	}
 
 	@keyframes neuralPulse {
@@ -498,40 +929,6 @@
 		}
 	}
 
-	@keyframes quantumSpin {
-		from {
-			transform: translate(-50%, -50%) rotate(0deg);
-		}
-		to {
-			transform: translate(-50%, -50%) rotate(360deg);
-		}
-	}
-
-	@keyframes rotate {
-		from {
-			transform: rotate(0deg);
-		}
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	/* Header */
-	.auth-header {
-		text-align: center;
-		padding: 3rem 2rem 2rem;
-		position: relative;
-		z-index: 2;
-	}
-
-	.logo {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 1rem;
-		margin-bottom: 1rem;
-	}
-
 	.logo-text {
 		font-size: 2.5rem;
 		font-weight: 200;
@@ -550,7 +947,7 @@
 		margin: 0;
 	}
 
-	/* Main Auth Card */
+	/* Main Content */
 	.auth-main {
 		flex: 1;
 		display: flex;
@@ -561,6 +958,7 @@
 		z-index: 2;
 	}
 
+	/* Auth Card (Login) */
 	.auth-card {
 		width: 100%;
 		max-width: 480px;
@@ -574,18 +972,75 @@
 		animation: slideUp 0.8s ease forwards;
 	}
 
+	/* Application Card */
+	.application-card {
+		width: 100%;
+		max-width: 900px;
+		background: var(--neural-glass);
+		backdrop-filter: blur(20px);
+		border: 1px solid var(--neural-border);
+		border-radius: 24px;
+		padding: 3rem;
+		box-shadow: var(--neural-shadow);
+		transform: translateY(20px);
+		animation: slideUp 0.8s ease forwards;
+	}
+
+	/* Success Card */
+	.success-card {
+		width: 100%;
+		max-width: 600px;
+		background: var(--neural-glass);
+		backdrop-filter: blur(20px);
+		border: 1px solid var(--neural-border);
+		border-radius: 24px;
+		padding: 3rem;
+		box-shadow: var(--neural-shadow);
+		text-align: center;
+		transform: translateY(20px);
+		animation: slideUp 0.8s ease forwards;
+	}
+
 	@keyframes slideUp {
 		to {
 			transform: translateY(0);
 		}
 	}
 
-	.auth-form-header {
-		text-align: center;
-		margin-bottom: 2.5rem;
+	/* Application Header */
+	.application-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 3rem;
 	}
 
-	.auth-form-header h1 {
+	.back-btn {
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		color: var(--neural-text);
+		padding: 0.75rem 1rem;
+		border-radius: 12px;
+		cursor: pointer;
+		transition: all var(--neural-transition);
+		font-size: 0.9rem;
+		font-weight: 300;
+	}
+
+	.back-btn:hover {
+		background: var(--neural-hover);
+		transform: translateY(-2px);
+	}
+
+	/* Form Headers */
+	.auth-form-header,
+	.application-header > div {
+		flex: 1;
+		text-align: center;
+	}
+
+	.auth-form-header h1,
+	.application-header h1 {
 		font-size: 2rem;
 		font-weight: 200;
 		margin: 0 0 1rem 0;
@@ -627,18 +1082,61 @@
 		color: #4caf50;
 	}
 
-	/* Form */
-	.auth-form {
+	.alert-icon {
+		font-size: 1.2rem;
+	}
+
+	/* Form Styles */
+	.auth-form,
+	.application-form {
 		display: flex;
 		flex-direction: column;
 		gap: 2rem;
-		margin-bottom: 2.5rem;
 	}
 
+	.application-form {
+		gap: 3rem;
+	}
+
+	/* Form Sections */
+	.form-section {
+		border: 1px solid var(--neural-border);
+		border-radius: 16px;
+		padding: 2rem;
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.form-section h2 {
+		font-size: 1.3rem;
+		font-weight: 300;
+		margin: 0 0 1.5rem 0;
+		color: var(--neural-accent);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.form-section h3 {
+		font-size: 1.1rem;
+		font-weight: 300;
+		margin: 2rem 0 1rem 0;
+		color: var(--neural-text);
+		opacity: 0.9;
+		border-bottom: 1px solid var(--neural-border);
+		padding-bottom: 0.5rem;
+	}
+
+	/* Form Groups */
 	.form-group {
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
+	}
+
+	.form-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
 	}
 
 	.form-group label {
@@ -649,8 +1147,10 @@
 		color: var(--neural-text);
 	}
 
-	.form-group input {
-		padding: 1.25rem;
+	.form-group input,
+	.form-group select,
+	.form-group textarea {
+		padding: 1rem;
 		background: var(--neural-glass);
 		border: 1px solid var(--neural-border);
 		border-radius: 12px;
@@ -659,27 +1159,80 @@
 		font-weight: 300;
 		letter-spacing: 0.01em;
 		transition: all var(--neural-transition);
+		font-family: inherit;
 	}
 
-	.form-group input::placeholder {
+	.form-group fieldset {
+		border: 1px solid var(--neural-border);
+		border-radius: 12px;
+		padding: 1rem;
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.form-group legend {
+		font-size: 0.9rem;
+		font-weight: 300;
+		letter-spacing: 0.02em;
+		opacity: 0.9;
+		color: var(--neural-text);
+		padding: 0 0.5rem;
+	}
+
+	.form-group textarea {
+		resize: vertical;
+		min-height: 100px;
+	}
+
+	.form-group input::placeholder,
+	.form-group textarea::placeholder {
 		color: rgba(255, 255, 255, 0.5);
 		font-weight: 300;
 	}
 
-	.form-group input:focus {
+	.form-group input:focus,
+	.form-group select:focus,
+	.form-group textarea:focus {
 		outline: none;
 		border-color: var(--neural-accent);
 		box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
 		background: var(--neural-hover);
 	}
 
-	.form-group input:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
+	/* Checkbox Grid */
+	.checkbox-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 1rem;
+		margin-top: 1rem;
 	}
 
-	/* Submit Button */
-	.auth-submit {
+	.checkbox-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-radius: 12px;
+		cursor: pointer;
+		transition: all var(--neural-transition);
+		font-size: 0.9rem;
+		font-weight: 300;
+	}
+
+	.checkbox-item:hover {
+		background: var(--neural-hover);
+		border-color: var(--neural-accent);
+	}
+
+	.checkbox-item input[type='checkbox'] {
+		width: 16px;
+		height: 16px;
+		accent-color: var(--neural-accent);
+	}
+
+	/* Buttons */
+	.btn-primary {
 		padding: 1.25rem 2rem;
 		background: var(--neural-gradient);
 		border: none;
@@ -696,51 +1249,36 @@
 		gap: 0.75rem;
 	}
 
-	.auth-submit:hover:not(:disabled) {
+	.btn-primary:hover:not(:disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
 	}
 
-	.auth-submit:disabled {
+	.btn-primary:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
 		transform: none;
 	}
 
-	/* Auth Actions */
-	.auth-actions {
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-		text-align: center;
-	}
-
-	.toggle-mode {
-		background: none;
-		border: none;
+	.btn-secondary {
+		padding: 1rem 2rem;
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-radius: 12px;
 		color: var(--neural-text);
-		cursor: pointer;
-		font-size: 0.9rem;
+		font-size: 1rem;
 		font-weight: 300;
-		letter-spacing: 0.01em;
-		padding: 0.75rem;
+		letter-spacing: 0.02em;
+		cursor: pointer;
 		transition: all var(--neural-transition);
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
 	}
 
-	.toggle-mode:hover {
-		color: var(--neural-accent);
+	.btn-secondary:hover {
+		background: var(--neural-hover);
+		transform: translateY(-2px);
 	}
 
-	.toggle-text {
-		font-size: 0.8rem;
-		opacity: 0.7;
-		color: var(--neural-accent);
-	}
-
-	.demo-access {
+	.btn-demo {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -754,71 +1292,155 @@
 		letter-spacing: 0.02em;
 		cursor: pointer;
 		transition: all var(--neural-transition);
+		width: 100%;
 	}
 
-	.demo-access:hover {
+	.btn-demo:hover {
 		background: var(--neural-hover);
 		transform: translateY(-2px);
 		box-shadow: var(--neural-shadow);
 	}
 
-	/* Footer */
-	.auth-footer {
-		padding: 2rem;
+	.btn-link {
+		background: none;
+		border: none;
+		color: var(--neural-accent);
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: 300;
+		letter-spacing: 0.01em;
+		transition: color var(--neural-transition);
+	}
+
+	.btn-link:hover {
+		color: var(--neural-text);
+	}
+
+	/* Auth Divider */
+	.auth-divider {
+		display: flex;
+		align-items: center;
 		text-align: center;
-		border-top: 1px solid var(--neural-border);
-		position: relative;
-		z-index: 2;
+		margin: 1.5rem 0;
+		font-size: 0.9rem;
+		opacity: 0.7;
+	}
+
+	.auth-divider::before,
+	.auth-divider::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: var(--neural-border);
+	}
+
+	.auth-divider span {
+		padding: 0 1rem;
+	}
+
+	/* Auth Footer */
+	.auth-footer {
+		text-align: center;
+		margin-top: 2rem;
 	}
 
 	.auth-footer p {
 		margin: 0 0 1rem 0;
-		font-size: 0.8rem;
-		opacity: 0.7;
-		font-weight: 300;
-		letter-spacing: 0.01em;
+		font-size: 0.9rem;
+		opacity: 0.8;
 	}
 
-	.footer-links {
+	/* Form Actions */
+	.form-actions {
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 1rem;
-		font-size: 0.8rem;
+		gap: 1.5rem;
+		justify-content: flex-end;
+		margin-top: 2rem;
+		padding-top: 2rem;
+		border-top: 1px solid var(--neural-border);
+	}
+
+	/* Success Content */
+	.success-icon {
+		font-size: 4rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.success-content {
+		text-align: left;
+		margin: 2rem 0;
+	}
+
+	.success-content p {
+		margin: 0 0 1rem 0;
+		line-height: 1.6;
+	}
+
+	.next-steps {
+		background: var(--neural-glass);
+		border: 1px solid var(--neural-border);
+		border-radius: 12px;
+		padding: 2rem;
+		margin: 2rem 0;
+	}
+
+	.next-steps h3 {
+		margin: 0 0 1rem 0;
+		color: var(--neural-accent);
 		font-weight: 300;
 	}
 
-	.footer-links a {
-		color: var(--neural-accent);
-		text-decoration: none;
-		transition: color var(--neural-transition);
-	}
-	.footer-links a:hover {
-		color: var(--neural-text);
+	.next-steps ol {
+		margin: 0;
+		padding-left: 1.5rem;
 	}
 
-	.footer-links span.disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-		color: var(--neural-accent);
+	.next-steps li {
+		margin: 0.75rem 0;
+		line-height: 1.5;
 	}
 
-	.footer-links span {
-		opacity: 0.5;
+	.contact-info {
+		background: rgba(0, 212, 255, 0.1);
+		border: 1px solid rgba(0, 212, 255, 0.3);
+		border-radius: 12px;
+		padding: 1.5rem;
+		margin: 2rem 0;
 	}
 
 	/* Responsive Design */
 	@media (max-width: 768px) {
-		.auth-card {
+		.auth-card,
+		.application-card {
 			padding: 2rem;
 			margin: 1rem;
+		}
+
+		.form-row {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		.checkbox-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.form-actions {
+			flex-direction: column;
+		}
+
+		.application-header {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 1.5rem;
 		}
 
 		.logo-text {
 			font-size: 2rem;
 		}
 
-		.auth-form-header h1 {
+		.auth-form-header h1,
+		.application-header h1 {
 			font-size: 1.5rem;
 		}
 	}
@@ -832,7 +1454,12 @@
 			padding: 1rem;
 		}
 
-		.auth-card {
+		.auth-card,
+		.application-card {
+			padding: 1.5rem;
+		}
+
+		.form-section {
 			padding: 1.5rem;
 		}
 

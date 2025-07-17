@@ -40,19 +40,19 @@
 	});
 
 	function showMonthlyView() {
-		alert('Monatsansicht wird geladen...');
+		alert('Loading monthly view...');
 		// Here would be monthly view logic
 	}
 
 	function showYearlyView() {
-		alert('Jahresansicht wird geladen...');
+		alert('Loading yearly view...');
 		// Here would be yearly view logic
 	}
 </script>
 
 <svelte:head>
 	<title>Analytics - LaufplanerPro</title>
-	<meta name="description" content="Detaillierte Leistungsanalyse und Trends" />
+	<meta name="description" content="Detailed performance analysis and trends" />
 </svelte:head>
 
 {#if mounted}
@@ -61,27 +61,27 @@
 	<div class="analytics-page">
 		<div class="container">
 			<header class="page-header">
-				<h1>Analytics & Leistungsanalyse</h1>
-				<p>Detaillierte Auswertung Ihrer Trainingsdaten und Leistungstrends</p>
+				<h1>Analytics & Performance Analysis</h1>
+				<p>Detailed analysis of your training data and performance trends</p>
 			</header>
 
 			<div class="analytics-grid">
 				<div class="analytics-card">
 					<h2>📈 Performance Trends</h2>
-					<p>Langzeit-Leistungsentwicklung und Verbesserungen</p>
+					<p>Long-term performance development and improvements</p>
 					<div class="placeholder-chart">
 						<div class="chart-line"></div>
 						<div class="chart-data">
 							<span>VO2 Max: 68.5 ml/kg/min (+2.1 seit letztem Jahr)</span>
 							<span>FTP: 285W (+15W seit letztem Test)</span>
-							<span>Lauf-Schwelle: 3:45/km (-8s Verbesserung)</span>
+							<span>Running Threshold: 3:45/km (-8s improvement)</span>
 						</div>
 					</div>
 				</div>
 
 				<div class="analytics-card">
 					<h2>📊 Training Load Analysis</h2>
-					<p>TSS, CTL, ATL und Form-Entwicklung</p>
+					<p>TSS, CTL, ATL and form development</p>
 					<div class="training-metrics">
 						<div class="metric">
 							<span class="label">Chronic Training Load (CTL)</span>
@@ -104,17 +104,17 @@
 					<div class="sport-breakdown">
 						<div class="sport-item">
 							<span class="sport-icon">🏊‍♂️</span>
-							<span class="sport-name">Schwimmen</span>
+							<span class="sport-name">Swimming</span>
 							<span class="percentage">25%</span>
 						</div>
 						<div class="sport-item">
 							<span class="sport-icon">🚴‍♂️</span>
-							<span class="sport-name">Radfahren</span>
+							<span class="sport-name">Cycling</span>
 							<span class="percentage">45%</span>
 						</div>
 						<div class="sport-item">
 							<span class="sport-icon">🏃‍♂️</span>
-							<span class="sport-name">Laufen</span>
+							<span class="sport-name">Running</span>
 							<span class="percentage">30%</span>
 						</div>
 					</div>
@@ -122,7 +122,7 @@
 
 				<div class="analytics-card">
 					<h2>🎯 Zone Distribution</h2>
-					<p>Trainingsintensität und Zonenverteilung</p>
+					<p>Training intensity and zone distribution</p>
 					<div class="zone-chart">
 						<div class="zone-bar zone-1" style="width: 45%">Zone 1-2: 45%</div>
 						<div class="zone-bar zone-3" style="width: 25%">Zone 3: 25%</div>

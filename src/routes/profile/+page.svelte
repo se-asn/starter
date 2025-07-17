@@ -7,16 +7,25 @@
 	let user: any = null;
 
 	onMount(() => {
-		// Check authentication
-		const token = localStorage.getItem('authToken');
-		if (!token) {
-			goto('/auth');
-			return;
-		}
+		// Check authentication - support both demo and real users
+		if (localStorage.getItem('demoMode') === 'true') {
+			// Demo mode
+			const userData = localStorage.getItem('user');
+			if (userData) {
+				user = JSON.parse(userData);
+			}
+		} else {
+			// Check for authToken (real users)
+			const token = localStorage.getItem('authToken');
+			if (!token) {
+				goto('/auth');
+				return;
+			}
 
-		const userData = localStorage.getItem('user');
-		if (userData) {
-			user = JSON.parse(userData);
+			const userData = localStorage.getItem('user');
+			if (userData) {
+				user = JSON.parse(userData);
+			}
 		}
 	});
 </script>
